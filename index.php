@@ -24,7 +24,7 @@ include 'header.php';
 // ?>
 
 <!-- Hero Section with Parallax Effect -->
-<div class="hero-section text-center py-5 mb-5 parallax-window" data-parallax="scroll" data-image-src="assets/images/hero-bg.jpg">
+<div class="hero-section text-center py-5 mb-5 parallax-window" data-parallax="scroll" data-image-src="assets/images/hero-bg.jpg" style="background-size: cover; background-position: center;">
     <div class="container">
         <h1 class="display-4 mb-4 animate__animated animate__fadeInDown">Welcome to Ultrakey  Learning</h1>
         <p class="lead mb-4 animate__animated animate__fadeInUp">Empower your future with our cutting-edge online courses</p>

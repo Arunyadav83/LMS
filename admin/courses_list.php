@@ -38,9 +38,36 @@ $courses = mysqli_fetch_all($result, MYSQLI_ASSOC);
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
 </head>
 <style>
-    .mb-4{
-        color: #f3899d;
+    .mb-4 {
+        /* color: #f3899d;
+        margin-left: 10px;
+        color:; */
     }
+    h1
+    {
+        color:navy;
+    }
+    .card-title {
+        color: black;
+    }
+    body {
+        background-color:lightblue;
+        border-radius: 10px;
+        
+    }
+    .btn-navy {
+    background-color: navy;
+    color: white;
+    border: none;
+}
+.btn-navy:hover {
+    background-color: #fff;
+    color: navy;
+     /* A darker shade of navy for hover effect */
+}
+.card {
+    min-height: 200px; /* Set a minimum height for the cards */
+}
 </style>
 <body>
     <!-- Navigation Bar -->
@@ -75,40 +102,53 @@ $courses = mysqli_fetch_all($result, MYSQLI_ASSOC);
                     
                     <!-- Add this just before the table in the main content section -->
                     <div class="mb-3">
-                        <a href="add_course.php" class="btn btn-success">Add New Course</a>
+                        <a href="add_course.php" class="btn btn-navy">Add New Course</a>
                     </div>
 
-                    <!-- Course List -->
-                    <table class="table table-striped">
-                        <thead>
-                            <tr>
-                                <th>ID</th>
-                                <th>Title</th>
-                                <th>Description</th>
-                                <th>Topics Covered</th>
-                                <th>Actions</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <?php foreach ($courses as $course): ?>
-                            <tr>
-                                <td><?php echo htmlspecialchars($course['id']); ?></td>
-                                <td><?php echo htmlspecialchars($course['title']); ?></td>
-                                <td><?php echo htmlspecialchars($course['description']); ?></td>
-                                <td><?php echo htmlspecialchars($course['topics']); ?></td>
-                                <td>
-                                    <div class="btn-group" role="group" aria-label="Course Actions">
-                                        <a href="edit_course.php?id=<?php echo $course['id']; ?>" class="btn btn-sm btn-primary me-2">Edit</a>
-                                        <form action="" method="post" class="d-inline" onsubmit="return confirm('Are you sure you want to delete this course?');">
-                                            <input type="hidden" name="course_id" value="<?php echo $course['id']; ?>">
-                                            <button type="submit" name="delete_course" class="btn btn-sm btn-danger">Delete</button>
-                                        </form>
+                    <!-- Course List (Replaced with Cards) -->
+                    <div class="row">
+                        <?php foreach ($courses as $course): ?>
+                        <div class="col-md-4 mb-4">
+                            <div class="card">
+                                <div class="card-body">
+                                    <h5 class="card-title text-black"><?php echo htmlspecialchars($course['title']); ?></h5>
+                                    <div class="position-relative" style="float: right; margin-top: -38px;background-color: #f3899d;">
+                                            <button class="btn btn-secondary" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                                <i class="fas fa-ellipsis-v"></i>
+                                            </button>
+                                            <ul class="dropdown-menu dropdown-menu-end">
+                                                <li><a class="dropdown-item" href="edit_course.php?id=<?php echo $course['id']; ?>"><i class="fas fa-pencil-alt"></i> Edit</a></li>
+                                                <li>
+                                                    <form action="" method="post" class="d-inline" onsubmit="return confirm('Are you sure you want to delete this course?');">
+                                                        <input type="hidden" name="course_id" value="<?php echo $course['id']; ?>">
+                                                        <button type="submit" name="delete_course" class="dropdown-item"><i class="fas fa-trash"></i> Delete</button>
+                                                    </form>
+                                                </li>
+                                            </ul>
+                                        </div>
+                                    <p class="card-text"><?php echo htmlspecialchars($course['description']); ?></p>
+                                    <div class="d-flex justify-content-between align-items-center">
+                                        <p class="card-text"><strong>Topics Covered:</strong> <?php echo htmlspecialchars($course['topics']); ?></p>
+                                        <!-- <div class="position-relative">
+                                            <button class="btn btn-secondary" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                                <i class="fas fa-ellipsis-v"></i>
+                                            </button>
+                                            <ul class="dropdown-menu dropdown-menu-end">
+                                                <li><a class="dropdown-item" href="edit_course.php?id=<?php echo $course['id']; ?>">Edit</a></li>
+                                                <li>
+                                                    <form action="" method="post" class="d-inline" onsubmit="return confirm('Are you sure you want to delete this course?');">
+                                                        <input type="hidden" name="course_id" value="<?php echo $course['id']; ?>">
+                                                        <button type="submit" name="delete_course" class="dropdown-item">Delete</button>
+                                                    </form>
+                                                </li>
+                                            </ul>
+                                        </div> -->
                                     </div>
-                                </td>
-                            </tr>
-                            <?php endforeach; ?>
-                        </tbody>
-                    </table>
+                                </div>
+                            </div>
+                        </div>
+                        <?php endforeach; ?>
+                    </div>
                 </div>
             </main>
         </div>

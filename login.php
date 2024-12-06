@@ -26,9 +26,9 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                 $_SESSION['user_role'] = 'student';
 
                 // Debug: Print session after setting
-                echo "<pre>";
-                print_r($_SESSION);
-                echo "</pre>";
+                // echo "<pre>";
+                // print_r($_SESSION);
+                // echo "</pre>";
 
                 // Redirect to index page
                 redirect('index.php');

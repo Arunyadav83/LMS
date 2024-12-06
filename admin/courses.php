@@ -76,7 +76,7 @@ $course_titles = mysqli_fetch_all($result, MYSQLI_ASSOC);
      <style>
         /* Add styles for the Add New Course section */
         #a {
-            color:  #00CED1 ; /* Change the color of the heading */
+            color:  navy ; /* Change the color of the heading */
             font-size: 2.5rem; /* Increase font size */
             margin-bottom: 20px; /* Add some space below the heading */
         }
@@ -92,6 +92,22 @@ $course_titles = mysqli_fetch_all($result, MYSQLI_ASSOC);
         /* Increase font size for the courses list */
         .courses-list th, .courses-list td {
             font-size: 1.1rem; /* Increase font size for table headers and cells */
+        }
+        body {
+            background-color: lightblue;
+        }
+        .btn-navy {
+            background-color:navy; /* Change to a darker purple */
+            color: #E6E6FA; /* Light lavender text color */
+            border: none; /* Remove border */
+            padding: 10px 20px; /* Add padding for a better look */
+            border-radius: 5px; /* Rounded corners */
+            font-size: 1rem; /* Adjust font size */
+        }
+        .btn-navy:hover {
+            background-color: #E6E6FA; /* Light lavender on hover */
+            color: #4B0082; /* Dark purple text on hover */
+            border: none; /* Keep border removed on hover */
         }
      </style>
 </head>
@@ -122,7 +138,7 @@ $course_titles = mysqli_fetch_all($result, MYSQLI_ASSOC);
             <?php include 'sidebar.php'; ?>
 
             <!-- Main Content -->
-            <main class="col-md-9 ms-sm-auto col-lg-10 px-md-4">
+            <main class="col-md-9 ms-sm-auto col-lg-10 px-md-4" style="background-color: lightblue;">
                 <div class="container mt-4">
                     <h1 class="mb-4">Courses</h1>
                     
@@ -151,82 +167,83 @@ $course_titles = mysqli_fetch_all($result, MYSQLI_ASSOC);
                                 <?php endforeach; ?>
                             </select>
                         </div>
-                        <button type="submit" name="add_course" class="btn btn-primary">Add Course</button>
+                        <button type="submit" name="add_course" class="btn btn-secondary">Add Course</button>
                     </form>
 
                     <!-- Courses List -->
                     <h2>Courses List</h2>
-                    <table class="table table-striped">
-                        <thead>
-                            <tr>
-                                <th>ID</th>
-                                <th>Title</th>
-                                <th>Description</th>
-                                <th>Tutor</th>
-                                <th>Actions</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <?php foreach ($courses as $course): ?>
-                            <tr>
-                                <td><?php echo htmlspecialchars($course['id']); ?></td>
-                                <td><?php echo htmlspecialchars($course['title']); ?></td>
-                                <td><?php echo htmlspecialchars($course['description']); ?></td>
-                                <td><?php echo htmlspecialchars($course['tutor_name']); ?></td>
-                                <td>
-                                    <div class="btn-group" role="group">
-                                        <button type="button" class="btn btn-sm btn-primary" data-bs-toggle="modal" data-bs-target="#editCourse<?php echo $course['id']; ?>">
-                                            Edit
+                    <div class="row">
+                        <?php foreach ($courses as $course): ?>
+                        <div class="col-md-4 mb-4">
+                            <div class="card">
+                                <div class="card-body">
+                                    <h5 class="card-title"><?php echo htmlspecialchars($course['title']); ?></h5>
+                                    <p class="card-text"><?php echo htmlspecialchars($course['description']); ?></p>
+                                    <p class="card-text"><strong>Tutor:</strong> <?php echo htmlspecialchars($course['tutor_name']); ?></p>
+                                    <div class="dropdown" style="position: absolute; right: 10px; top: 10px;">
+                                        <button class="btn btn-secondary" type="button" id="dropdownMenuButton<?php echo $course['id']; ?>" data-bs-toggle="dropdown" aria-expanded="false">
+                                            <i class="fas fa-ellipsis-v"></i>
                                         </button>
-                                        <form action="" method="post" class="d-inline">
-                                            <input type="hidden" name="id" value="<?php echo $course['id']; ?>">
-                                            <button type="submit" name="delete_course" class="btn btn-sm btn-danger" onclick="return confirm('Are you sure you want to delete this course?')">Delete</button>
-                                        </form>
-                                    </div>
-                                </td>
-                            </tr>
-
-                            <!-- Edit Course Modal -->
-                            <div class="modal fade" id="editCourse<?php echo $course['id']; ?>" tabindex="-1" aria-labelledby="editCourseLabel<?php echo $course['id']; ?>" aria-hidden="true">
-                                <div class="modal-dialog">
-                                    <div class="modal-content">
-                                        <div class="modal-header">
-                                            <h5 class="modal-title" id="editCourseLabel<?php echo $course['id']; ?>">Edit Course</h5>
-                                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                                        </div>
-                                        <div class="modal-body">
-                                            <form action="" method="post">
-                                                <input type="hidden" name="id" value="<?php echo $course['id']; ?>">
-                                                <div class="mb-3">
-                                                    <label for="edit_title_id<?php echo $course['id']; ?>" class="form-label">Title</label>
-                                                    <select class="form-control" id="edit_title_id<?php echo $course['id']; ?>" name="title_id" required>
-                                                        <?php foreach ($course_titles as $title): ?>
-                                                            <option value="<?php echo $title['id']; ?>" <?php echo ($title['title'] == $course['title']) ? 'selected' : ''; ?>><?php echo htmlspecialchars($title['title']); ?></option>
-                                                        <?php endforeach; ?>
-                                                    </select>
-                                                </div>
-                                                <div class="mb-3">
-                                                    <label for="edit_description<?php echo $course['id']; ?>" class="form-label">Description</label>
-                                                    <textarea class="form-control" id="edit_description<?php echo $course['id']; ?>" name="description" rows="3"><?php echo htmlspecialchars($course['description']); ?></textarea>
-                                                </div>
-                                                <div class="mb-3">
-                                                    <label for="edit_tutor_id<?php echo $course['id']; ?>" class="form-label">Tutor</label>
-                                                    <select class="form-control" id="edit_tutor_id<?php echo $course['id']; ?>" name="tutor_id" required>
-                                                        <option value="">Select Tutor</option>
-                                                        <?php foreach ($tutors as $tutor): ?>
-                                                            <option value="<?php echo $tutor['id']; ?>" <?php echo ($tutor['id'] == $course['tutor_id']) ? 'selected' : ''; ?>><?php echo htmlspecialchars($tutor['full_name']); ?></option>
-                                                        <?php endforeach; ?>
-                                                    </select>
-                                                </div>
-                                                <button type="submit" name="edit_course" class="btn btn-primary">Save Changes</button>
-                                            </form>
-                                        </div>
+                                        <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton<?php echo $course['id']; ?>">
+                                            <li>
+                                                <button class="dropdown-item" data-bs-toggle="modal" data-bs-target="#editCourse<?php echo $course['id']; ?>">
+                                                    <i class="fas fa-pencil-alt"></i> Edit
+                                                </button>
+                                            </li>
+                                            <li>
+                                                <form action="" method="post" class="d-inline">
+                                                    <input type="hidden" name="id" value="<?php echo $course['id']; ?>">
+                                                    <button type="submit" name="delete_course" class="dropdown-item" onclick="return confirm('Are you sure you want to delete this course?')">
+                                                        <i class="fas fa-trash"></i> Delete
+                                                    </button>
+                                                </form>
+                                            </li>
+                                        </ul>
                                     </div>
                                 </div>
                             </div>
-                            <?php endforeach; ?>
-                        </tbody>
-                    </table>
+                        </div>
+
+                        <!-- Edit Course Modal -->
+                        <div class="modal fade" id="editCourse<?php echo $course['id']; ?>" tabindex="-1" aria-labelledby="editCourseLabel<?php echo $course['id']; ?>" aria-hidden="true">
+                            <div class="modal-dialog">
+                                <div class="modal-content">
+                                    <div class="modal-header">
+                                        <h5 class="modal-title" id="editCourseLabel<?php echo $course['id']; ?>">Edit Course</h5>
+                                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                    </div>
+                                    <div class="modal-body">
+                                        <form action="" method="post">
+                                            <input type="hidden" name="id" value="<?php echo $course['id']; ?>">
+                                            <div class="mb-3">
+                                                <label for="edit_title_id<?php echo $course['id']; ?>" class="form-label">Title</label>
+                                                <select class="form-control" id="edit_title_id<?php echo $course['id']; ?>" name="title_id" required>
+                                                    <?php foreach ($course_titles as $title): ?>
+                                                        <option value="<?php echo $title['id']; ?>" <?php echo ($title['title'] == $course['title']) ? 'selected' : ''; ?>><?php echo htmlspecialchars($title['title']); ?></option>
+                                                    <?php endforeach; ?>
+                                                </select>
+                                            </div>
+                                            <div class="mb-3">
+                                                <label for="edit_description<?php echo $course['id']; ?>" class="form-label">Description</label>
+                                                <textarea class="form-control" id="edit_description<?php echo $course['id']; ?>" name="description" rows="3"><?php echo htmlspecialchars($course['description']); ?></textarea>
+                                            </div>
+                                            <div class="mb-3">
+                                                <label for="edit_tutor_id<?php echo $course['id']; ?>" class="form-label">Tutor</label>
+                                                <select class="form-control" id="edit_tutor_id<?php echo $course['id']; ?>" name="tutor_id" required>
+                                                    <option value="">Select Tutor</option>
+                                                    <?php foreach ($tutors as $tutor): ?>
+                                                        <option value="<?php echo $tutor['id']; ?>" <?php echo ($tutor['id'] == $course['tutor_id']) ? 'selected' : ''; ?>><?php echo htmlspecialchars($tutor['full_name']); ?></option>
+                                                    <?php endforeach; ?>
+                                                </select>
+                                            </div>
+                                            <button type="submit" name="edit_course" class="btn btn-primary">Save Changes</button>
+                                        </form>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <?php endforeach; ?>
+                    </div>
                 </div>
             </main>
         </div>

@@ -104,6 +104,100 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 $query = "SELECT * FROM tutors";
 $result = mysqli_query($conn, $query);
 $tutors = mysqli_fetch_all($result, MYSQLI_ASSOC);
+
+// Function to render tutors in grid view
+function renderTutorsGrid($tutors) {
+    $output = '<div class="row">';
+    foreach ($tutors as $tutor) {
+        $output .= '<div class="col-md-4 mb-4">
+                        <div class="card">
+                            <div class="card-body">
+                                <div class="d-flex justify-content-between align-items-start">
+                                    <div>
+                                        <h5 class="card-title">' . htmlspecialchars($tutor['full_name'] ?? 'N/A') . '</h5>
+                                        <p class="card-text">
+                                            <strong>Username:</strong> ' . htmlspecialchars($tutor['username']) . '<br>
+                                            <strong>Email:</strong> ' . htmlspecialchars($tutor['email']) . '<br>
+                                            <strong>Specialization:</strong> ' . htmlspecialchars($tutor['specialization'] ?? 'N/A') . '<br>
+                                            <strong>Resume:</strong> 
+                                            ' . (!empty($tutor['resume_path']) ? '<a href="' . $tutor['resume_path'] . '" target="_blank" class="btn btn-info">View Resume</a>' : 'N/A') . '
+                                        </p>
+                                    </div>
+                                    <div class="dropdown">
+                                        <button class="btn btn-secondary dropdown-toggle" type="button" id="dropdownMenuButton" data-bs-toggle="dropdown" aria-expanded="false"></button>
+                                        <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+                                            <li>
+                                                <button type="button" class="dropdown-item" data-bs-toggle="modal" data-bs-target="#editTutor' . $tutor['id'] . '">
+                                                    <i class="fas fa-pencil-alt"></i> Edit
+                                                </button>
+                                            </li>
+                                            <li>
+                                                <form action="" method="post" class="d-inline" onsubmit="return confirm(\'Are you sure you want to delete this tutor?\')">
+                                                    <input type="hidden" name="id" value="' . $tutor['id'] . '">
+                                                    <button type="submit" name="delete_tutor" class="dropdown-item">
+                                                        <i class="fas fa-trash-alt"></i> Delete
+                                                    </button>
+                                                </form>
+                                            </li>
+                                        </ul>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>';
+    }
+    $output .= '</div>';
+    return $output;
+}
+
+// Function to render tutors in list view as a table
+function renderTutorsList($tutors) {
+    $output = '<table class="table table-striped">';
+    $output .= '<thead>
+                    <tr>
+                        <th>Tutor Name</th>
+                        <th>ID</th>
+                        <th>Email</th>
+                        <th>Specialization</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>';
+    $output .= '<tbody>';
+    foreach ($tutors as $tutor) {
+        $output .= '<tr>
+                        <td>' . htmlspecialchars($tutor['full_name'] ?? 'N/A') . '</td>
+                        <td>' . htmlspecialchars($tutor['id']) . '</td>
+                        <td>' . htmlspecialchars($tutor['email']) . '</td>
+                        <td>' . htmlspecialchars($tutor['specialization'] ?? 'N/A') . '</td>
+                        <td>
+                            <div class="dropdown">
+                                <button class="btn btn-secondary dropdown-toggle" type="button" id="dropdownMenuButton" data-bs-toggle="dropdown" aria-expanded="false"></button>
+                                <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+                                    <li>
+                                        <button type="button" class="dropdown-item" data-bs-toggle="modal" data-bs-target="#editTutor' . $tutor['id'] . '">
+                                            <i class="fas fa-pencil-alt"></i> Edit
+                                        </button>
+                                    </li>
+                                    <li>
+                                        <form action="" method="post" class="d-inline" onsubmit="return confirm(\'Are you sure you want to delete this tutor?\')">
+                                            <input type="hidden" name="id" value="' . $tutor['id'] . '">
+                                            <button type="submit" name="delete_tutor" class="dropdown-item">
+                                                <i class="fas fa-trash-alt"></i> Delete
+                                            </button>
+                                        </form>
+                                    </li>
+                                </ul>
+                            </div>
+                        </td>
+                    </tr>';
+    }
+    $output .= '</tbody>';
+    $output .= '</table>';
+    return $output;
+}
+
+// Toggle view
+$view = isset($_GET['view']) ? $_GET['view'] : 'grid';
 ?>
 
 <!DOCTYPE html>
@@ -115,6 +209,27 @@ $tutors = mysqli_fetch_all($result, MYSQLI_ASSOC);
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
 </head>
+<style>
+    .row {
+        margin-left: 0px;
+    }
+    .card {
+        height: 200px;
+    }
+    .btn-navy {
+        background-color: navy;
+        color: white;
+        border-radius: 0.6px;
+        border: none;
+    }
+    .btn-navy:hover {
+        background-color: white;
+        color: black;
+    }
+    .table {
+        background-color: transparent;
+    }
+</style>
 <body>
     <!-- Navigation Bar -->
     <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
@@ -146,146 +261,79 @@ $tutors = mysqli_fetch_all($result, MYSQLI_ASSOC);
                 <div class="container mt-4">
                     <h1 class="mb-4">Tutors</h1>
                     
-                    <!-- Add Tutor Form -->
-                    <h2>Add New Tutor</h2>
-                    <form action="" method="post" enctype="multipart/form-data" class="mb-4">
-                        <div class="mb-3">
-                            <label for="username" class="form-label">Username</label>
-                            <input type="text" class="form-control" id="username" name="username" required>
-                        </div>
-                        <div class="mb-3">
-                            <label for="email" class="form-label">Email</label>
-                            <input type="email" class="form-control" id="email" name="email" required>
-                        </div>
-                        <div class="mb-3">
-                            <label for="password" class="form-label">Password</label>
-                            <input type="password" class="form-control" id="password" name="password" required>
-                        </div>
-                        <div class="mb-3">
-                            <label for="full_name" class="form-label">Full Name</label>
-                            <input type="text" class="form-control" id="full_name" name="full_name" required>
-                        </div>
-                        <div class="mb-3">
-                            <label for="bio" class="form-label">Bio</label>
-                            <textarea class="form-control" id="bio" name="bio" rows="3"></textarea>
-                        </div>
-                        <div class="mb-3">
-                            <label for="specialization" class="form-label">Specialization</label>
-                            <input type="text" class="form-control" id="specialization" name="specialization">
-                        </div>
-                        <div class="mb-3">
-                            <label for="resume" class="form-label">Resume</label>
-                            <input type="file" class="form-control" id="resume" name="resume">
-                        </div>
-                        <div class="mb-3">
-                            <label for="certificate" class="form-label">Certificate</label>
-                            <input type="file" class="form-control" id="certificate" name="certificate">
-                        </div>
-                        <button type="submit" name="add_tutor" class="btn btn-primary">Add Tutor</button>
-                    </form>
+                    <!-- Add Tutor Button -->
+                    <div class="mb-3">
+                        <button type="button" class="btn btn-navy" data-bs-toggle="modal" data-bs-target="#addTutorModal">
+                            Add Tutor
+                        </button>
+                    </div>
 
-                    <!-- Tutor List -->
-                    <h2>Tutor List</h2>
-                    <table class="table table-striped">
-                        <thead>
-                            <tr>
-                                <th>ID</th>
-                                <th>Username</th>
-                                <th>Email</th>
-                                <th>Full Name</th>
-                                <th>Specialization</th>
-                                <th>Resume</th>
-                                <th>Certificate</th>
-                                <th>Actions</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <?php foreach ($tutors as $tutor): ?>
-                            <tr>
-                                <td><?php echo htmlspecialchars($tutor['id']); ?></td>
-                                <td><?php echo htmlspecialchars($tutor['username']); ?></td>
-                                <td><?php echo htmlspecialchars($tutor['email']); ?></td>
-                                <td><?php echo htmlspecialchars($tutor['full_name'] ?? 'N/A'); ?></td>
-                                <td><?php echo htmlspecialchars($tutor['specialization'] ?? 'N/A'); ?></td>
-                                <td>
-                                    <?php if (!empty($tutor['resume_path'])): ?>
-                                        <a href="<?php echo $tutor['resume_path']; ?>" target="_blank">View Resume</a>
-                                    <?php else: ?>
-                                        N/A
-                                    <?php endif; ?>
-                                </td>
-                                <td>
-                                    <?php if (!empty($tutor['certificate_path'])): ?>
-                                        <a href="<?php echo $tutor['certificate_path']; ?>" target="_blank">View Certificate</a>
-                                    <?php else: ?>
-                                        N/A
-                                    <?php endif; ?>
-                                </td>
-                                <td>
-                                    <button type="button" class="btn btn-sm btn-primary" data-bs-toggle="modal" data-bs-target="#editTutor<?php echo $tutor['id']; ?>">
-                                        Edit
-                                    </button>
-                                    <form action="" method="post" class="d-inline">
-                                        <input type="hidden" name="id" value="<?php echo $tutor['id']; ?>">
-                                        <button type="submit" name="delete_tutor" class="btn btn-sm btn-danger" onclick="return confirm('Are you sure you want to delete this tutor?')">Delete</button>
+                    <!-- Add Tutor Modal -->
+                    <div class="modal fade" id="addTutorModal" tabindex="-1" aria-labelledby="addTutorModalLabel" aria-hidden="true">
+                        <div class="modal-dialog">
+                            <div class="modal-content">
+                                <div class="modal-header">
+                                    <h5 class="modal-title" id="addTutorModalLabel">Add New Tutor</h5>
+                                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                </div>
+                                <div class="modal-body">
+                                    <form action="" method="post" enctype="multipart/form-data">
+                                        <div class="mb-3">
+                                            <label for="username" class="form-label">Username</label>
+                                            <input type="text" class="form-control" id="username" name="username" required>
+                                        </div>
+                                        <div class="mb-3">
+                                            <label for="email" class="form-label">Email</label>
+                                            <input type="email" class="form-control" id="email" name="email" required>
+                                        </div>
+                                        <div class="mb-3">
+                                            <label for="password" class="form-label">Password</label>
+                                            <input type="password" class="form-control" id="password" name="password" required>
+                                        </div>
+                                        <div class="mb-3">
+                                            <label for="full_name" class="form-label">Full Name</label>
+                                            <input type="text" class="form-control" id="full_name" name="full_name" required>
+                                        </div>
+                                        <div class="mb-3">
+                                            <label for="bio" class="form-label">Bio</label>
+                                            <textarea class="form-control" id="bio" name="bio" rows="3"></textarea>
+                                        </div>
+                                        <div class="mb-3">
+                                            <label for="specialization" class="form-label">Specialization</label>
+                                            <input type="text" class="form-control" id="specialization" name="specialization">
+                                        </div>
+                                        <div class="mb-3">
+                                            <label for="resume" class="form-label">Resume</label>
+                                            <input type="file" class="form-control" id="resume" name="resume">
+                                        </div>
+                                        <div class="mb-3">
+                                            <label for="certificate" class="form-label">Certificate</label>
+                                            <input type="file" class="form-control" id="certificate" name="certificate">
+                                        </div>
+                                        <button type="submit" name="add_tutor" class="btn btn-navy">Add Tutor</button>
                                     </form>
-                                </td>
-                            </tr>
-
-                            <!-- Edit Tutor Modal -->
-                            <div class="modal fade" id="editTutor<?php echo $tutor['id']; ?>" tabindex="-1" aria-labelledby="editTutorLabel<?php echo $tutor['id']; ?>" aria-hidden="true">
-                                <div class="modal-dialog">
-                                    <div class="modal-content">
-                                        <div class="modal-header">
-                                            <h5 class="modal-title" id="editTutorLabel<?php echo $tutor['id']; ?>">Edit Tutor</h5>
-                                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                                        </div>
-                                        <div class="modal-body">
-                                            <form action="" method="post" enctype="multipart/form-data">
-                                                <input type="hidden" name="id" value="<?php echo $tutor['id']; ?>">
-                                                <div class="mb-3">
-                                                    <label for="edit_username<?php echo $tutor['id']; ?>" class="form-label">Username</label>
-                                                    <input type="text" class="form-control" id="edit_username<?php echo $tutor['id']; ?>" name="username" value="<?php echo htmlspecialchars($tutor['username']); ?>" required>
-                                                </div>
-                                                <div class="mb-3">
-                                                    <label for="edit_email<?php echo $tutor['id']; ?>" class="form-label">Email</label>
-                                                    <input type="email" class="form-control" id="edit_email<?php echo $tutor['id']; ?>" name="email" value="<?php echo htmlspecialchars($tutor['email']); ?>" required>
-                                                </div>
-                                                <div class="mb-3">
-                                                    <label for="edit_full_name<?php echo $tutor['id']; ?>" class="form-label">Full Name</label>
-                                                    <input type="text" class="form-control" id="edit_full_name<?php echo $tutor['id']; ?>" name="full_name" value="<?php echo htmlspecialchars($tutor['full_name'] ?? ''); ?>" required>
-                                                </div>
-                                                <div class="mb-3">
-                                                    <label for="edit_bio<?php echo $tutor['id']; ?>" class="form-label">Bio</label>
-                                                    <textarea class="form-control" id="edit_bio<?php echo $tutor['id']; ?>" name="bio" rows="3"><?php echo htmlspecialchars($tutor['bio'] ?? ''); ?></textarea>
-                                                </div>
-                                                <div class="mb-3">
-                                                    <label for="edit_specialization<?php echo $tutor['id']; ?>" class="form-label">Specialization</label>
-                                                    <input type="text" class="form-control" id="edit_specialization<?php echo $tutor['id']; ?>" name="specialization" value="<?php echo htmlspecialchars($tutor['specialization'] ?? ''); ?>">
-                                                </div>
-                                                <div class="mb-3">
-                                                    <label for="edit_resume<?php echo $tutor['id']; ?>" class="form-label">Resume</label>
-                                                    <input type="file" class="form-control" id="edit_resume<?php echo $tutor['id']; ?>" name="resume">
-                                                    <?php if (!empty($tutor['resume_path'])): ?>
-                                                        <small>Current resume: <a href="<?php echo $tutor['resume_path']; ?>" target="_blank">View</a></small>
-                                                    <?php endif; ?>
-                                                </div>
-                                                <div class="mb-3">
-                                                    <label for="edit_certificate<?php echo $tutor['id']; ?>" class="form-label">Certificate</label>
-                                                    <input type="file" class="form-control" id="edit_certificate<?php echo $tutor['id']; ?>" name="certificate">
-                                                    <?php if (!empty($tutor['certificate_path'])): ?>
-                                                        <small>Current certificate: <a href="<?php echo $tutor['certificate_path']; ?>" target="_blank">View</a></small>
-                                                    <?php endif; ?>
-                                                </div>
-                                                <button type="submit" name="edit_tutor" class="btn btn-primary">Save Changes</button>
-                                            </form>
-                                        </div>
-                                    </div>
                                 </div>
                             </div>
-                            <?php endforeach; ?>
-                        </tbody>
-                    </table>
+                        </div>
+                    </div>
+
+                    <!-- Add View Toggle Buttons -->
+                    <div class="mb-3">
+                        <a href="?view=grid" class="btn btn-primary">Grid View</a>
+                        <a href="?view=list" class="btn btn-secondary">List View</a>
+                    </div>
+
+                    <!-- Render Tutors Based on Selected View -->
+                    <div class="container mt-4">
+                        <h2>Tutor List</h2>
+                        <?php
+                        if ($view === 'list') {
+                            echo renderTutorsList($tutors);
+                        } else {
+                            echo renderTutorsGrid($tutors);
+                        }
+                        ?>
+                    </div>
                 </div>
             </main>
         </div>

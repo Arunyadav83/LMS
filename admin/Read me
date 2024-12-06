@@ -19,6 +19,8 @@ email:ramana@gmail.com user:Ramana
 password:Ramana@1234
 email:arun@gmail.com user:Arun
 password:Arun@1234
+email:naveen@gmail.com user:Naveen
+password:naveen@1234
 1. For the existing 'admin' user:
 Email: admin@example.com (or the email associated with the existing admin account)
 Password: password

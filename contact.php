@@ -33,7 +33,7 @@
         }
 
         .container {
-            max-width:  1000px;
+            max-width:  1200px;
             margin: 50px;
             padding: 20px;
             backdrop-filter: blur(10px);
@@ -70,10 +70,12 @@
             width: 60%;
             padding: 12px;
             margin: 10px 0;
-            margin-left: 15px;
+            margin-left: 95px;
             border: 1px solid #ccc;
             border-radius: 5px;
             margin-bottom: 10px;
+            position: relative;
+            bottom: 40px;
         }
 
         .contact-form button {
@@ -85,8 +87,11 @@
             cursor: pointer;
             transition: background-color 0.3s, transform 0.3s;
             font-size: 16px;
-            width: 50%;
+            width: 20%;
+            margin-left: 205px;
             margin-top: 20px;
+            position: relative;
+            bottom: 20px;
         }
 
         .locations-section {
@@ -135,6 +140,14 @@
             .container{
                 flex-direction: column;
             }
+            .contact-form input, .contact-form textarea{
+                margin-left: 45px;
+                position: relative;
+                top: 10px;
+        }
+        .contact-form button{
+            margin-left: 70px;
+            width: 40%;
         }
         .main-container{
             width: 100%;
@@ -165,10 +178,12 @@
             </div>
             <div class="contact-form">
                 <h2>Send Message</h2>
-                <input type="text" placeholder="Full Name" required>
-                <input type="email" placeholder="Email" required>
-                <textarea placeholder="Type your Message..." rows="4" required></textarea>
-                <button type="submit">Send</button>
+                <form action="submit_message.php" method="POST">
+                    <input type="text" name="name" placeholder="Full Name" required>
+                    <input type="email" name="email" placeholder="Email" required>
+                    <textarea name="message" placeholder="Type your Message..." rows="4" required></textarea>
+                    <button type="submit">Send</button>
+                </form>
             </div>
         </div>
     </div>

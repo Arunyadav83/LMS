@@ -10,7 +10,7 @@ $articles = [
     [
         "title" => "Success Stories from UltraKey Users",
         "description" => "Read testimonials and stories of how UltraKey transformed students' skills.",
-        "link" => "article-success-stories.php",
+        "link" => "addSuccess.php",
         "image" => "assets/images/success-stories.jpg",
     ],
     [
@@ -60,7 +60,7 @@ $articles = [
     width: 90%;
     max-width: 1200px;
     margin: 0 auto;
-    padding: 20px;
+    padding: 6px;
 }
 
 .articles-grid {

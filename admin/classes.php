@@ -65,12 +65,14 @@ if (!isset($_SESSION['user_id']) || !isset($_SESSION['role']) || $_SESSION['role
              .form-label{
                 color:blue
              }
+             
+           
         </style>
     </head>
     <body>
         <div class="container mt-5">
             <div class="row justify-content-center">
-                <div class="col-md-6">
+                <div class="col-md-6" style="background-color:rgba(178, 445, 215, 0.5); padding: 20px; border-radius: 5px;">
                     <h2 class="mb-4">Tutor Login</h2>
                     <?php if (isset($error)): ?>
                         <div class="alert alert-danger"><?php echo $error; ?></div>
@@ -84,7 +86,7 @@ if (!isset($_SESSION['user_id']) || !isset($_SESSION['role']) || $_SESSION['role
                             <label for="password" class="form-label">Password</label>
                             <input type="password" class="form-control" id="password" name="password" required>
                         </div>
-                        <button type="submit" name="login" class="btn btn-primary">Login</button>
+                        <button type="submit" name="login" class="btn btn-primary mx-auto d-block">Login</button>
                     </form>
                 </div>
             </div>

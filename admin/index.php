@@ -35,6 +35,20 @@ $query_recent = "SELECT title, created_at FROM courses ORDER BY created_at DESC 
 $result_recent = mysqli_query($conn, $query_recent);
 $recent_courses = mysqli_fetch_all($result_recent, MYSQLI_ASSOC);
 
+// Fetch unread messages count
+$query_unread = "SELECT COUNT(*) AS unread_count FROM messages WHERE status = 'unread'"; // Adjust the table and column names as necessary
+$result_unread = mysqli_query($conn, $query_unread);
+
+// Check if the query was successful
+if ($result_unread) {
+    $row_unread = mysqli_fetch_assoc($result_unread);
+    $unread_count = $row_unread['unread_count'];
+} else {
+    // Output the error message
+    echo "Error: " . mysqli_error($conn);
+    $unread_count = 0; // Set to 0 or handle as needed
+}
+
 // Function to format the date
 function time_ago($datetime, $full = false) {
     $now = new DateTime();
@@ -217,6 +231,14 @@ function time_ago($datetime, $full = false) {
             padding: 0.5rem 1rem; /* Adjust padding as needed */
             transition: padding 0.3s; /* Smooth transition */
         }
+
+        .badge {
+            background-color: red; /* Set badge color to red */
+        }
+
+        .text-right {
+            float: right;
+        }
     </style>
 </head>
 <body>
@@ -234,6 +256,12 @@ function time_ago($datetime, $full = false) {
                     </li>
                     <li class="nav-item">
                         <a class="nav-link" href="logout.php"><i class="fas fa-sign-out-alt"></i> Logout</a>
+                    </li> 
+                    <li class="nav-item">
+                        <a class="nav-link position-relative" href="fetchmessages.php" id="notificationLink">
+                            <i class="fas fa-bell"></i>
+                            <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill" id="messageCount" style="display: <?php echo $unread_count > 0 ? 'inline' : 'none'; ?>;"><?php echo $unread_count; ?></span>
+                        </a>
                     </li>
                 </ul>
             </div>
@@ -333,96 +361,21 @@ function time_ago($datetime, $full = false) {
                         </div>
                     </div>
 
-                    <!-- Add this after your existing cards section -->
-                    <!-- <div class="row">
-                        <div class="col-12 mb-4">
+                    <!-- Messages Section -->
+                    <div class="row mb-4">
+                        <div class="col-12">
                             <div class="card dashboard-card">
-                                <div class="card-header bg-white d-flex justify-content-between align-items-center">
-                                    <h5 class="card-title mb-0">Quick Access</h5>
-                                    <button type="button" class="btn-close" aria-label="Close"></button>
+                                <div class="card-header bg-white">
+                                    <h5 class="card-title mb-0">Messages</h5>
                                 </div>
                                 <div class="card-body">
-                                     Search Bar -->
-                                    <!-- <div class="search-container mb-4"> -->
-                                        <!-- <div class="input-group">
-                                            <span class="input-group-text bg-white border-end-0">
-                                                <i class="fas fa-search text-muted"></i>
-                                            </span>
-                                            <input type="text" class="form-control border-start-0" placeholder="Search here">
-                                        </div>
-                                    </div> -->
-
-                                    <!-- Filter Buttons -->
-                                    <!-- <div class="filter-buttons mb-4">
-                                        <div class="d-flex flex-wrap gap-2">
-                                            <button class="btn btn-primary active">All</button>
-                                            <button class="btn btn-outline-secondary">My Favourites</button>
-                                            <button class="btn btn-outline-secondary">Employee</button>
-                                            <button class="btn btn-outline-secondary">Payroll</button>
-                                            <button class="btn btn-outline-secondary">Leave</button>
-                                            <button class="btn btn-outline-secondary">Other</button>
-                                        </div>
-                                    </div> -->
-
-                                    <!-- Quick Access Cards
-                                    <div class="row g-4">
-                                        Add Holidays Card -->
-                                       <!--- <div class="col-12 col-sm-6 col-md-4 col-xl-3">
-                                            <div class="card h-100 border rounded">
-                                                <div class="card-body">
-                                                    <div class="d-flex justify-content-between">
-                                                        <div class="icon-box bg-info bg-opacity-10 rounded p-2">
-                                                            <i class="fas fa-calendar text-info"></i>
-                                                        </div>
-                                                        <button class="btn btn-link p-0">
-                                                            <i class="far fa-star"></i>
-                                                        </button>
-                                                    </div>
-                                                    <h6 class="mt-3">Add Holidays</h6>
-                                                </div>
-                                            </div>
-                                        </div> -->
-
-                                        <!-- Prepare Letter Card
-                                        <div class="col-12 col-sm-6 col-md-4 col-xl-3">
-                                            <div class="card h-100 border rounded">
-                                                <div class="card-body">
-                                                    <div class="d-flex justify-content-between">
-                                                        <div class="icon-box bg-primary bg-opacity-10 rounded p-2">
-                                                            <i class="fas fa-file-alt text-primary"></i>
-                                                        </div>
-                                                        <button class="btn btn-link p-0">
-                                                            <i class="far fa-star"></i>
-                                                        </button>
-                                                    </div>
-                                                    <h6 class="mt-3">Prepare Letter</h6>
-                                                </div>
-                                            </div>
-                                        </div> -->
-
-                                        <!-- Import Data Card -->
-                                        <!-- <div class="col-12 col-sm-6 col-md-4 col-xl-3">
-                                            <div class="card h-100 border rounded">
-                                                <div class="card-body">
-                                                    <div class="d-flex justify-content-between">
-                                                        <div class="icon-box bg-success bg-opacity-10 rounded p-2">
-                                                            <i class="fas fa-file-excel text-success"></i>
-                                                        </div>
-                                                        <button class="btn btn-link p-0">
-                                                            <i class="far fa-star"></i>
-                                                        </button>
-                                                    </div>
-                                                    <h6 class="mt-3">Import Data From Excel</h6>
-                                                </div>
-                                            </div>
-                                        </div> -->
-
-                                        <!-- Add more quick access cards following the same pattern -->
+                                    <div id="messagesContainer" class="messages-container">
+                                        <!-- Messages will be dynamically inserted here -->
                                     </div>
                                 </div>
                             </div>
                         </div>
-                    </div> -->
+                    </div>
                 </div>
             </main>
         </div>
@@ -430,20 +383,85 @@ function time_ago($datetime, $full = false) {
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
     <script>
-        // Toggle sidebar on mobile
-        document.querySelector('.navbar-toggler').addEventListener('click', function() {
-            document.querySelector('.sidebar').classList.toggle('active');
+        let messageCount = 0; // Initialize message count
+
+        // Fetch new messages count
+        function fetchNewMessages() {
+            fetch('fetchmessages.php') // New endpoint to get unread message count
+                .then(response => response.json())
+                .then(data => {
+                    const messageCountElement = document.getElementById('messageCount');
+                    if (data.unread_count > messageCount) {
+                        messageCount = data.unread_count; // Update message count
+                        messageCountElement.textContent = messageCount;
+                        messageCountElement.style.display = 'inline'; // Show the badge
+                    } else if (data.unread_count === 0) {
+                        messageCountElement.style.display = 'none'; // Hide if no messages
+                    }
+                })
+                .catch(error => console.error('Error fetching messages:', error));
+        }
+
+        // Function to reset message count and clear messages
+        function resetMessages() {
+            messageCount = 0; // Reset count
+            const messageCountElement = document.getElementById('messageCount');
+            messageCountElement.style.display = 'none'; // Hide the badge
+
+            const messagesContainer = document.getElementById('messagesContainer');
+            messagesContainer.innerHTML = ''; // Clear existing messages
+        }
+
+        // Call this function when the dashboard is loaded
+        document.addEventListener('DOMContentLoaded', function() {
+            resetMessages(); // Reset messages when the dashboard is loaded
         });
 
-        // Change navbar style on scroll
-        window.addEventListener('scroll', function() {
-            const navbar = document.querySelector('.navbar');
-            if (window.scrollY > 50) { // Adjust the scroll threshold as needed
-                navbar.classList.add('scrolled');
-            } else {
-                navbar.classList.remove('scrolled');
-            }
+        // Reset message count and update status when the notification is clicked
+        document.getElementById('notificationLink').addEventListener('click', function() {
+            fetch('reset_message_status.php') // Call the PHP file to reset message status
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        messageCount = 0; // Reset count
+                        const messageCountElement = document.getElementById('messageCount');
+                        messageCountElement.style.display = 'none'; // Hide the badge
+                        fetchMessages(); // Fetch and display messages
+                    }
+                })
+                .catch(error => console.error('Error resetting message status:', error));
         });
+
+        // Function to fetch and display messages
+        function fetchMessages() {
+            fetch('fetchmessages.php') // Adjust this to your actual endpoint
+                .then(response => response.json())
+                .then(messages => {
+                    const messagesContainer = document.getElementById('messagesContainer'); // Ensure you have a container for messages
+                    messagesContainer.innerHTML = ''; // Clear existing messages
+
+                    if (messages.length > 0) {
+                        messages.forEach(message => {
+                            const messageElement = document.createElement('div');
+                            messageElement.classList.add('message-item');
+                            messageElement.innerHTML = `
+                                <p>${message.content}</p> <!-- Adjust based on your message structure -->
+                                <small>${time_ago(message.created_at)}</small> <!-- Assuming you have a time_ago function -->
+                            `;
+                            messagesContainer.appendChild(messageElement);
+                        });
+                    } else {
+                        messagesContainer.innerHTML = '<p>No new messages.</p>';
+                    }
+                })
+                .catch(error => console.error('Error fetching messages:', error));
+        }
+
+        // Call the function to fetch new messages count
+        fetchNewMessages();
+
+        // Set interval to fetch new messages every 5 seconds
+        setInterval(fetchNewMessages, 5000);
     </script>
 </body>
 </html>

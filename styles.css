@@ -243,7 +243,7 @@ body {
 }
 
 .cta {
-    /* background: linear-gradient(rgba(52, 152, 219, 0.9), rgba(46, 204, 113, 0.9)), url('assets/images/cta-bg.jpg') no-repeat center center; */
+    background: linear-gradient(rgba(52, 152, 219, 0.9), rgba(46, 204, 113, 0.9)), url('assets/images/cta-bg.jpg') no-repeat center center;
     background-size: cover;
     color: white;
     border-radius: 10px;

@@ -101,7 +101,7 @@
 
     <div class="profile-container">
         <div class="profile-header">
-        <img src="assets/images/default-male.png">
+        <img src="uploads/resumes/default-male.png">
             <div class="profile-details">
                 <h2><?php echo htmlspecialchars($adminDetails['username']); ?></h2>
                 <p>Password: ********</p>

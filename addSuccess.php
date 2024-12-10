@@ -41,15 +41,29 @@
         form button:hover {
             background-color: darkgreen;
         }
+        .image-preview {
+            margin-top: 15px;
+            max-width: 100%;
+            max-height: 300px;
+            display: none; /* Initially hidden */
+        }
     </style>
+    <script>
+        function previewImage(event) {
+            const imagePreview = document.getElementById('imagePreview');
+            imagePreview.src = URL.createObjectURL(event.target.files[0]);
+            imagePreview.style.display = 'block'; // Show the image
+        }
+    </script>
 </head>
 <body>
     <div class="form-container">
-        <form method="POST" action="article-success-stories.php">
+        <form method="POST" action="article-success-stories.php" enctype="multipart/form-data">
             <h3>Add Your Success Story</h3>
             <input type="text" name="name" placeholder="Your Name" required>
             <textarea name="successtory" placeholder="Your Success Story" rows="5" required></textarea>
-            <input type="file" name="image_path" placeholder="Select an image" required>
+            <input type="file" name="image_path" placeholder="Select an image" required onchange="previewImage(event)">
+            <img id="imagePreview" class="image-preview" alt="Image Preview">
             <input type="text" name="image_alt" placeholder="Alt text for the image" required>
             <button type="submit">Submit</button>
         </form>

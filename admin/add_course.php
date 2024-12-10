@@ -9,31 +9,23 @@ if (!is_admin_logged_in()) {
     exit();
 }
 
-if ($_SERVER['REQUEST_METHOD'] == 'POST') {
-    // Debugging output
-    echo '<pre>';
-    print_r($_POST);
-    echo '</pre>';
-
+// Handle course addition
+if (isset($_POST['add_course'])) {
     $title = mysqli_real_escape_string($conn, $_POST['title']);
-    $description = mysqli_real_escape_string($conn, $_POST['description']);
-    $topics = isset($_POST['topics']) ? $_POST['topics'] : [];
+    $description = strip_tags(mysqli_real_escape_string($conn, $_POST['description']));
+    $topics = mysqli_real_escape_string($conn, $_POST['topics']);
+    $course_prize = (float)$_POST['course_price'];
+
+    // Insert the new course into the database
+    $insert_query = "INSERT INTO courses (title, description, course_prize) VALUES ('$title', '$description', $course_prize)";
     
-
-    // Insert new course
-    $insert_query = "INSERT INTO courses (title, description) VALUES ('$title', '$description')";
-    mysqli_query($conn, $insert_query);
-    $course_id = mysqli_insert_id($conn);
-
-    // Insert topics
-    foreach ($topics as $topic) {
-        $topic = mysqli_real_escape_string($conn, $topic);
-        $insert_topic_query = "INSERT INTO course_topics (course_id, topic_name) VALUES ($course_id, '$topic')";
-        mysqli_query($conn, $insert_topic_query);
+    if (mysqli_query($conn, $insert_query)) {
+        // Redirect to courses.php after successful addition
+        header("Location: courses.php");
+        exit();
+    } else {
+        echo "<div class='alert alert-danger'>Error adding course: " . mysqli_error($conn) . "</div>";
     }
-
-    header("Location: courses_list.php");
-    exit();
 }
 ?>
 
@@ -42,59 +34,49 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Add New Course - LMS Admin</title>
+    <title>Add Course</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <script src="https://cdn.tiny.cloud/1/azj9n0neceenohuu03tmpx6oq579m7sfow413lvfsebb2293/tinymce/5/tinymce.min.js" referrerpolicy="origin"></script>
+    <script>
+        tinymce.init({
+            selector: '#modal_description',
+            plugins: 'lists link image table',
+            toolbar: 'undo redo | bold italic | alignleft aligncenter alignright | bullist numlist outdent indent | link image',
+            menubar: false,
+            setup: function (editor) {
+                editor.on('change', function () {
+                    editor.save(); // Ensure the content is saved to the textarea
+                });
+            }
+        });
 
-    <style>
-
-       #a {
-            color:  #00CED1 ; /* Change the color of the heading */
-            font-size: 2.5rem; /* Increase font size */
-            margin-bottom: 20px; /* Add some space below the heading */
-        }
-         .label{
-           color:#00CED1;
-           font-size:20px;
-            
-         }
-    </style>
+        document.addEventListener('touchstart', function(e) {
+            // Your code here
+        }, { passive: true });
+    </script>
 </head>
 <body>
-    <div class="container mt-5">
-        <h1 id="a">Add New Course</h1>
+    <div class="container mt-4">
+        <h1>Add New Course</h1>
         <form action="" method="post">
             <div class="mb-3">
-                <label for="title" class="form-label label">Title</label>
-                <input type="text" class="form-control" id="title" name="title" required>
+                <label for="modal_title" class="form-label">Title</label>
+                <input type="text" class="form-control" id="modal_title" name="title" required>
             </div>
             <div class="mb-3">
-                <label for="description" class="form-label label">Description</label>
-                <textarea class="form-control" id="description" name="description" rows="3" ></textarea>
+                <label for="modal_description" class="form-label">Description</label>
+                <textarea class="form-control" id="modal_description" name="description" rows="3" required></textarea>
             </div>
             <div class="mb-3">
-                <label for="topics" class="form-label label">Topics (one per line)</label>
-                <textarea class="form-control" id="topics" name="topics[]" rows="5"></textarea>
+                <label for="modal_topics" class="form-label">Topics Covered</label>
+                <input type="text" class="form-control" id="modal_topics" name="topics" required>
             </div>
             <div class="mb-3">
-                <!-- Removed Select Tutor dropdown -->
-                <!-- <label for="tutor_id" class="form-label label">Select Tutor</label>
-                <select class="form-select" id="tutor_id" name="tutor_id" required>
-                    <option value="">Select Tutor</option>
-                    <?php
-                    // Fetch all tutors for the dropdown
-                    $query = "SELECT id, full_name FROM tutors";
-                    $result = mysqli_query($conn, $query);
-                    $tutors = mysqli_fetch_all($result, MYSQLI_ASSOC);
-                    foreach ($tutors as $tutor): ?>
-                        <option value="<?php echo $tutor['id']; ?>"><?php echo htmlspecialchars($tutor['full_name']); ?></option>
-                    <?php endforeach; ?>
-                </select> -->
+                <label for="modal_course_price" class="form-label">Course Price</label>
+                <input type="number" class="form-control" id="modal_course_price" name="course_price" required>
             </div>
-            <button type="submit" class="btn btn-primary">Add Course</button>
-            <a href="courses_list.php" class="btn btn-secondary">Cancel</a>
+            <button type="submit" name="add_course" class="btn btn-primary">Add Course</button>
         </form>
     </div>
-
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>

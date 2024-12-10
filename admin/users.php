@@ -124,7 +124,9 @@ function renderTutorsGrid($tutors) {
                                         </p>
                                     </div>
                                     <div class="dropdown">
-                                        <button class="btn btn-secondary dropdown-toggle" type="button" id="dropdownMenuButton" data-bs-toggle="dropdown" aria-expanded="false"></button>
+                                        <button class="btn btn-secondary" type="button" id="dropdownMenuButton" data-bs-toggle="dropdown" aria-expanded="false">
+                                        <i class="fas fa-ellipsis-v"></i>
+                                        </button>
                                         <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton">
                                             <li>
                                                 <button type="button" class="dropdown-item" data-bs-toggle="modal" data-bs-target="#editTutor' . $tutor['id'] . '">
@@ -171,7 +173,9 @@ function renderTutorsList($tutors) {
                         <td>' . htmlspecialchars($tutor['specialization'] ?? 'N/A') . '</td>
                         <td>
                             <div class="dropdown">
-                                <button class="btn btn-secondary dropdown-toggle" type="button" id="dropdownMenuButton" data-bs-toggle="dropdown" aria-expanded="false"></button>
+                                <button class="btn btn-secondary" type="button" id="dropdownMenuButton" data-bs-toggle="dropdown" aria-expanded="false">
+                                <i class="fas fa-ellipsis-v"></i>
+                                </button>
                                 <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton">
                                     <li>
                                         <button type="button" class="dropdown-item" data-bs-toggle="modal" data-bs-target="#editTutor' . $tutor['id'] . '">
@@ -212,6 +216,7 @@ $view = isset($_GET['view']) ? $_GET['view'] : 'grid';
 <style>
     .row {
         margin-left: 0px;
+        
     }
     .card {
         height: 200px;

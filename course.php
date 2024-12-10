@@ -77,9 +77,19 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['course_id']) && isset
     // Prepare the SQL statement to update the course with the selected tutor
     $query_assign_tutor = "UPDATE courses SET tutor_id = ? WHERE id = ?";
     $stmt = $conn->prepare($query_assign_tutor);
-    $stmt->bind_param("ii", $tutor_id, $course_id);
-    $stmt->execute();
-    $stmt->close();
+    
+    // Check if the statement preparation was successful
+    if ($stmt) {
+        $stmt->bind_param("ii", $tutor_id, $course_id);
+        if ($stmt->execute()) {
+            $_SESSION['success'] = "Tutor assigned successfully."; // Success message
+        } else {
+            $_SESSION['error'] = "Failed to assign tutor: " . $stmt->error; // Error message
+        }
+        $stmt->close();
+    } else {
+        $_SESSION['error'] = "Failed to prepare statement: " . $conn->error; // Error message
+    }
 }
 
 ?>

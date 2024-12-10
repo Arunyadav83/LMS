@@ -1,84 +1,70 @@
 <?php
-require_once 'config.php';
-require_once 'functions.php';
-include 'header.php';
+error_reporting(E_ALL);
+ini_set('display_errors', 1);
+require_once 'config.php'; // Include your DB config or any setup file
+require 'vendor/autoload.php'; // Include Composer's autoloader
 
-$message = '';
-$error = '';
+use Razorpay\Api\Api;
 
-// Check if the user is logged in
-if (!isset($_SESSION['user_id'])) {
-    $error = "You must be logged in to enroll in a course.";
-} else {
-    $user_id = $_SESSION['user_id']; // Use the session user ID
+// Check if the request method is POST
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    // Get course details from the request
+    $courseId = $_POST['course_id'];
+    $userId = $_POST['user_id'];
 
-    // Check if the user exists
-    $user_check_query = "SELECT * FROM users WHERE id = ?";
-    $user_check_stmt = mysqli_prepare($conn, $user_check_query);
-    mysqli_stmt_bind_param($user_check_stmt, "i", $user_id);
-    mysqli_stmt_execute($user_check_stmt);
-    $user_check_result = mysqli_stmt_get_result($user_check_stmt);
+    // Fetch course details from the database
+    $query = "SELECT * FROM courses WHERE id = $courseId";
+    $result = mysqli_query($conn, $query);
 
-    if (mysqli_num_rows($user_check_result) === 0) {
-        $error = "The user ID you're trying to enroll with does not exist in the users table.";
+    if ($result && mysqli_num_rows($result) > 0) {
+        $course = mysqli_fetch_assoc($result);
+
+        // Calculate the amount (in paise, since Razorpay expects the amount in INR paise)
+        $amount = $course['price'] * 100; 
+
+        // Initialize Razorpay API
+        $apiKey = 'rzp_test_Bvq9kiuaq8gkcs';
+        $apiSecret = 'qnN6ytUKNw6beVzQUw7OBiJM';
+        $api = new Api($apiKey, $apiSecret);
+
+        // Create an order
+        $order = $api->order->create([
+            'receipt' => 'order_' . uniqid(),
+            'amount' => $amount, // Amount in paise
+            'currency' => 'INR',
+            'payment_capture' => 1 // Automatically capture payment
+        ]);
+
+        // After creating the response
+        $response = [
+            'order_id' => $order['id'],
+            'amount' => $amount,
+            'course_title' => $course['title'],
+            'course_id' => $courseId,
+            'user_id' => $userId,
+            'success' => true // Indicate success
+        ];
+
+        // Log the response to a file for debugging
+        file_put_contents('debug.log', print_r($response, true));
+
+        // Send JSON response
+        header('Content-Type: application/json');
+        echo json_encode($response);
     } else {
-        // Check if a course_id is provided
-        if (!isset($_GET['course_id'])) {
-            $error = "No course selected for enrollment.";
-        } else {
-            $course_id = (int)$_GET['course_id'];
-
-            // Check if the user is already enrolled in the course
-            $check_query = "SELECT * FROM enrollments WHERE user_id = ? AND course_id = ?";
-            $check_stmt = mysqli_prepare($conn, $check_query);
-            mysqli_stmt_bind_param($check_stmt, "ii", $user_id, $course_id);
-            mysqli_stmt_execute($check_stmt);
-            $check_result = mysqli_stmt_get_result($check_stmt);
-
-            if (mysqli_num_rows($check_result) > 0) {
-                $message = "You are already enrolled in this course.";
-            } else {
-                // Fetch course details
-                $course_query = "SELECT title, tutor_id FROM courses WHERE id = ?";
-                $course_stmt = mysqli_prepare($conn, $course_query);
-                mysqli_stmt_bind_param($course_stmt, "i", $course_id);
-                mysqli_stmt_execute($course_stmt);
-                $course_result = mysqli_stmt_get_result($course_stmt);
-                $course = mysqli_fetch_assoc($course_result);
-
-                if (!$course) {
-                    $error = "Invalid course selected.";
-                } else {
-                    // Enroll in the course
-                    $enroll_query = "INSERT INTO enrollments (user_id, course_id, course_name, tutor_id, enrolled_at) VALUES (?, ?, ?, ?, NOW())";
-                    $enroll_stmt = mysqli_prepare($conn, $enroll_query);
-                    mysqli_stmt_bind_param($enroll_stmt, "iisi", $user_id, $course_id, $course['title'], $course['tutor_id']);
-
-                    if (mysqli_stmt_execute($enroll_stmt)) {
-                        $message = "You have successfully enrolled in the course: " . $course['title'];
-                    } else {
-                        $error = "There was an error enrolling in the course. Please try again. Error: " . mysqli_error($conn);
-                    }
-                }
-            }
-        }
+        // Handle case where course is not found
+        header('Content-Type: application/json');
+        echo json_encode([
+            'success' => false,
+            'message' => 'Course not found.'
+        ]);
     }
+} else {
+    // Handle invalid request method
+    header('Content-Type: application/json');
+    echo json_encode([
+        'success' => false,
+        'message' => 'Invalid request method.'
+    ]);
 }
 ?>
-
-<div class="container mt-4">
-    <h2>Course Enrollment</h2>
-    <?php if ($message): ?>
-        <div class="alert alert-success" role="alert">
-            <?php echo $message; ?>
-        </div>
-    <?php endif; ?>
-    <?php if ($error): ?>
-        <div class="alert alert-danger" role="alert">
-            <?php echo $error; ?>
-        </div>
-    <?php endif; ?>
-    <a href="index.php" class="btn btn-primary">Back to Courses</a>
-</div>
-
-<?php include 'footer.php'; ?>

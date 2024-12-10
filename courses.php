@@ -1,4 +1,6 @@
 <?php
+error_reporting(E_ALL);
+ini_set('display_errors', 1);
 require_once 'config.php';
 require_once 'functions.php';
 include 'header.php';
@@ -9,6 +11,9 @@ $query = "SELECT c.id, c.title, c.description, t.full_name AS tutor_name
           LEFT JOIN tutors t ON c.tutor_id = t.id
           ORDER BY c.created_at DESC";
 $result = mysqli_query($conn, $query);
+
+// Assuming you have defined the Razorpay key in your config.php
+$razorpayKey = 'rzp_test_Bvq9kiuaq8gkcs'; // Your Razorpay API key
 ?>
 
 <div class="container mt-2">
@@ -28,7 +33,7 @@ $result = mysqli_query($conn, $query);
                         <div class="card-footer bg-transparent border-0">
                             <?php if (is_logged_in()): ?>
                                 <a href="course.php?id=<?php echo $course['id']; ?>" class="btn btn-primary btn-sm">View Course</a>
-                                <a href="enroll.php?course_id=<?php echo $course['id']; ?>" class="btn btn-success btn-sm">Enroll</a>
+                                <a href="javascript:void(0)" onclick="enrollCourse(<?php echo $course['id']; ?>, <?php echo $_SESSION['user_id']; ?>)" class="btn btn-success btn-sm">Enroll</a>
                             <?php else: ?>
                                 <a href="login.php" class="btn btn-secondary btn-sm">Login to Enroll</a>
                             <?php endif; ?>
@@ -42,7 +47,9 @@ $result = mysqli_query($conn, $query);
     <?php endif; ?>
 </div>
 
-<?php include 'footer.php'; ?> 
+<!-- Include jQuery before your scripts -->
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script src="https://checkout.razorpay.com/v1/checkout.js"></script>
 
 <!-- Include SweetAlert CSS and JS -->
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/sweetalert/1.1.3/sweetalert.min.css">
@@ -52,7 +59,7 @@ $result = mysqli_query($conn, $query);
 function showSuccessAlert() {
     swal("Enroll successful!", "You have successfully enrolled in the course.", "success");
 }
-</script> 
+</script>
 
 <script>
 $(document).ready(function() {
@@ -62,23 +69,86 @@ $(document).ready(function() {
         var form = $(this);
         $.ajax({
             type: 'POST',
-            url: 'enroll.php', // URL to the PHP file that processes the enrollment
+            url: 'verify_payment.php', // URL to the PHP file that processes the enrollment
             data: form.serialize(), // Serialize form data
             success: function(response) {
-                // Assuming the response contains a success message
-                if (response.success) {
-                    // Redirect to enroll.php with course_id
-                    var courseId = form.find('input[name="course_id"]').val();
-                    window.location.href = 'enroll.php?course_id=' + courseId;
-                } else {
-                    swal("Enrollment failed!", response.message, "error");
+                console.log("Raw response:", response); // Log the raw response
+                try {
+                    // Check if the response is already an object, and if not, parse it
+                    if (typeof response === 'string') {
+                        response = JSON.parse(response); // Parse the response if it's a string
+                    }
+
+                    if (response.success) {
+                        var courseId = form.find('input[name="course_id"]').val();
+                        window.location.href = 'verify_payment.php?course_id=' + courseId + 
+                            '&razorpay_payment_id=' + paymentResponse.razorpay_payment_id + 
+                            '&order_id=' + response.order_id + 
+                            '&razorpay_signature=' + paymentResponse.razorpay_signature; // Pass payment details including signature
+                    } else {
+                        swal("Enrollment failed!", response.message, "error");
+                    }
+                } catch (e) {
+                    console.error("Parsing error:", e);
+                    console.error("Response received:", response); // Log the raw response for debugging
+                    swal("Enrollment failed!", "An unexpected error occurred. Please check the console for details.", "error");
                 }
             },
-            error: function() {
-                // Show error alert
+            error: function(xhr, status, error) {
+                console.error("AJAX error:", status, error); // Log AJAX error details
                 swal("Enrollment failed!", "Please try again.", "error");
             }
         });
     });
 });
-</script> 
+</script>
+
+<script>
+function enrollCourse(courseId, userId) {
+    $.ajax({
+        type: 'POST',
+        url: 'create_order.php', // URL to the PHP file that processes the enrollment
+        data: { course_id: courseId, user_id: userId }, // Send course ID and user ID
+        success: function(response) {
+            console.log("Raw response:", response); // Log raw response
+            try {
+                // Check if the response is already an object, and if not, parse it
+                if (typeof response === 'string') {
+                    response = JSON.parse(response); // Parse the response if it's a string
+                }
+
+                if (response.success) {
+                    // Initiate Razorpay payment
+                    var options = {
+                        key: '<?php echo $razorpayKey; ?>',
+                        amount: response.course_price,
+                        currency: 'INR',
+                        name: 'Course Enrollment',
+                        description: 'Enroll in Course',
+                        image: 'assets/images/logo.png',
+                        order_id: response.order_id,
+                        handler: function(paymentResponse) {
+                            console.log("Payment Response:", paymentResponse);
+                            window.location.href = 'verify_payment.php?course_id=' + courseId + '&razorpay_payment_id=' + paymentResponse.razorpay_payment_id + '&order_id=' + response.order_id; // Pass payment details
+                        },
+                        theme: { color: '#F37254' }
+                    };
+                    var rzp1 = new Razorpay(options);
+                    rzp1.open();
+                } else {
+                    swal("Enrollment failed!", response.message, "error");
+                }
+            } catch (e) {
+                console.error("Parsing error:", e);
+                console.error("Response received:", response);
+                swal("Enrollment failed!", "An unexpected error occurred. Check console for details.", "error");
+            }
+        },
+        error: function(xhr, status, error) {
+            console.error("AJAX error:", status, error); // Log AJAX error details
+            swal("Enrollment failed!", "Please try again.", "error");
+        }
+    });
+}
+window.enrollCourse = enrollCourse; // Expose the function globally
+</script>

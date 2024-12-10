@@ -14,8 +14,113 @@ $current_page = 'courses_list';
 // Handle delete action
 if (isset($_POST['delete_course'])) {
     $course_id = (int)$_POST['course_id'];
-    $delete_query = "DELETE FROM courses WHERE id = $course_id";
-    mysqli_query($conn, $delete_query);
+    // Ensure the course ID is valid before executing the delete query
+    if ($course_id > 0) {
+        // First, delete related records in the quiz_results table
+        $delete_quiz_results_query = "DELETE FROM quiz_results WHERE class_id IN (SELECT id FROM classes WHERE course_id = $course_id)";
+        if (!mysqli_query($conn, $delete_quiz_results_query)) {
+            echo "<div class='alert alert-danger'>Error deleting related quiz results: " . mysqli_error($conn) . "</div>";
+        }
+
+        // Next, delete related records in the quiz_answers table
+        $delete_quiz_answers_query = "DELETE FROM quiz_answers WHERE question_id IN (SELECT id FROM quiz_questions WHERE class_id IN (SELECT id FROM classes WHERE course_id = $course_id))";
+        if (!mysqli_query($conn, $delete_quiz_answers_query)) {
+            echo "<div class='alert alert-danger'>Error deleting related quiz answers: " . mysqli_error($conn) . "</div>";
+        }
+
+        // Then, delete related records in the quiz_questions table
+        $delete_quiz_questions_query = "DELETE FROM quiz_questions WHERE class_id IN (SELECT id FROM classes WHERE course_id = $course_id)";
+        if (!mysqli_query($conn, $delete_quiz_questions_query)) {
+            echo "<div class='alert alert-danger'>Error deleting related quiz questions: " . mysqli_error($conn) . "</div>";
+        }
+
+        // Next, delete related records in the enrollments table
+        $delete_enrollments_query = "DELETE FROM enrollments WHERE course_id = $course_id";
+        if (!mysqli_query($conn, $delete_enrollments_query)) {
+            echo "<div class='alert alert-danger'>Error deleting related enrollments: " . mysqli_error($conn) . "</div>";
+        }
+
+        // Finally, delete related records in the classes table
+        $delete_classes_query = "DELETE FROM classes WHERE course_id = $course_id";
+        if (!mysqli_query($conn, $delete_classes_query)) {
+            echo "<div class='alert alert-danger'>Error deleting related classes: " . mysqli_error($conn) . "</div>";
+        }
+
+        // Now delete the course
+        $delete_query = "DELETE FROM courses WHERE id = $course_id";
+        if (mysqli_query($conn, $delete_query)) {
+            if (mysqli_affected_rows($conn) > 0) {
+                echo "<div class='alert alert-success'>Course deleted successfully.</div>";
+            } else {
+                echo "<div class='alert alert-danger'>No course found with that ID.</div>";
+            }
+        } else {
+            echo "<div class='alert alert-danger'>Error deleting course: " . mysqli_error($conn) . "</div>";
+        }
+    } else {
+        echo "<div class='alert alert-danger'>Invalid course ID.</div>";
+    }
+}
+
+// Handle update action
+if (isset($_POST['update_course'])) {
+    // Removed the tutor_id check
+    // Now we can directly use the tutor_id if it exists
+    $tutor_id = isset($_POST['tutor_id']) ? (int)$_POST['tutor_id'] : null; // Set to null if not provided
+
+    $course_id = (int)$_POST['course_id'];
+    $course_title = mysqli_real_escape_string($conn, $_POST['course_title']);
+    $course_description = mysqli_real_escape_string($conn, $_POST['course_description']);
+    $course_topics = mysqli_real_escape_string($conn, $_POST['course_topics']);
+    $course_prize = (float)$_POST['course_prize']; // Assuming price is a float
+
+    // Check if the tutor and title exist (add your validation logic here)
+    if ($tutor_id !== null) {
+        $tutor_exists_query = "SELECT COUNT(*) FROM tutors WHERE id = $tutor_id";
+        $tutor_exists_result = mysqli_query($conn, $tutor_exists_query);
+        
+        // Check if the query was successful
+        if (!$tutor_exists_result) {
+            echo "<div class='alert alert-danger'>Error checking tutor: " . mysqli_error($conn) . "</div>";
+            exit();
+        }
+        
+        $tutor_exists = mysqli_fetch_row($tutor_exists_result)[0] > 0;
+    } else {
+        $tutor_exists = true; // If tutor_id is not provided, consider it valid
+    }
+
+    $title_exists_query = "SELECT COUNT(*) FROM courses  WHERE id = (SELECT id FROM courses WHERE id = $course_id)";
+    $title_exists_result = mysqli_query($conn, $title_exists_query);
+    
+    // Check if the query was successful
+    if (!$title_exists_result) {
+        echo "<div class='alert alert-danger'>Error checking title: " . mysqli_error($conn) . "</div>";
+        exit();
+    }
+
+    $title_exists = mysqli_fetch_row($title_exists_result)[0] > 0;
+
+    if (!$tutor_exists || !$title_exists) {
+        echo "<div class='alert alert-danger'>Invalid tutor or title selected.</div>";
+    } else {
+        // Ensure the course ID is valid before executing the update query
+        if ($course_id > 0) {
+            $update_query = "UPDATE courses SET title = '$course_title', description = '$course_description', course_prize = $course_prize WHERE id = $course_id";
+            
+            if (mysqli_query($conn, $update_query)) {
+                if (mysqli_affected_rows($conn) > 0) {
+                    echo "<div class='alert alert-success'>Course updated successfully.</div>";
+                } else {
+                    echo "<div class='alert alert-danger'>No changes made or course not found.</div>";
+                }
+            } else {
+                echo "<div class='alert alert-danger'>Error updating course: " . mysqli_error($conn) . "</div>";
+            }
+        } else {
+            echo "<div class='alert alert-danger'>Invalid course ID.</div>";
+        }
+    }
 }
 
 // Fetch all courses with their topics
@@ -38,36 +143,9 @@ $courses = mysqli_fetch_all($result, MYSQLI_ASSOC);
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
 </head>
 <style>
-    .mb-4 {
-        /* color: #f3899d;
-        margin-left: 10px;
-        color:; */
+    .card {
+        margin-bottom: 20px; /* Adjust this value as needed */
     }
-    h1
-    {
-        color:navy;
-    }
-    .card-title {
-        color: black;
-    }
-    body {
-        background-color:lightblue;
-        border-radius: 10px;
-        
-    }
-    .btn-navy {
-    background-color: navy;
-    color: white;
-    border: none;
-}
-.btn-navy:hover {
-    background-color: #fff;
-    color: navy;
-     /* A darker shade of navy for hover effect */
-}
-.card {
-    min-height: 200px; /* Set a minimum height for the cards */
-}
 </style>
 <body>
     <!-- Navigation Bar -->
@@ -99,42 +177,51 @@ $courses = mysqli_fetch_all($result, MYSQLI_ASSOC);
             <main class="col-md-9 ms-sm-auto col-lg-10 px-md-4">
                 <div class="container mt-4">
                     <h1 class="mb-4">Courses List</h1>
+                       <!-- Add this just before the table in the main content section -->
+                       <div class="mb-3">
+                        <a href="add_course.php" class="btn btn-success">Add New Course</a>
+                    </div>
                     
-                    <!-- Add this just before the table in the main content section -->
+                    <!-- View Toggle Buttons -->
                     <div class="mb-3">
-                        <a href="add_course.php" class="btn btn-navy">Add New Course</a>
+                        <button id="listViewBtn" class="btn btn-primary" onclick="showListView()">List View</button>
+                        <button id="gridViewBtn" class="btn btn-secondary" onclick="showGridView()">Grid View</button>
                     </div>
 
-                    <!-- Course List (Replaced with Cards) -->
-                    <div class="row">
-                        <?php foreach ($courses as $course): ?>
-                        <div class="col-md-4 mb-4">
-                            <div class="card">
-                                <div class="card-body">
-                                    <h5 class="card-title text-black"><?php echo htmlspecialchars($course['title']); ?></h5>
-                                    <div class="position-relative" style="float: right; margin-top: -38px;background-color: #f3899d;">
-                                            <button class="btn btn-secondary" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+                    <!-- List View -->
+                    <div id="listView" class="view">
+                        <h2>List View</h2>
+                        <table class="table table-striped">
+                            <thead>
+                                <tr>
+                                    <th>ID</th>
+                                    <th>Title</th>
+                                    <th>Description</th>
+                                    <th>Topics</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <?php foreach ($courses as $course): ?>
+                                <tr>
+                                    <td><?php echo htmlspecialchars($course['id']); ?></td>
+                                    <td><?php echo htmlspecialchars($course['title']); ?></td>
+                                    <td><?php echo htmlspecialchars($course['description']); ?></td>
+                                    <td><?php echo htmlspecialchars($course['topics']); ?></td>
+                                    <td>
+                                        <div class="dropdown">
+                                            <button class="btn btn-secondary" type="button" id="dropdownMenuButton" data-bs-toggle="dropdown" aria-expanded="false">
                                                 <i class="fas fa-ellipsis-v"></i>
                                             </button>
-                                            <ul class="dropdown-menu dropdown-menu-end">
-                                                <li><a class="dropdown-item" href="edit_course.php?id=<?php echo $course['id']; ?>"><i class="fas fa-pencil-alt"></i> Edit</a></li>
+                                            <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="dropdownMenuButton">
                                                 <li>
-                                                    <form action="" method="post" class="d-inline" onsubmit="return confirm('Are you sure you want to delete this course?');">
-                                                        <input type="hidden" name="course_id" value="<?php echo $course['id']; ?>">
-                                                        <button type="submit" name="delete_course" class="dropdown-item"><i class="fas fa-trash"></i> Delete</button>
-                                                    </form>
+                                                    <button class="dropdown-item edit-btn" data-bs-toggle="modal" data-bs-target="#editModal" 
+                                                            data-id="<?php echo $course['id']; ?>" 
+                                                            data-title="<?php echo htmlspecialchars($course['title']); ?>" 
+                                                            data-description="<?php echo htmlspecialchars($course['description']); ?>" 
+                                                            data-topics="<?php echo htmlspecialchars($course['topics']); ?>" 
+                                                            data-prize="<?php echo isset($course['course_prize']) ? htmlspecialchars($course['course_prize']) : ''; ?>">Edit</button>
                                                 </li>
-                                            </ul>
-                                        </div>
-                                    <p class="card-text"><?php echo htmlspecialchars($course['description']); ?></p>
-                                    <div class="d-flex justify-content-between align-items-center">
-                                        <p class="card-text"><strong>Topics Covered:</strong> <?php echo htmlspecialchars($course['topics']); ?></p>
-                                        <!-- <div class="position-relative">
-                                            <button class="btn btn-secondary" type="button" data-bs-toggle="dropdown" aria-expanded="false">
-                                                <i class="fas fa-ellipsis-v"></i>
-                                            </button>
-                                            <ul class="dropdown-menu dropdown-menu-end">
-                                                <li><a class="dropdown-item" href="edit_course.php?id=<?php echo $course['id']; ?>">Edit</a></li>
                                                 <li>
                                                     <form action="" method="post" class="d-inline" onsubmit="return confirm('Are you sure you want to delete this course?');">
                                                         <input type="hidden" name="course_id" value="<?php echo $course['id']; ?>">
@@ -142,18 +229,177 @@ $courses = mysqli_fetch_all($result, MYSQLI_ASSOC);
                                                     </form>
                                                 </li>
                                             </ul>
-                                        </div> -->
+                                        </div>
+                                    </td>   
+
+                                </tr>
+                                <?php endforeach; ?>
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <!-- Grid View -->
+                    <div id="gridView" class="view">
+                        <h2>Grid View</h2>
+                        <div class="row g-4" id="enrollmentGrid">
+                            <?php foreach ($courses as $course): ?>
+                            <div class="col-md-4 mb-4">
+                                <div class="card">
+                                    <div class="card-body">
+                                        <div class="dropdown float-end">
+                                            <a class="btn btn-secondary" type="button" id="dropdownMenuButton" data-bs-toggle="dropdown" aria-expanded="false">
+                                                <i class="fas fa-ellipsis-v"></i>
+                                            </a>
+                                            <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="dropdownMenuButton">
+                                                <li>
+                                                    <button class="dropdown-item edit-btn" data-bs-toggle="modal" data-bs-target="#editModal" 
+                                                            data-id="<?php echo $course['id']; ?>" 
+                                                            data-title="<?php echo htmlspecialchars($course['title']); ?>" 
+                                                            data-description="<?php echo htmlspecialchars($course['description']); ?>" 
+                                                            data-topics="<?php echo htmlspecialchars($course['topics']); ?>" 
+                                                            data-prize="<?php  isset($course['course_prize']) ? htmlspecialchars($course['course_prize']) : ''; ?>">Edit</button>
+                                                </li>
+                                                <li>
+                                                    <form action="" method="post" class="d-inline" onsubmit="return confirm('Are you sure you want to delete this course?');">
+                                                        <input type="hidden" name="course_id" value="<?php echo $course['id']; ?>">
+                                                        <button type="submit" name="delete_course" class="dropdown-item">Delete</button>
+                                                    </form>
+                                                </li>
+                                            </ul>
+                                        </div>
+                                        <h5 class="card-title"><?php echo htmlspecialchars($course['title']); ?></h5>
+                                        <p class="card-text"><?php echo htmlspecialchars($course['description']); ?></p>
+                                        <p class="card-text"><strong>Topics Covered:</strong> <?php echo htmlspecialchars($course['topics']); ?></p>
                                     </div>
                                 </div>
                             </div>
+                            <?php endforeach; ?>
                         </div>
-                        <?php endforeach; ?>
                     </div>
                 </div>
             </main>
         </div>
     </div>
+    
+    <!-- Add Course Modal -->
+    <div class="modal fade" id="addCourseModal" tabindex="-1" aria-labelledby="addCourseModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="addCourseModalLabel">Add New Course</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <form action="" method="post">
+                        <div class="mb-3">
+                            <label for="modal_title" class="form-label">Title</label>
+                            <input type="text" class="form-control" id="modal_title" name="title" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="modal_topics" class="form-label">Topics Covered</label>
+                            <input type="text" class="form-control" id="modal_topics" name="topics" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="modal_description" class="form-label">Description</label>
+                            <textarea class="form-control" id="modal_description" name="description" rows="3"></textarea>
+                        </div>
+                        <div class="mb-3">
+                            <label for="modal_course_price" class="form-label">Course Price</label>
+                            <input type="number" class="form-control" id="modal_course_price" name="course_price" required>
+                        </div>
+                        <button type="submit" name="add_course" class="btn btn-primary">Add Course</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Edit Course Modal -->
+    <div class="modal fade" id="editModal" tabindex="-1" aria-labelledby="editModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="editModalLabel">Edit Course</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="editCourseForm" method="post" action="">
+                        <input type="hidden" name="course_id" id="course_id">
+                        <div class="mb-3">
+                            <label for="course_title" class="form-label">Title</label>
+                            <input type="text" class="form-control" id="course_title" name="course_title" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="course_description" class="form-label">Description</label>
+                            <textarea class="form-control" id="course_description" name="course_description" required></textarea>
+                        </div>
+                        <div class="mb-3">
+                            <label for="course_topics" class="form-label">Topics</label>
+                            <input type="text" class="form-control" id="course_topics" name="course_topics">
+                        </div>
+                        <div class="mb-3">
+                            <label for="course_prize" class="form-label">Course Price</label>
+                            <input type="number" class="form-control" id="course_prize" name="course_prize" required>
+                        </div>
+                        <button type="submit" name="update_course" class="btn btn-primary">Save changes</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        // Show List View
+        function showListView() {
+            document.getElementById('listView').style.display = 'block';
+            document.getElementById('gridView').style.display = 'none';
+            document.getElementById('listViewBtn').classList.add('btn-primary');
+            document.getElementById('listViewBtn').classList.remove('btn-secondary');
+            document.getElementById('gridViewBtn').classList.add('btn-secondary');
+            document.getElementById('gridViewBtn').classList.remove('btn-primary');
+        }
+
+        // Show Grid View
+        function showGridView() {
+            document.getElementById('listView').style.display = 'none';
+            document.getElementById('gridView').style.display = 'block';
+            document.getElementById('gridViewBtn').classList.add('btn-primary');
+            document.getElementById('gridViewBtn').classList.remove('btn-secondary');
+            document.getElementById('listViewBtn').classList.add('btn-secondary');
+            document.getElementById('listViewBtn').classList.remove('btn-primary');
+        }
+
+        // Populate the edit modal with course data
+        const editModal = document.getElementById('editModal');
+        editModal.addEventListener('show.bs.modal', function (event) {
+            const button = event.relatedTarget; // Button that triggered the modal
+            const courseId = button.getAttribute('data-id');
+            const courseTitle = button.getAttribute('data-title');
+            const courseDescription = button.getAttribute('data-description');
+            const courseTopics = button.getAttribute('data-topics');
+            const coursePrize = button.getAttribute('data-prize');
+
+            // Update the modal's content
+            const modalTitle = editModal.querySelector('.modal-title');
+            const courseIdInput = editModal.querySelector('#course_id');
+            const courseTitleInput = editModal.querySelector('#course_title');
+            const courseDescriptionInput = editModal.querySelector('#course_description');
+            const courseTopicsInput = editModal.querySelector('#course_topics');
+            const coursePrizeInput = editModal.querySelector('#course_prize');
+
+            modalTitle.textContent = 'Edit Course: ' + courseTitle;
+            courseIdInput.value = courseId;
+            courseTitleInput.value = courseTitle;
+            courseDescriptionInput.value = courseDescription;
+            courseTopicsInput.value = courseTopics;
+            coursePrizeInput.value = coursePrize;
+        });
+
+        // Ensure only one view is visible on load
+        document.addEventListener('DOMContentLoaded', function() {
+            showListView(); // or showGridView() based on your preference
+        });
+    </script>
 </body>
 </html>

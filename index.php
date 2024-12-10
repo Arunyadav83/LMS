@@ -147,7 +147,7 @@ include 'header.php';
                             <div class="card-footer bg-transparent border-0">
                                 <?php if (is_logged_in()): ?>
                                     <a href="course.php?id=<?php echo $course['id']; ?>" class="btn btn-primary btn-sm">View Course</a>
-                                    <a href="enroll.php?course_id=<?php echo $course['id']; ?>" class="btn btn-success btn-sm">Enroll</a>
+                                    <a href="courses.php" class="btn btn-success btn-sm">Enroll</a>
                                 <?php else: ?>
                                     <a href="login.php" class="btn btn-secondary btn-sm">Login to Enroll</a>
                                 <?php endif; ?>

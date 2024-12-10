@@ -1,82 +1,75 @@
 <?php
+error_reporting(E_ALL);
+ini_set('display_errors', 1);
+require_once 'config.php';
 
-// Include database configuration
-require_once 'config.php'; // Database connection
+// Fetch the course details
+if (isset($_POST['course_id'], $_POST['user_id'])) {
+    $course_id = $_POST['course_id'];
+    $user_id = $_POST['user_id'];
 
-// Include the Razorpay PHP library using Composer's autoload
-require 'vendor/autoload.php'; 
+    // Query to get the course details
+    $query = $query = "SELECT c.id, c.title AS title, c.course_prize AS course_prize, t.id AS tutor_id 
+    FROM courses c
+    LEFT JOIN tutors t ON c.tutor_id = t.id
+    WHERE c.id = ?";
 
-// Set the response content type to JSON
-header('Content-Type: application/json');
+    $stmt = $conn->prepare($query);
+    if (!$stmt) {
+        die(json_encode(['success' => false, 'message' => 'SQL error: ' . $conn->error]));
+    }
 
-// Check if the request method is POST
-if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
-    echo json_encode(['success' => false, 'message' => 'Invalid request method']);
-    exit;
+    $stmt->bind_param('i', $course_id);
+    $stmt->execute();
+    $result = $stmt->get_result();
+
+    if ($result->num_rows > 0) {
+        $course = $result->fetch_assoc();
+
+        $razorpayOrderData = [
+            'amount' => $course['course_prize'] * 100,
+            // Razorpay expects the amount in paise
+            'currency' => 'INR',
+            'receipt' => 'order_' . $course_id,
+            'notes' => [
+                'course_id' => $course_id,
+                'tutor_id' => $course['tutor_id'],
+                'course_name' => $course['title'],
+                'course_prize' => $course['course_prize'],
+                'title' => $course['title']
+            
+            ]
+        ];
+        
+        require_once('vendor/autoload.php');
+        $apiKey = 'rzp_test_Bvq9kiuaq8gkcs';
+        $apiSecret = 'qnN6ytUKNw6beVzQUw7OBiJM';
+        $api = new \Razorpay\Api\Api($apiKey, $apiSecret);
+
+        // Create the order
+        try {
+            $order = $api->order->create($razorpayOrderData);
+            // Prepare the response for a successful order creation
+            echo json_encode([
+                'success' => true,                // Indicates the success of the operation
+                'order_id' => $order->id,        // The ID of the created order
+                'course_id' => $course_id,        // The ID of the course
+                'user_id' => $user_id,            // The ID of the user
+                // 'amount' => $course['course_prize'], // Amount in paise
+                'course_prize' => $course['course_prize'], // Original course prize
+                'title' => $course['title']  ,
+                'tutor_id' => $course['tutor_id'],
+                'enrolled_at' => date('Y-m-d H:i:s')
+                 // Title of the course
+            ]);
+            
+        } catch (Exception $e) {
+            echo json_encode(['success' => false, 'message' => $e->getMessage()]);
+        }
+    } else {
+        echo json_encode(['success' => false, 'message' => 'Course not found']);
+    }
+} else {
+    echo json_encode(['success' => false, 'message' => 'Missing course or user ID']);
 }
-
-// Check if the required parameters are provided
-if (empty($_POST['course_id']) || empty($_POST['user_id'])) {
-    echo json_encode(['success' => false, 'message' => 'Invalid input']);
-    exit;
-}
-
-// Retrieve and validate input data
-$courseId = intval($_POST['course_id']);
-$userId = intval($_POST['user_id']);
-
-// Fetch course price from the database
-$query = "SELECT course_prize FROM courses WHERE id = ?";
-$stmt = $conn->prepare($query);
-$stmt->bind_param('i', $courseId);
-
-if (!$stmt->execute()) {
-    echo json_encode(['success' => false, 'message' => 'Database error: ' . $stmt->error]);
-    exit;
-}
-
-$result = $stmt->get_result();
-if ($result->num_rows === 0) {
-    echo json_encode(['success' => false, 'message' => 'Course not found']);
-    exit;
-}
-
-$course = $result->fetch_assoc();
-if (!isset($course['course_prize']) || $course['course_prize'] <= 0) {
-    echo json_encode(['success' => false, 'message' => 'Invalid course price']);
-    exit;
-}
-
-$coursePrice = $course['course_prize'] * 100; // Convert to paise for Razorpay
-
-// Initialize the Razorpay API
-use Razorpay\Api\Api;
-
-$apiKey = "rzp_test_Bvq9kiuaq8gkcs";
-$apiSecret = "qnN6ytUKNw6beVzQUw7OBiJM";
-$api = new Api($apiKey, $apiSecret);
-
-try {
-    // Create Razorpay order
-    $order = $api->order->create([
-        'receipt' => 'rcptid_' . $courseId,
-        'amount' => $coursePrice, // Amount in paise
-        'currency' => 'INR'
-    ]);
-
-    // Respond with the order details
-    echo json_encode([
-        'success' => true,
-        'order_id' => $order['id'],
-        'course_price' => $coursePrice
-    ]);
-} catch (Exception $e) {
-    // Handle errors in order creation
-    echo json_encode([
-        'success' => false,
-        'message' => 'Failed to create order. ' . $e->getMessage()
-    ]);
-}
-
-
 ?>

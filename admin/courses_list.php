@@ -40,6 +40,7 @@ if (isset($_POST['delete_course'])) {
             echo "<div class='alert alert-danger'>Error deleting related enrollments: " . mysqli_error($conn) . "</div>";
         }
 
+        $delete_payments_query = "DELETE FROM payments WHERE course_id = $course_id"; if (!mysqli_query($conn, $delete_payments_query)) { echo "<div class='alert alert-danger'>Error deleting related payments: " . mysqli_error($conn) . "</div>"; }
         // Finally, delete related records in the classes table
         $delete_classes_query = "DELETE FROM classes WHERE course_id = $course_id";
         if (!mysqli_query($conn, $delete_classes_query)) {

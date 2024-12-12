@@ -12,7 +12,7 @@ $query = "SELECT c.id, c.title, c.description, t.full_name AS tutor_name
           ORDER BY c.created_at DESC";
 $result = mysqli_query($conn, $query);
 
-// Assuming you have defined the Razorpay key in your config.php
+// Razorpay API key from the config
 $razorpayKey = 'rzp_test_Bvq9kiuaq8gkcs'; // Your Razorpay API key
 ?>
 
@@ -47,7 +47,7 @@ $razorpayKey = 'rzp_test_Bvq9kiuaq8gkcs'; // Your Razorpay API key
     <?php endif; ?>
 </div>
 
-<!-- Include jQuery before your scripts -->
+<!-- Include jQuery and Razorpay scripts -->
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
 
@@ -56,107 +56,43 @@ $razorpayKey = 'rzp_test_Bvq9kiuaq8gkcs'; // Your Razorpay API key
 <script src="https://cdnjs.cloudflare.com/ajax/libs/sweetalert/1.1.3/sweetalert.min.js"></script>
 
 <script>
-function showSuccessAlert() {
-    swal("Enroll successful!", "You have successfully enrolled in the course.", "success");
-}
+    function showSuccessAlert() {
+        swal("Enroll successful!", "You have successfully enrolled in the course.", "success");
+    }
 </script>
 
-<!-- <script>
-$(document).ready(function() {
-    $('.enroll-form').on('submit', function(e) {
-        e.preventDefault(); // Prevent the default form submission
-
-        var form = $(this);
-        $.ajax({
-            type: 'POST',
-            url: 'verify_payment.php', // URL to the PHP file that processes the enrollment
-            data: form.serialize(), // Serialize form data
-            success: function(response) {
-                console.log("Raw response:", response); // Log the raw response
-                try {
-                    // Check if the response is already an object, and if not, parse it
-                    if (typeof response === 'string') {
-                        response = JSON.parse(response); // Parse the response if it's a string
-                    }
-
-                    if (response.success) {
-                        var courseId = form.find('input[name="course_id"]').val();
-                        
-                        // First make the AJAX call
-                        $.ajax({
-                            type: 'POST',
-                            url: 'verify_payment.php',
-                            data: {
-                                razorpay_payment_id: paymentResponse.razorpay_payment_id,
-                                order_id: response.order_id,
-                                razorpay_signature: paymentResponse.razorpay_signature,
-                                course_id: courseId,
-                                user_id: userId,
-                                course_prize: response.course_prize,
-                                title: response.title
-                                tutor_id: response.tutor_id
-                            },
-                            success: function(ajaxResponse) {
-                                // After successful AJAX call, redirect to verify_payment.php
-                                window.location.href = 'verify_payment.php?course_id=' + courseId + 
-                                    '&razorpay_payment_id=' + paymentResponse.razorpay_payment_id + 
-                                    '&payment_id=' + paymentResponse.razorpay_payment_id +
-                                    '&order_id=' + response.order_id + 
-                                    '&razorpay_signature=' + paymentResponse.razorpay_signature +
-                                    '&title=' + response.title +
-                                    '&user_id=' + userId +
-                                    '&course_id=' + courseId +
-                                    '&course_prize=' + response.course_prize+
-                                    '&tutor_id=' + response.tutor_id
-                            },
-                            error: function(xhr, status, error) {
-                                console.error('Payment verification failed:', error);
-                            }
-                        });
-                    } else {
-                        swal("Enrollment failed!", response.message, "error");
-                    }
-                } catch (e) {
-                    console.error("Parsing error:", e);
-                    console.error("Response received:", response); // Log the raw response for debugging
-                    swal("Enrollment failed!", "An unexpected error occurred. Please check the console for details.", "error");
-                }
-            },
-            error: function(xhr, status, error) {
-                console.error("AJAX error:", status, error); // Log AJAX error details
-                swal("Enrollment failed!", "Please try again.", "error");
-            }
-        });
-    });
-});
-</script> -->
+<script>
+    var username = '<?php echo isset($_SESSION['username']) ? htmlspecialchars($_SESSION['username'], ENT_QUOTES, 'UTF-8') : ''; ?>'; 
+</script>
 
 <script>
-function enrollCourse(courseId, userId) {
-    $.ajax({
-        type: 'POST',
-        url: 'create_order.php',
-        data: { course_id: courseId, user_id: userId },
-        success: function(response) {
-            console.log("Raw response:", response);
-            try {
-                response = typeof response === 'string' ? JSON.parse(response) : response;
+    function enrollCourse(courseId, userId) {
+        $.ajax({
+            type: 'POST',
+            url: 'create_order.php',
+            data: {
+                course_id: courseId,
+                user_id: userId
+            },
+            success: function(response) {
+                console.log("Raw response:", response);
+                try {
+                    response = typeof response === 'string' ? JSON.parse(response) : response;
 
-                if (response.success) {
-                    var options = {
-                        key: '<?php echo $razorpayKey; ?>',
-                        amount: response.amount,
-                        currency: 'INR',
-                        name: 'Course Enrollment',
-                        description: 'Enroll in Course',
-                        image: 'assets/images/logo.png',
-                        order_id: response.order_id,
-                        handler: function(paymentResponse) {
-                            // Send payment details to the backend for verification
-                            $.ajax({
-                                type: 'POST',
-                                url: 'verify_payment.php',
-                               
+                    if (response.success) {
+                        var options = {
+                            key: '<?php echo $razorpayKey; ?>',
+                            amount: response.amount,
+                            currency: 'INR',
+                            name: 'Course Enrollment',
+                            description: 'Enroll in Course',
+                            image: 'assets/images/logo.png',
+                            order_id: response.order_id,
+                            handler: function(paymentResponse) {
+                                // Send payment details to the backend for verification
+                                $.ajax({
+                                    type: 'POST',
+                                    url: 'verify_payment.php',
                                     data: {
                                         razorpay_payment_id: paymentResponse.razorpay_payment_id,
                                         order_id: response.order_id,
@@ -166,40 +102,48 @@ function enrollCourse(courseId, userId) {
                                         course_prize: response.course_prize,
                                         title: response.title,
                                         tutor_id: response.tutor_id,
-                                        enrolled_at: response.enrolled_at
+                                        username: username,
+                                        enrolled_at: response.enrolled_at,
                                     },
-                                success: function(verifyResponse) {
-                                    console.log("Verify Response:", verifyResponse);
-                                    verifyResponse = typeof verifyResponse === 'string' ? JSON.parse(verifyResponse) : verifyResponse;
+                                    success: function(verifyResponse) {
+                                        console.log("Verify Response:", verifyResponse);
+                                        verifyResponse = typeof verifyResponse === 'string' ? JSON.parse(verifyResponse) : verifyResponse;
 
-                                    if (verifyResponse.success) {
-                                        showSuccessAlert();
-                                    } else {
-                                        swal("Payment Verification Failed!", verifyResponse.message, "error");
+                                        if (verifyResponse.success) {
+                                            showSuccessAlert();
+                                        } else {
+                                            swal("Payment Verification Failed!", verifyResponse.message, "error");
+                                        }
+                                    },
+                                    error: function(xhr, status, error) {
+                                        console.error("Verification AJAX error:", status, error);
+                                        swal("Payment Verification Failed!", "Please try again.", "error");
                                     }
-                                },
-                                error: function(xhr, status, error) {
-                                    console.error("Verification AJAX error:", status, error);
-                                    swal("Payment Verification Failed!", "Please try again.", "error");
-                                }
-                            });
-                        },
-                        theme: { color: '#F37254' }
-                    };
-                    var rzp1 = new Razorpay(options);
-                    rzp1.open();
-                } else {
-                    swal("Order Creation Failed!", response.message, "error");
+                                });
+                            },
+                            theme: {
+                                color: '#F37254'
+                            }
+                        };
+                        var rzp1 = new Razorpay(options);
+                        rzp1.open();
+                    } else {
+                        swal("Order Creation Failed!", response.message, "error");
+                    }
+                } catch (e) {
+                    console.error("Parsing error:", e, response);
+                    swal("Enrollment Failed!", "An unexpected error occurred.", "error");
                 }
-            } catch (e) {
-                console.error("Parsing error:", e, response);
-                swal("Enrollment Failed!", "An unexpected error occurred.", "error");
+            },
+            error: function(xhr, status, error) {
+                console.error("Order Creation AJAX error:", status, error);
+                swal({
+                    title: "Enrollment Failed!",
+                    text: "There was an issue with your enrollment. Please contact support.",
+                    icon: "error",
+                    button: "OK",
+                });
             }
-        },
-        error: function(xhr, status, error) {
-            console.error("Order Creation AJAX error:", status, error);
-            swal("Enrollment Failed!", "Please try again.", "error");
-        }
-    });
-}
+        });
+    }
 </script>

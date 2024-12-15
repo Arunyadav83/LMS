@@ -49,7 +49,7 @@ if (session_status() === PHP_SESSION_NONE) {
                         <a class="nav-link" href="courses.php"><i class="fas fa-book"></i> Courses</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="help-center.php"><i class="fas fa-life-ring"></i> Help Center</a>
+                        <a class="nav-link" href="about.php"><i class="fas fa-life-ring"></i> About Us</a>
                     </li>
                     <?php if (is_logged_in()): ?>
                         <li class="nav-item">

@@ -18,12 +18,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     if (isset($_FILES['image_path']) && $_FILES['image_path']['error'] === UPLOAD_ERR_OK) {
         $name = htmlspecialchars($_POST['name'], ENT_QUOTES, 'UTF-8'); // Sanitize input
         $successstory = htmlspecialchars($_POST['successtory'], ENT_QUOTES, 'UTF-8'); // Sanitize input
-        $imageAlt = htmlspecialchars($_POST['image_alt'], ENT_QUOTES, 'UTF-8'); // Sanitize input
 
         // Handle the uploaded file
         $fileTmpPath = $_FILES['image_path']['tmp_name'];
         $fileName = basename($_FILES['image_path']['name']);
-        $uploadFileDir = __DIR__ . '/uploaded_images/'; // Absolute path
+        $fileName = str_replace(' ', '_', $fileName); // Replace spaces with underscores for consistency
+        $uploadFileDir = '/uploaded_images/'; // Relative path for storing images
         $dest_path = $uploadFileDir . $fileName;
 
         // Check if the directory exists, if not, create it
@@ -33,12 +33,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
         // Move the file to the specified directory
         if (move_uploaded_file($fileTmpPath, $dest_path)) {
-            // Convert the destination path to a relative path for database storage
-            $relativePath = str_replace(__DIR__, '', $dest_path);
+            // Store the relative path in the database (e.g., 'uploaded_images/filename.jpg')
+            $relativePath = $dest_path;
 
             // Prepare the SQL query using prepared statements
-            $stmt = $conn->prepare("INSERT INTO student_success_stories (name, successtory, image_path, image_alt) VALUES (?, ?, ?, ?)");
-            $stmt->bind_param("ssss", $name, $successstory, $relativePath, $imageAlt);
+            $stmt = $conn->prepare("INSERT INTO student_success_stories (name, successtory, image_path) VALUES (?, ?, ?)");
+            $stmt->bind_param("sss", $name, $successstory, $relativePath);
 
             if ($stmt->execute()) {
                 // Redirect to successstory.php after successful insertion

@@ -24,7 +24,11 @@ $razorpayKey = 'rzp_test_Bvq9kiuaq8gkcs'; // Your Razorpay API key
             <?php while ($course = mysqli_fetch_assoc($result)): ?>
                 <div class="col-12 col-sm-6 col-md-3 mb-3">
                     <div class="card h-60" style="padding: 0px;!important">
-                        <img src="assets/images/-<?php echo $course['id']; ?>.jpg" class="card-img-top img-fluid" style="max-height: 150px; object-fit: cover;" alt="<?php echo htmlspecialchars($course['title']); ?>">
+                        <img
+                            src="assets/images/<?php echo htmlspecialchars($course['title'], ENT_QUOTES, 'UTF-8'); ?>.jpg"
+                            class="card-img-top img-fluid"
+                            style="max-height: 150px; object-fit: cover;"
+                            alt="<?php echo htmlspecialchars($course['title']); ?>">
                         <div class="card-body">
                             <h5 class="card-title"><?php echo htmlspecialchars($course['title']); ?></h5>
                             <p class="card-text" style="max-height: 50px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;"><?php echo htmlspecialchars($course['description']); ?></p>
@@ -55,14 +59,14 @@ $razorpayKey = 'rzp_test_Bvq9kiuaq8gkcs'; // Your Razorpay API key
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/sweetalert/1.1.3/sweetalert.min.css">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/sweetalert/1.1.3/sweetalert.min.js"></script>
 
-<script>
+<!-- <script>
     function showSuccessAlert() {
         swal("Enroll successful!", "You have successfully enrolled in the course.", "success");
     }
-</script>
+</script> -->
 
 <script>
-    var username = '<?php echo isset($_SESSION['username']) ? htmlspecialchars($_SESSION['username'], ENT_QUOTES, 'UTF-8') : ''; ?>'; 
+    var username = '<?php echo isset($_SESSION['username']) ? htmlspecialchars($_SESSION['username'], ENT_QUOTES, 'UTF-8') : ''; ?>';
 </script>
 
 <script>
@@ -74,76 +78,106 @@ $razorpayKey = 'rzp_test_Bvq9kiuaq8gkcs'; // Your Razorpay API key
                 course_id: courseId,
                 user_id: userId
             },
+            dataType: 'json',
             success: function(response) {
-                console.log("Raw response:", response);
-                try {
-                    response = typeof response === 'string' ? JSON.parse(response) : response;
-
-                    if (response.success) {
-                        var options = {
-                            key: '<?php echo $razorpayKey; ?>',
-                            amount: response.amount,
-                            currency: 'INR',
-                            name: 'Course Enrollment',
-                            description: 'Enroll in Course',
-                            image: 'assets/images/logo.png',
-                            order_id: response.order_id,
-                            handler: function(paymentResponse) {
-                                // Send payment details to the backend for verification
-                                $.ajax({
-                                    type: 'POST',
-                                    url: 'verify_payment.php',
-                                    data: {
-                                        razorpay_payment_id: paymentResponse.razorpay_payment_id,
-                                        order_id: response.order_id,
-                                        razorpay_signature: paymentResponse.razorpay_signature,
-                                        course_id: courseId,
-                                        user_id: userId,
-                                        course_prize: response.course_prize,
-                                        title: response.title,
-                                        tutor_id: response.tutor_id,
-                                        username: username,
-                                        enrolled_at: response.enrolled_at,
-                                    },
-                                    success: function(verifyResponse) {
-                                        console.log("Verify Response:", verifyResponse);
-                                        verifyResponse = typeof verifyResponse === 'string' ? JSON.parse(verifyResponse) : verifyResponse;
-
-                                        if (verifyResponse.success) {
-                                            showSuccessAlert();
-                                        } else {
-                                            swal("Payment Verification Failed!", verifyResponse.message, "error");
-                                        }
-                                    },
-                                    error: function(xhr, status, error) {
-                                        console.error("Verification AJAX error:", status, error);
-                                        swal("Payment Verification Failed!", "Please try again.", "error");
-                                    }
-                                });
-                            },
-                            theme: {
-                                color: '#F37254'
+                console.log("RAW response:", response);
+                if (response.success) {
+                    var options = {
+                        key: '<?php echo $razorpayKey; ?>',
+                        amount: response.course_prize * 100, // Convert to paise
+                        currency: 'INR',
+                        name: 'Course Enrollment',
+                        description: 'Enroll in ' + response.title,
+                        image: 'assets/images/logo.png',
+                        order_id: response.order_id,
+                        handler: function(paymentResponse) {
+                            verifyPayment(paymentResponse, response, courseId, userId);
+                        },
+                        modal: {
+                            ondismiss: function() {
+                                console.log("Checkout form closed");
                             }
-                        };
-                        var rzp1 = new Razorpay(options);
-                        rzp1.open();
-                    } else {
-                        swal("Order Creation Failed!", response.message, "error");
-                    }
-                } catch (e) {
-                    console.error("Parsing error:", e, response);
-                    swal("Enrollment Failed!", "An unexpected error occurred.", "error");
+                        },
+                        theme: {
+                            color: '#F37254'
+                        }
+                    };
+                    var rzp1 = new Razorpay(options);
+                    rzp1.on('payment.failed', function(response) {
+                        console.error("Payment failed:", response.error);
+                        showErrorAlert("Payment Failed!", response.error.description);
+                    });
+                    rzp1.open();
+                } else {
+                    showErrorAlert("Order Creation Failed!", response.message);
                 }
             },
             error: function(xhr, status, error) {
                 console.error("Order Creation AJAX error:", status, error);
-                swal({
-                    title: "Enrollment Failed!",
-                    text: "There was an issue with your enrollment. Please contact support.",
-                    icon: "error",
-                    button: "OK",
-                });
+                showErrorAlert("Enrollment Failed!", "An unexpected error occurred. Please try again.");
+            }
+        });
+
+    }
+
+    function verifyPayment(paymentResponse, orderResponse, courseId, userId) {
+        $.ajax({
+            type: 'POST',
+            url: 'verify_payment.php',
+            data: {
+                razorpay_payment_id: paymentResponse.razorpay_payment_id,
+                order_id: paymentResponse.razorpay_order_id,
+                razorpay_signature: paymentResponse.razorpay_signature,
+                course_id: courseId,
+                course_prize: orderResponse.course_prize,
+                title: orderResponse.title,
+                tutor_id: orderResponse.tutor_id
+            },
+            dataType: 'json',
+            success: function(response) {
+                if (response.success) {
+                    swal("Success!", response.message, "success");
+                } else {
+                    swal("Failed!", response.message, "error");
+                }
+            },
+            error: function(xhr, status, error) {
+                console.error("Verification error:", error);
+                swal("Failed!", "An unexpected error occurred while verifying the payment.", "error");
             }
         });
     }
+
+    function showSuccessAlert() {
+        swal({
+            title: "Enrollment Successful!",
+            text: "You have successfully enrolled in the course.",
+            icon: "success",
+            button: "OK",
+            className: "green-bg"
+        })
+    }
+
+    function showErrorAlert(title, message) {
+        swal({
+            title: title,
+            text: message,
+            icon: "error",
+            button: "OK",
+        });
+    }
 </script>
+<?php include 'footer.php'; ?>
+<!-- <script>
+    function showSuccessAlert() {
+    swal({
+        title: "Enrollment Successful!",
+        text: "You have successfully enrolled in the course.",
+        icon: "success",
+        button: "OK",
+    }).then(function() {
+        // Optionally, you can redirect the user or refresh the page
+        window.location.reload();
+    });
+}
+</script> -->

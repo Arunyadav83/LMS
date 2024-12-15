@@ -51,7 +51,8 @@ mysqli_stmt_execute($classes_stmt);
 $classes_result = mysqli_stmt_get_result($classes_stmt);
 
 // Function to check if the previous quiz was completed and if enough time has passed
-function isPreviousQuizCompletedAndTimeElapsed($conn, $class_id, $user_id) {
+function isPreviousQuizCompletedAndTimeElapsed($conn, $class_id, $user_id)
+{
     $query = "SELECT completed_at FROM quiz_completions 
               WHERE class_id = ? AND user_id = ? 
               ORDER BY completed_at DESC LIMIT 1";
@@ -60,7 +61,7 @@ function isPreviousQuizCompletedAndTimeElapsed($conn, $class_id, $user_id) {
     mysqli_stmt_execute($stmt);
     $result = mysqli_stmt_get_result($stmt);
     $completion = mysqli_fetch_assoc($result);
-    
+
     if ($completion) {
         $completed_time = strtotime($completion['completed_at']);
         $current_time = time();
@@ -77,7 +78,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['course_id']) && isset
     // Prepare the SQL statement to update the course with the selected tutor
     $query_assign_tutor = "UPDATE courses SET tutor_id = ? WHERE id = ?";
     $stmt = $conn->prepare($query_assign_tutor);
-    
+
     // Check if the statement preparation was successful
     if ($stmt) {
         $stmt->bind_param("ii", $tutor_id, $course_id);
@@ -102,9 +103,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['course_id']) && isset
 
     <?php if (mysqli_num_rows($classes_result) > 0): ?>
         <div class="row">
-            <?php 
+            <?php
             $lesson_number = 1;
-            while ($class = mysqli_fetch_assoc($classes_result)): 
+            while ($class = mysqli_fetch_assoc($classes_result)):
                 $is_unlocked = ($lesson_number === 1);
             ?>
                 <div class="col-md-4 mb-4">
@@ -131,53 +132,56 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['course_id']) && isset
                                     <div id="quiz_option_<?php echo $class['id']; ?>" style="display: none;">
                                         <a href="take_quiz.php?class_id=<?php echo $class['id']; ?>" class="btn btn-primary">Take Quiz</a>
                                     </div>
+                                    <!-- <p><strong>Description:</strong></p>
+                                    <p><?php echo htmlspecialchars($course['description']); ?></p> -->
+
                                     <script>
-                                    document.addEventListener('DOMContentLoaded', function() {
-                                        var video = document.getElementById('video_<?php echo $class['id']; ?>');
-                                        var playPauseButton = document.getElementById('play_pause_<?php echo $class['id']; ?>');
-                                        var seekBar = document.getElementById('seek_bar_<?php echo $class['id']; ?>');
-                                        var volumeControl = document.getElementById('volume_<?php echo $class['id']; ?>');
-                                        var quizOption = document.getElementById('quiz_option_<?php echo $class['id']; ?>');
-                                        var hasWatched = false;
-                                        var maxTime = 0;
+                                        document.addEventListener('DOMContentLoaded', function() {
+                                            var video = document.getElementById('video_<?php echo $class['id']; ?>');
+                                            var playPauseButton = document.getElementById('play_pause_<?php echo $class['id']; ?>');
+                                            var seekBar = document.getElementById('seek_bar_<?php echo $class['id']; ?>');
+                                            var volumeControl = document.getElementById('volume_<?php echo $class['id']; ?>');
+                                            var quizOption = document.getElementById('quiz_option_<?php echo $class['id']; ?>');
+                                            var hasWatched = false;
+                                            var maxTime = 0;
 
-                                        // Remove default controls
-                                        video.removeAttribute('controls');
+                                            // Remove default controls
+                                            video.removeAttribute('controls');
 
-                                        playPauseButton.addEventListener('click', function() {
-                                            if (video.paused) {
-                                                video.play();
-                                            } else {
-                                                video.pause();
-                                            }
+                                            playPauseButton.addEventListener('click', function() {
+                                                if (video.paused) {
+                                                    video.play();
+                                                } else {
+                                                    video.pause();
+                                                }
+                                            });
+
+                                            video.addEventListener('timeupdate', function() {
+                                                var value = (100 / video.duration) * video.currentTime;
+                                                seekBar.value = value;
+                                                if (video.currentTime > maxTime) {
+                                                    maxTime = video.currentTime;
+                                                }
+                                            });
+
+                                            seekBar.addEventListener('change', function() {
+                                                var time = video.duration * (seekBar.value / 100);
+                                                if (time <= maxTime) {
+                                                    video.currentTime = time;
+                                                } else {
+                                                    seekBar.value = (100 / video.duration) * maxTime;
+                                                }
+                                            });
+
+                                            volumeControl.addEventListener('change', function() {
+                                                video.volume = volumeControl.value;
+                                            });
+
+                                            video.addEventListener('ended', function() {
+                                                hasWatched = true;
+                                                quizOption.style.display = 'block';
+                                            });
                                         });
-
-                                        video.addEventListener('timeupdate', function() {
-                                            var value = (100 / video.duration) * video.currentTime;
-                                            seekBar.value = value;
-                                            if (video.currentTime > maxTime) {
-                                                maxTime = video.currentTime;
-                                            }
-                                        });
-
-                                        seekBar.addEventListener('change', function() {
-                                            var time = video.duration * (seekBar.value / 100);
-                                            if (time <= maxTime) {
-                                                video.currentTime = time;
-                                            } else {
-                                                seekBar.value = (100 / video.duration) * maxTime;
-                                            }
-                                        });
-
-                                        volumeControl.addEventListener('change', function() {
-                                            video.volume = volumeControl.value;
-                                        });
-
-                                        video.addEventListener('ended', function() {
-                                            hasWatched = true;
-                                            quizOption.style.display = 'block';
-                                        });
-                                    });
                                     </script>
                                 <?php else: ?>
                                     <p>No video available for this class.</p>
@@ -192,9 +196,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['course_id']) && isset
                         </div>
                     </div>
                 </div>
-            <?php 
-            $lesson_number++;
-            endwhile; 
+            <?php
+                $lesson_number++;
+            endwhile;
             ?>
         </div>
     <?php else: ?>

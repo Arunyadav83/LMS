@@ -86,7 +86,7 @@
       <strong>Ultrakey</strong> is located at:
       <br> Address: 2nd Floor, Above Indian Bank, 2th Block, Indira Nagar Gachibowli , Hydearabd, 500082
       <br> Email: <a href="mailto:support@gmail.com">support@gmail.com</a>
-      <br> Website: <a href="https://www.ultrakey.com" target="_blank">www.ultrakey.com</a>
+      <br> Website: <a href="https://www.ultrakeyit.com" target="_blank">www.ultrakey.com</a>
     </p>
   </div>
   

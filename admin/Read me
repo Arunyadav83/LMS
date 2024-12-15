@@ -6,14 +6,20 @@ Email: admin@gmail.com
 Password: admin (hashed)
 
 credentials for student
+---------------------------
 email and Username: nehakumari@gmail.com &Neha
 password=neha@1234 , 
 
 email and Username: srivani@gmail.com &srivani
 password=Srivani@123 , 
 
+user:ShivaMani
+password:shivamani@1234
+
 email: rohithpatel@gmail.com user:Rohith Patel
 password:rohith@1234
+user:Saikumar
+password:saikumar@123
 
 email:ramana@gmail.com user:Ramana
 password:Ramana@1234
@@ -37,6 +43,7 @@ Password: password
 
 
 classes login details
+----------------------------
 
 gopichand93667@gmail.com
 123
@@ -49,3 +56,6 @@ sanjay@1234
 
 admin@gmail.com
 123
+
+rajesh234@gmail.com
+rajesh@1234

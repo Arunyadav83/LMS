@@ -183,10 +183,13 @@ $courses = mysqli_fetch_all($result, MYSQLI_ASSOC);
                         <a href="add_course.php" class="btn btn-success">Add New Course</a>
                     </div>
                     
-                    <!-- View Toggle Buttons -->
-                    <div class="mb-3">
-                        <button id="listViewBtn" class="btn btn-primary" onclick="showListView()">List View</button>
-                        <button id="gridViewBtn" class="btn btn-secondary" onclick="showGridView()">Grid View</button>
+                    <div style="margin-left: 700px;">
+                    <button id="listViewBtn" class="btn btn-primary" onclick="showListView()">
+                        <i class="fas fa-list"></i> List View
+                    </button>
+                    <button id="gridViewBtn" class="btn btn-secondary" onclick="showGridView()">
+                        <i class="fas fa-th"></i> Grid View
+                    </button>
                     </div>
 
                     <!-- List View -->

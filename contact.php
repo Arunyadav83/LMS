@@ -1,5 +1,23 @@
+<?php
+// Check if the form is submitted
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    // Retrieve form data
+    $name = $_POST['name'];
+    $email = $_POST['email'];
+    $message = $_POST['message'];
+
+    // Process form data (e.g., save to database)
+    // Example: Assume a successful save
+    // TODO: Add your database connection and insertion logic here
+
+    // Redirect to user dashboard or thank you page
+    header("Location: index.php");
+    exit;
+}
+?>
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -33,7 +51,7 @@
         }
 
         .container {
-            max-width:  1200px;
+            max-width: 1200px;
             margin: 50px;
             padding: 20px;
             backdrop-filter: blur(10px);
@@ -66,7 +84,8 @@
             height: auto;
         }
 
-        .contact-form input, .contact-form textarea {
+        .contact-form input,
+        .contact-form textarea {
             width: 60%;
             padding: 12px;
             margin: 10px 0;
@@ -119,45 +138,54 @@
         .map-container {
             margin-top: 10px;
         }
-        .section-title{
+
+        .section-title {
             color: white;
             text-align: center;
             margin-bottom: 50px;
-            /* margin-top: 50px; */
             font-size: 35px;
         }
-        h2{
+
+        h2 {
             color: white;
             text-align: center;
             margin-bottom: 50px;
-            /* margin-top: 50px; */
             font-size: 35px;
         }
+
         @media (max-width: 768px) {
             .location-card {
                 width: 100%;
             }
-            .container{
+
+            .container {
                 flex-direction: column;
             }
-            .contact-form input, .contact-form textarea{
+
+            .contact-form input,
+            .contact-form textarea {
                 margin-left: 45px;
                 position: relative;
                 top: 10px;
-        }
-        .contact-form button{
-            margin-left: 70px;
-            width: 40%;
-        }
-        .main-container{
-            width: 100%;
-            height: 100%;
-        }
-        .contact-form h2 {
-            margin-bottom: 10px;
+            }
+
+            .contact-form button {
+                margin-left: 70px;
+                width: 40%;
+            }
+
+            .main-container {
+                width: 100%;
+                height: 100%;
+            }
+
+            .contact-form h2 {
+                margin-bottom: 10px;
+            }
         }
     </style>
 </head>
+
 <body>
     <div class="main-container">
         <div class="container">
@@ -195,12 +223,12 @@
                 <h3>Gachibowli</h3>
                 <p>Flat No: 204, 2nd Floor, Cyber Residency, above Indian Bank, Indira Nagar, Gachibowli, Hyderabad, Telangana 500032</p>
                 <div class="map-container">
-                    <iframe 
-                        src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3806.3760464279485!2d78.35711507369068!3d17.441706501240915!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x4f7a26b96d6c0b61%3A0x6b3acb732ef5e3!2sUltrakey%20IT%20Solutions%20Private%20Limited!5e0!3m2!1sen!2sin!4v1732775159454!5m2!1sen!2sin" 
-                        width="300" 
-                        height="200" 
-                        style="border:0;" 
-                        allowfullscreen="" 
+                    <iframe
+                        src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3806.3760464279485!2d78.35711507369068!3d17.441706501240915!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x4f7a26b96d6c0b61%3A0x6b3acb732ef5e3!2sUltrakey%20IT%20Solutions%20Private%20Limited!5e0!3m2!1sen!2sin!4v1732775159454!5m2!1sen!2sin"
+                        width="300"
+                        height="200"
+                        style="border:0;"
+                        allowfullscreen=""
                         loading="lazy">
                     </iframe>
                 </div>
@@ -209,20 +237,18 @@
                 <h3>KPHB Colony</h3>
                 <p>Flat No. 301, 3rd Floor, Manyavar Building, Rd Number 2, Hyderabad, Telangana, 500085</p>
                 <div class="map-container">
-                    <iframe 
-                        src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d315217.9999999999!2d78.3872!3d17.385044!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x3bcb93e1e1e1e1e1%3A0x3bcb93e1e1e1e1e1!2sKPHB%20Colony%2C%20Hyderabad%2C%20Telangana%2C%20500085!5e0!3m2!1sen!2sin!4v1631234567890&maptype=satellite" 
-                        width="300" 
-                        height="200" 
-                        style="border:0;" 
-                        allowfullscreen="" 
+                    <iframe
+                        src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d315217.9999999999!2d78.3872!3d17.385044!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x3bcb93e1e1e1e1e1%3A0x0e1c9c918791b8f!2sKPHB%20Colony%20Road!5e0!3m2!1sen!2sin!4v1644537905478!5m2!1sen!2sin"
+                        width="300"
+                        height="200"
+                        style="border:0;"
+                        allowfullscreen=""
                         loading="lazy">
                     </iframe>
                 </div>
             </div>
         </div>
     </div>
-
-    <!-- Font Awesome for icons -->
-    <script src="https://kit.fontawesome.com/a076d05399.js" crossorigin="anonymous"></script>
 </body>
+
 </html>

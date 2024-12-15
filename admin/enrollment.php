@@ -16,7 +16,7 @@ if (isset($_POST['delete_enrollment'])) {
     // Ensure the enrollment ID is valid before executing the delete query
     if ($enrollment_id > 0) {
         $delete_query = "DELETE FROM enrollments WHERE id = $enrollment_id";
-        
+
         if (mysqli_query($conn, $delete_query)) {
             echo "<div class='alert alert-success'>Enrollment deleted successfully.</div>";
         } else {
@@ -50,6 +50,7 @@ foreach ($enrollments as $enrollment) {
 
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -58,10 +59,11 @@ foreach ($enrollments as $enrollment) {
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
 </head>
 <style>
-    h1{
-        color:darkblue;
+    h1 {
+        color: darkblue;
     }
 </style>
+
 <body>
     <!-- Navigation Bar -->
     <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
@@ -93,12 +95,14 @@ foreach ($enrollments as $enrollment) {
                 <div class="container mt-4">
                     <h1 class="mb-4">Enrollments</h1>
 
-                    <!-- View Toggle Buttons -->
-                    <div class="mb-3">
-                        <button id="listViewBtn" class="btn btn-primary" onclick="showListView()">List View</button>
-                        <button id="gridViewBtn" class="btn btn-secondary" onclick="showGridView()">Grid View</button>
+                    <div style="margin-left: 700px;">
+                    <button id="listViewBtn" class="btn btn-primary" onclick="showListView()">
+                        <i class="fas fa-list"></i> List 
+                    </button>
+                    <button id="gridViewBtn" class="btn btn-secondary" onclick="showGridView()">
+                        <i class="fas fa-th"></i> Grid 
+                    </button>
                     </div>
-
                     <!-- List View -->
                     <div id="listView" class="view">
                         <h2>Enrollments List</h2>
@@ -116,62 +120,62 @@ foreach ($enrollments as $enrollment) {
                             </thead>
                             <tbody>
                                 <?php foreach ($enrollments as $enrollment): ?>
-                                <tr>
-                                    <td><?php echo htmlspecialchars($enrollment['id']); ?></td>
-                                    <td><?php echo htmlspecialchars($enrollment['username']); ?></td>
-                                    <td><?php echo htmlspecialchars($enrollment['email']); ?></td>
-                                    <td><?php echo htmlspecialchars($enrollment['course_name']); ?></td>
-                                    <td><?php echo htmlspecialchars($enrollment['tutor_name']); ?></td>
-                                    <td><?php echo htmlspecialchars($enrollment['enrolled_at']); ?></td>
-                                    <td>
-                                        <div class="dropdown">
-                                            <button class="btn btn-secondary dropdown-toggle" type="button" id="dropdownMenuButton<?php echo $enrollment['id']; ?>" data-bs-toggle="dropdown" aria-expanded="false">
-                                                <i class="fas fa-ellipsis-v"></i> <!-- Three horizontal lines -->
-                                            </button>
-                                            <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton<?php echo $enrollment['id']; ?>">
-                                                <li>
-                                                    <button class="dropdown-item" data-bs-toggle="modal" data-bs-target="#editEnrollment<?php echo $enrollment['id']; ?>">
-                                                        <i class="fas fa-pencil-alt"></i> Edit
-                                                    </button>
-                                                </li>
-                                                <li>
-                                                    <form action="" method="post" class="d-inline">
-                                                        <input type="hidden" name="id" value="<?php echo $enrollment['id']; ?>">
-                                                        <button type="submit" name="delete_enrollment" class="dropdown-item" onclick="return confirm('Are you sure you want to delete this enrollment?')">
-                                                            <i class="fas fa-trash"></i> Delete
+                                    <tr>
+                                        <td><?php echo htmlspecialchars($enrollment['id']); ?></td>
+                                        <td><?php echo htmlspecialchars($enrollment['username']); ?></td>
+                                        <td><?php echo htmlspecialchars($enrollment['email']); ?></td>
+                                        <td><?php echo htmlspecialchars($enrollment['course_name']); ?></td>
+                                        <td><?php echo htmlspecialchars($enrollment['tutor_name']); ?></td>
+                                        <td><?php echo htmlspecialchars($enrollment['enrolled_at']); ?></td>
+                                        <td>
+                                            <div class="dropdown">
+                                                <button class="btn btn-secondary" type="button" id="dropdownMenuButton<?php echo $enrollment['id']; ?>" data-bs-toggle="dropdown" aria-expanded="false">
+                                                    <i class="fas fa-ellipsis-v"></i> <!-- Three horizontal lines -->
+                                                </button>
+                                                <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton<?php echo $enrollment['id']; ?>">
+                                                    <li>
+                                                        <button class="dropdown-item" data-bs-toggle="modal" data-bs-target="#editEnrollment<?php echo $enrollment['id']; ?>">
+                                                            <i class="fas fa-pencil-alt"></i> Edit
                                                         </button>
-                                                    </form>
-                                                </li>
-                                            </ul>
-                                        </div>
-                                    </td>
-                                </tr>
-
-                                <!-- Edit Enrollment Modal -->
-                                <div class="modal fade" id="editEnrollment<?php echo $enrollment['id']; ?>" tabindex="-1" aria-labelledby="editEnrollmentLabel<?php echo $enrollment['id']; ?>" aria-hidden="true">
-                                    <div class="modal-dialog">
-                                        <div class="modal-content">
-                                            <div class="modal-header">
-                                                <h5 class="modal-title" id="editEnrollmentLabel<?php echo $enrollment['id']; ?>">Edit Enrollment</h5>
-                                                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                                    </li>
+                                                    <li>
+                                                        <form action="" method="post" class="d-inline">
+                                                            <input type="hidden" name="id" value="<?php echo $enrollment['id']; ?>">
+                                                            <button type="submit" name="delete_enrollment" class="dropdown-item" onclick="return confirm('Are you sure you want to delete this enrollment?')">
+                                                                <i class="fas fa-trash"></i> Delete
+                                                            </button>
+                                                        </form>
+                                                    </li>
+                                                </ul>
                                             </div>
-                                            <div class="modal-body">
-                                                <form action="" method="post">
-                                                    <input type="hidden" name="id" value="<?php echo $enrollment['id']; ?>">
-                                                    <div class="mb-3">
-                                                        <label for="edit_username<?php echo $enrollment['id']; ?>" class="form-label">Username</label>
-                                                        <input type="text" class="form-control" id="edit_username<?php echo $enrollment['id']; ?>" name="username" value="<?php echo htmlspecialchars($enrollment['username']); ?>" required>
-                                                    </div>
-                                                    <div class="mb-3">
-                                                        <label for="edit_email<?php echo $enrollment['id']; ?>" class="form-label">Email</label>
-                                                        <input type="email" class="form-control" id="edit_email<?php echo $enrollment['id']; ?>" name="email" value="<?php echo htmlspecialchars($enrollment['email']); ?>" required>
-                                                    </div>
-                                                    <button type="submit" name="update_enrollment" class="btn btn-primary">Save changes</button>
-                                                </form>
+                                        </td>
+                                    </tr>
+
+                                    <!-- Edit Enrollment Modal -->
+                                    <div class="modal fade" id="editEnrollment<?php echo $enrollment['id']; ?>" tabindex="-1" aria-labelledby="editEnrollmentLabel<?php echo $enrollment['id']; ?>" aria-hidden="true">
+                                        <div class="modal-dialog">
+                                            <div class="modal-content">
+                                                <div class="modal-header">
+                                                    <h5 class="modal-title" id="editEnrollmentLabel<?php echo $enrollment['id']; ?>">Edit Enrollment</h5>
+                                                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                                </div>
+                                                <div class="modal-body">
+                                                    <form action="" method="post">
+                                                        <input type="hidden" name="id" value="<?php echo $enrollment['id']; ?>">
+                                                        <div class="mb-3">
+                                                            <label for="edit_username<?php echo $enrollment['id']; ?>" class="form-label">Username</label>
+                                                            <input type="text" class="form-control" id="edit_username<?php echo $enrollment['id']; ?>" name="username" value="<?php echo htmlspecialchars($enrollment['username']); ?>" required>
+                                                        </div>
+                                                        <div class="mb-3">
+                                                            <label for="edit_email<?php echo $enrollment['id']; ?>" class="form-label">Email</label>
+                                                            <input type="email" class="form-control" id="edit_email<?php echo $enrollment['id']; ?>" name="email" value="<?php echo htmlspecialchars($enrollment['email']); ?>" required>
+                                                        </div>
+                                                        <button type="submit" name="update_enrollment" class="btn btn-primary">Save changes</button>
+                                                    </form>
+                                                </div>
                                             </div>
                                         </div>
                                     </div>
-                                </div>
                                 <?php endforeach; ?>
                             </tbody>
                         </table>
@@ -186,28 +190,28 @@ foreach ($enrollments as $enrollment) {
                         </div>
                         <div class="row g-4" id="enrollmentGrid">
                             <?php foreach ($grouped_enrollments as $username => $enrollments): ?>
-                            <div class="col-md-4 enrollment-card" data-username="<?php echo htmlspecialchars($username); ?>" data-email="<?php echo htmlspecialchars($enrollments[0]['email']); ?>">
-                                <div class="card">
-                                    <div class="card-body">
-                                        <div class="dropdown float-end">
-                                            <a class="btn btn-secondary dropdown-toggle" type="button" id="dropdownMenuButton" data-bs-toggle="dropdown" aria-expanded="false">
-                                                <i class="fas fa-ellipsis-v"></i>
-                                            </a>
-                                            <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="dropdownMenuButton">
-                                                <li><a class="dropdown-item" href="#" data-bs-toggle="modal" data-bs-target="#editModal">Edit</a></li>
-                                                <li><a class="dropdown-item" href="#">Delete</a></li>
-                                            </ul>
+                                <div class="col-md-4 enrollment-card" data-username="<?php echo htmlspecialchars($username); ?>" data-email="<?php echo htmlspecialchars($enrollments[0]['email']); ?>">
+                                    <div class="card">
+                                        <div class="card-body">
+                                            <div class="dropdown float-end">
+                                                <a class="btn btn-secondary" type="button" id="dropdownMenuButton" data-bs-toggle="dropdown" aria-expanded="false">
+                                                    <i class="fas fa-ellipsis-v"></i>
+                                                </a>
+                                                <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="dropdownMenuButton">
+                                                    <li><a class="dropdown-item" href="#" data-bs-toggle="modal" data-bs-target="#editModal">Edit</a></li>
+                                                    <li><a class="dropdown-item" href="#">Delete</a></li>
+                                                </ul>
+                                            </div>
+                                            <h5 class="card-title"><?php echo htmlspecialchars($username); ?></h5>
+                                            <p class="card-text"><?php echo htmlspecialchars($enrollments[0]['email']); ?></p>
+                                            <?php if (!empty($enrollments[0]['user_id'])): ?>
+                                                <a href="fetch_enrollments.php?user=<?php echo htmlspecialchars($username); ?>" class="btn btn-primary">View Enrollments</a>
+                                            <?php else: ?>
+                                                <span class="text-danger">No user specified</span>
+                                            <?php endif; ?>
                                         </div>
-                                        <h5 class="card-title"><?php echo htmlspecialchars($username); ?></h5>
-                                        <p class="card-text"><?php echo htmlspecialchars($enrollments[0]['email']); ?></p>
-                                        <?php if (!empty($enrollments[0]['user_id'])): ?>
-                                            <a href="fetch_enrollments.php?user=<?php echo htmlspecialchars($username); ?>" class="btn btn-primary">View Enrollments</a>
-                                        <?php else: ?>
-                                            <span class="text-danger">No user specified</span>
-                                        <?php endif; ?>
                                     </div>
                                 </div>
-                            </div>
                             <?php endforeach; ?>
                         </div>
                     </div>
@@ -281,4 +285,5 @@ foreach ($enrollments as $enrollment) {
         }
     </script>
 </body>
+
 </html>

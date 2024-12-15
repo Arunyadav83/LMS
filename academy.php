@@ -131,9 +131,16 @@
 
         <!-- Call to Action -->
         <div class="cta">
-            <button>Join Now</button>
+            <button id="joinBtn">Join Now</button>
         </div>
     </div>
+    <!-- JavaScript for Join Button -->
+<script>
+    document.getElementById('joinBtn').addEventListener('click', function () {
+        // Redirect to the join page
+        window.location.href = 'join.php';
+    });
+</script>
     <?php include 'footer.php'; ?>
 </body>
 

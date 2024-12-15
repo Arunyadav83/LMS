@@ -138,7 +138,8 @@ include 'header.php';
                 <?php while ($course = mysqli_fetch_assoc($result)): ?>
                     <div class="col-md-4 mb-4">
                         <div class="card h-100 animate__animated animate__fadeIn" style="height: 300px;">
-                            <img src="assets/images/-<?php echo $course['id']; ?>.jpg" class="card-img-top" alt="<?php echo htmlspecialchars($course['title']); ?>" style="height: 150px; width: 100%; object-fit: cover;">
+                            <img
+                            src="assets/images/<?php echo htmlspecialchars($course['title'], ENT_QUOTES, 'UTF-8'); ?>.jpg">
                             <div class="card-body">
                                 <h5 class="card-title"><?php echo htmlspecialchars($course['title']); ?></h5>
                                 <p class="card-text"><?php echo htmlspecialchars(substr($course['description'], 0, 100)) . '...'; ?></p>

@@ -1,3 +1,6 @@
+<?php
+session_start();
+?>
 <!DOCTYPE html>
 <html lang="en">
 
@@ -15,33 +18,47 @@
             color: #333;
         }
 
+        /* General styling for the header */
         header {
-            background: linear-gradient(135deg, #6ab1e7, #4a90e2);
-            color: white;
-            padding: 40px 0;
-            text-align: center;
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            display: flex;
+            align-items: center;
+            justify-content: flex-start;
+            padding: 0;
+            margin: 0;
+            background-color: #f5f5f5;
+        }
+
+        /* Remove space between header and image */
+        header img {
+            max-width: 50px;
+            height: auto;
+            margin-right: 10px;
         }
 
         header h1 {
             margin: 0;
-            font-size: 3rem;
-            font-weight: 300;
-            letter-spacing: 2px;
+            font-size: 1.5rem;
+            line-height: 1;
+            color: #333;
         }
 
-        header p {
-            font-size: 1.2rem;
-            margin-top: 10px;
-            opacity: 0.8;
-        }
-
+        /* Remove extra space between image and text */
         .hero-image {
             width: 100%;
+            height: auto;
             max-height: 400px;
             object-fit: cover;
-            margin-bottom: 60px;
+            margin: 0; /* Remove margin */
             box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+            border-radius: 10px;
+        }
+
+        /* Make the image responsive */
+        @media (max-width: 768px) {
+            .hero-image {
+                max-height: 250px;
+                object-fit: contain;
+            }
         }
 
         * {
@@ -90,7 +107,6 @@
             background-color: #25D366;
         }
 
-         
         footer {
             text-align: center;
             padding: 20px;
@@ -113,7 +129,8 @@
             left: 20px;
             background-color: #2598d3;
         }
-        .container{
+
+        .container {
             margin-top: 5%;
         }
 
@@ -162,11 +179,6 @@
 <body>
 
     <?php include 'header.php'; ?>
-    <!-- 
-<header>
-    <h1>Privacy Policy</h1>
-    <p>Safeguarding Your Digital Journey</p>
-</header> -->
 
     <img src="assets/images/privacypolicy.jpg" alt="Privacy Policy" class="hero-image">
 
@@ -229,8 +241,6 @@
             significant changes via email or through prominent notices on our website. Your privacy
             journey with us is always transparent and up-to-date.
         </p>
-
-
     </div>
 
     <?php include 'footer.php'; ?>
@@ -246,4 +256,3 @@
 </body>
 
 </html>
-<!-- write media queries for image which will visible full so give me the entirepage in responsive -->

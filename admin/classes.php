@@ -2,7 +2,7 @@
 session_start();
 require_once '../config.php';
 require_once '../functions.php';
- 
+
 // At the beginning of your PHP script, add this function:
 function ensure_directory_exists($path)
 {
@@ -10,25 +10,25 @@ function ensure_directory_exists($path)
         mkdir($path, 0777, true);
     }
 }
- 
+
 // Check if the user is logging out
 if (isset($_GET['logout'])) {
     session_destroy();
     header("Location: " . $_SERVER['PHP_SELF']);
     exit();
 }
- 
+
 // Check if the user is logging in
 if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['login'])) {
     $email = mysqli_real_escape_string($conn, $_POST['email']);
     $password = $_POST['password'];
- 
+
     $query = "SELECT * FROM tutors WHERE email = ?";
     $stmt = mysqli_prepare($conn, $query);
     mysqli_stmt_bind_param($stmt, "s", $email);
     mysqli_stmt_execute($stmt);
     $result = mysqli_stmt_get_result($stmt);
- 
+
     if ($tutor = mysqli_fetch_assoc($result)) {
         if (password_verify($password, $tutor['password'])) {
             $_SESSION['user_id'] = $tutor['id'];
@@ -37,20 +37,20 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['login'])) {
             header("Location: " . $_SERVER['PHP_SELF']);
             exit();
         } else {
-            $error = "Invalid email or password";
+            $error = "Incorrect password. Please try again.";
         }
     } else {
-        $error = "Invalid email or password";
+        $error = "Email address not found. Please check or register.";
     }
 }
- 
+
 // Check if the user is logged in and is a tutor
 if (!isset($_SESSION['user_id']) || !isset($_SESSION['role']) || $_SESSION['role'] !== 'instructor') {
     // If not logged in, show login form
 ?>
     <!DOCTYPE html>
     <html lang="en">
- 
+
     <head>
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -61,13 +61,13 @@ if (!isset($_SESSION['user_id']) || !isset($_SESSION['role']) || $_SESSION['role
                 color: hotpink;
                 font-size: 35px
             }
- 
+
             .form-label {
                 color: blue
             }
         </style>
     </head>
- 
+
     <body>
         <div class="container mt-5">
             <div class="row justify-content-center">
@@ -92,64 +92,71 @@ if (!isset($_SESSION['user_id']) || !isset($_SESSION['role']) || $_SESSION['role
         </div>
         <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
     </body>
- 
+
     </html>
 <?php
     exit();
 }
- 
+
 $tutor_id = $_SESSION['user_id'];
 $tutor_name = $_SESSION['full_name'];
- 
+
 // Handle form submissions
 if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     if (isset($_POST['add_class'])) {
         $course_id = (int)$_POST['course_id'];
         $class_name = mysqli_real_escape_string($conn, $_POST['class_name']);
         $description = strip_tags(mysqli_real_escape_string($conn, $_POST['description']));
- 
+
         // Handle video upload
         $video_path = '';
         if (isset($_FILES['class_video']) && $_FILES['class_video']['error'] == 0) {
             $upload_dir = '../uploads/class_videos/';
             ensure_directory_exists($upload_dir);
-            $video_path = $upload_dir . time() . '_' . $_FILES['class_video']['name'];
+            $file_name = time() . '_' . basename($_FILES['class_video']['name']);
+            $video_path = $upload_dir . $file_name;
+
             if (move_uploaded_file($_FILES['class_video']['tmp_name'], $video_path)) {
-                $video_path = str_replace('../', '', $video_path); // Remove the '../' from the beginning for database storage
+                $video_path = str_replace('../', '', $video_path); // Store relative path
             } else {
-                $error = "Failed to upload video. Error: " . $_FILES['class_video']['error'];
+                $error = "Failed to upload video. Please ensure the file size and permissions are correct.";
             }
+        } else if (isset($_FILES['class_video']['error'])) {
+            $error = "Error during file upload: " . $_FILES['class_video']['error'];
         }
- 
+
         // Handle online class scheduling
         $is_online = isset($_POST['is_online']) ? 1 : 0;
-        $online_link = mysqli_real_escape_string($conn, $_POST['online_link'] ?? '');
+        $online_link = filter_var($_POST['online_link'] ?? '', FILTER_SANITIZE_URL);
         $schedule_time = mysqli_real_escape_string($conn, $_POST['schedule_time'] ?? '');
-           // Clean up the bio (remove \r characters)
-        //  $bio = str_replace("\r", "", $bio);
- 
+
+        if ($is_online && !filter_var($online_link, FILTER_VALIDATE_URL)) {
+            $error = "Invalid online link provided.";
+        }
+
+
         $query = "INSERT INTO classes (course_id, tutor_id, class_name, description, video_path, is_online, online_link, schedule_time)
         VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
         $stmt = mysqli_prepare($conn, $query);
         mysqli_stmt_bind_param($stmt, "iisssiis", $course_id, $tutor_id, $class_name, $description, $video_path, $is_online, $online_link, $schedule_time);
         mysqli_stmt_execute($stmt);
- 
+
         $class_id = mysqli_insert_id($conn);
- 
+
         // Handle quiz questions
         if (isset($_POST['questions'])) {
             foreach ($_POST['questions'] as $index => $question) {
                 $question_text = mysqli_real_escape_string($conn, $question);
                 $correct_answer = mysqli_real_escape_string($conn, $_POST['correct_answers'][$index]);
- 
+
                 $query = "INSERT INTO quiz_questions (class_id, question_text, correct_answer)
                           VALUES (?, ?, ?)";
                 $stmt = mysqli_prepare($conn, $query);
                 mysqli_stmt_bind_param($stmt, "iss", $class_id, $question_text, $correct_answer);
                 mysqli_stmt_execute($stmt);
- 
+
                 $question_id = mysqli_insert_id($conn);
- 
+
                 // Insert answer options and feedback
                 foreach ($_POST['answers'][$index] as $answer_index => $answer) {
                     $answer_text = mysqli_real_escape_string($conn, $answer);
@@ -164,7 +171,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         }
     }
 }
- 
+
 // Fetch courses assigned to the logged-in tutor
 // Fetch courses assigned to the logged-in tutor
 $query = "SELECT * FROM courses WHERE tutor_id = ?";
@@ -173,7 +180,7 @@ mysqli_stmt_bind_param($stmt, "i", $tutor_id);
 mysqli_stmt_execute($stmt);
 $result = mysqli_stmt_get_result($stmt);
 $courses = mysqli_fetch_all($result, MYSQLI_ASSOC);
- 
+
 $query = "SELECT c.*, co.title as course_title
           FROM classes c
           JOIN courses co ON c.course_id = co.id
@@ -185,10 +192,10 @@ mysqli_stmt_execute($stmt);
 $result = mysqli_stmt_get_result($stmt);
 $classes = mysqli_fetch_all($result, MYSQLI_ASSOC);
 ?>
- 
+
 <!DOCTYPE html>
 <html lang="en">
- 
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -210,17 +217,17 @@ $classes = mysqli_fetch_all($result, MYSQLI_ASSOC);
     </script>
     <style>
         body {
-            background-color:white;
+            background-color: white;
             width: 100%;
- 
+
         }
- 
+
         label {
             font-size: 23px;
         }
     </style>
 </head>
- 
+
 <body>
     <!-- Navigation Bar -->
     <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
@@ -242,7 +249,8 @@ $classes = mysqli_fetch_all($result, MYSQLI_ASSOC);
                 </ul>
             </div>
         </div>
-    </nav>
+            
+    </nav>
 
     <div class="container mt-4">
         <h1>Add New Class</h1>
@@ -252,13 +260,15 @@ $classes = mysqli_fetch_all($result, MYSQLI_ASSOC);
                 <select class="form-select" name="course_id" id="course_id" required>
                     <option value="">Select a course</option>
                     <?php foreach ($courses as $course): ?>
-                        <option value="<?= htmlspecialchars($course['id']) ?>">
-                            <?= htmlspecialchars($course['title']) ?>
+                        <option value="<?php echo $course['id']; ?>">
+                            <?php echo htmlspecialchars($course['title'], ENT_QUOTES, 'UTF-8'); ?>
+                            
                         </option>
                     <?php endforeach; ?>
+
                 </select>
             </div>
- 
+
             <div class="mb-3">
                 <label for="class_name" class="form-label">Class Name</label>
                 <input type="text" class="form-control" name="class_name" id="class_name" required>
@@ -287,6 +297,5 @@ $classes = mysqli_fetch_all($result, MYSQLI_ASSOC);
         </form>
     </div>
 </body>
- 
+
 </html>
- 

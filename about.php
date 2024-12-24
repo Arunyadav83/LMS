@@ -175,7 +175,7 @@ include 'footer.php';
         }
 
 
-        
+
         footer {
             text-align: center;
             padding: 20px;
@@ -223,17 +223,20 @@ include 'footer.php';
 
         }
 
-
-        /* Tutors Section */
         .tutors-section {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
             gap: 20px;
-            /* Increased space between the cards */
+            /* Space between grid items */
             margin-top: 30px;
             padding: 10px;
-            /* Added padding to ensure content doesn't touch the edges */
         }
+
+        .tutor-card {
+            margin: 0 15px;
+            /* Horizontal space between tutor cards */
+        }
+
 
 
         /* Responsive for smaller screens */
@@ -244,8 +247,23 @@ include 'footer.php';
                 gap: 15px;
                 /* Reduced gap for smaller screens */
             }
+           
         }
+        @media (max-width: 480px) {
+            .welcome-section{
+                padding: 0px;
+                width: 100%;
+            }
+            .why-card{
+                width: 250px !important;
+            }
+            .why-choose-us-cards {
+       
+            min-width: 0px;
+           
 
+        }
+        }
         /* Responsive for very small screens */
         @media (max-width: 480px) {
             .tutors-section {
@@ -310,8 +328,22 @@ include 'footer.php';
         /* Course Section */
         .course-slider {
             margin-top: 40px;
-
         }
+
+        .course-item {
+            margin: 0 15px;
+            /* Add horizontal margin between the course cards */
+        }
+
+        /* Slick Slider Fix to Handle Spacing */
+        .slick-slide {
+            display: flex;
+            /* Ensure proper alignment */
+            justify-content: center;
+            padding: 0;
+            /* Remove padding if any */
+        }
+
 
         /* Center the section titles */
         .section-title {
@@ -421,11 +453,11 @@ include 'footer.php';
                         breakpoint: 1024,
                         settings: {
                             slidesToShow: 2,
-                            slidesToScroll: 1,
+                            slidesToScroll: 2,
                         }
-                    }
-                ]
+                    }]
             });
+        
 
             $('.tutors-section').slick({
                 slidesToShow: 2,

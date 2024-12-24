@@ -36,7 +36,6 @@ class About
 
     private function fetchTutorsFromDatabase()
     {
-        // Use the same database connection as above
         $host = 'localhost';
         $db = 'lms';
         $user = 'root';
@@ -65,7 +64,7 @@ class About
 
     public function displayAbout()
     {
-        echo "<h2 class='section-title'>Tutors</h2>";
+        echo "<h2 class='section-title' >Tutors</h2>";
         echo "<div class='tutors-section'>";
 
         foreach ($this->tutors as $tutor) {
@@ -90,8 +89,8 @@ class About
 
         foreach ($this->courses as $course) {
             $image_name = strtolower(str_replace(' ', '_', $course['title'])) . '.jpg';
-            echo "<div class='course-item '>";
-            echo "<img src='assets/images/{$image_name}' alt='{$course['title']}' class='course-image' d-flex>";
+            echo "<div class='course-item'>";
+            echo "<img src='assets/images/{$image_name}' alt='{$course['title']}' class='course-image'>";
             echo "<p class='course-title'>{$course['title']}</p>";
             echo "</div>";
         }
@@ -102,24 +101,44 @@ class About
     public function displayWelcomeMessage()
     {
         echo "<div class='welcome-section'>";
-        echo "<h1 style='color: #2980b9; font-weight: bold; text-align: center; margin: 0 auto;'>About Us</h1>";
-        echo "<p>Welcome to Ultrakey, your trusted partner in academic success and personal growth!</p>";
-        echo "<p>At Ultrakey, we believe that education is more than just acquiring knowledge—it's about inspiring minds and igniting the passion to achieve greatness.</p>";
 
-        echo "<h2 class='section-title'>Why Choose Us?</h2>";
-        echo "<ul class='why-choose-us'>";
-        echo "<li><strong>Expert Educators:</strong> Innovative teaching methodologies to ensure student success.</li>";
-        echo "<li><strong>Motivating Environment:</strong> Encouraging growth and consistent progress.</li>";
-        echo "<li><strong>Outstanding Students:</strong> A dynamic learning ecosystem for thriving students.</li>";
-        echo "</ul>";
+        echo "<h1>About Us</h1>";
+
+        echo "<p>Welcome to Ultrakey, your trusted partner in academic success and personal growth!</p>";
+
+        echo '<h2 style="text-align: center; margin-top:4%">Why Choose Us?</h2>';
+
+
+
+        echo "<div class='why-choose-us-cards'>";
+
+        echo "<div class='why-card'>
+                <img src='assets/images/expert_educators.png' alt='Expert Educators'>
+                <h3>Expert Educators</h3>
+                <p>Innovative teaching methodologies to ensure student success.</p>
+              </div>";
+
+        echo "<div class='why-card'>
+                <img src='assets/images/motivators.png' alt='Motivators'>
+                <h3>Motivating Environment</h3>
+                <p>Encouraging growth and consistent progress.</p>
+              </div>";
+
+        echo "<div class='why-card'>
+                <img src='assets/images/outstanding_students.png' alt='Outstanding Students'>
+                <h3>Outstanding Students</h3>
+                <p>A dynamic learning ecosystem for thriving students.</p>
+              </div>";
+
+        echo "</div>";
         echo "</div>";
     }
 }
 
-// Usage
 $about = new About();
 $about->displayWelcomeMessage();
 $about->displayAbout();
+
 include 'footer.php';
 ?>
 
@@ -134,105 +153,246 @@ include 'footer.php';
     <link rel="stylesheet" type="text/css" href="https://cdnjs.cloudflare.com/ajax/libs/slick-carousel/1.8.1/slick-theme.min.css" />
     <style>
         body {
-            font-family: Arial, sans-serif;
-            line-height: 1.6;
+            font-family: 'Poppins', sans-serif;
+            background-color: #f4f4f4;
             margin: 0;
             padding: 0;
             color: #2c3e50;
-            background-color: #f4f4f4;
+            overflow-x: hidden;
         }
 
-        .section-title {
-            text-align: center;
-            font-size: 1.8em;
-            margin: 20px 0;
+        h1,
+        h2 {
             color: #2980b9;
+        }
+
+        h3 {
+            color: #34495e;
+        }
+
+        a {
+            text-decoration: none;
+        }
+
+
+        
+        footer {
+            text-align: center;
+            padding: 20px;
+            background-color: #333;
+            color: white;
+            font-size: 14px;
+            position: relative;
+        }
+
+        footer a {
+            color: #4facfe;
+            text-decoration: none;
+        }
+
+        footer a:hover {
+            text-decoration: underline;
+        }
+
+        /* Welcome Section */
+        .welcome-section {
+            background-color: rgb(202, 228, 247);
+            padding: 50px;
+            width: 100%;
+            /* margin: 20px; */
+            box-shadow: 0 6px 12px rgba(117, 113, 113, 0.1);
+        }
+
+        .welcome-section h1 {
+            text-align: center;
             font-weight: bold;
         }
 
-        .welcome-section,
-        .tutors-section,
-        .course-slider {
-            padding: 20px;
+        .welcome-section p {
+            text-align: center;
+            font-size: 1.2em;
+            margin-top: 20px;
+
         }
 
-        .tutors-section {
-            display: flex;
-          flex-wrap: wrap; 
-            justify-content: space-around;
-            margin-bottom: 15px;
-        } 
-       
-      
-        .tutor-card {
-            background: #ecf0f1;
-            padding: 5px;
-            margin: 5px;
-            border-radius: 8px;
+        .welcome-section .section-title {
             text-align: center;
-            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+
+            margin-top: 40px;
+
+
         }
+
+
+        /* Tutors Section */
+        .tutors-section {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+            /* Increased space between the cards */
+            margin-top: 30px;
+            padding: 10px;
+            /* Added padding to ensure content doesn't touch the edges */
+        }
+
+
+        /* Responsive for smaller screens */
+        @media (max-width: 768px) {
+            .tutors-section {
+                grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+                /* Adjusted for smaller screens */
+                gap: 15px;
+                /* Reduced gap for smaller screens */
+            }
+        }
+
+        /* Responsive for very small screens */
+        @media (max-width: 480px) {
+            .tutors-section {
+                grid-template-columns: 1fr;
+                /* One column layout on very small screens */
+                gap: 10px;
+                /* Reduced gap even further for small devices */
+            }
+        }
+
+
+        .tutor-card {
+            background-color: #ffffff;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.1);
+            text-align: center;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .tutor-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.15);
+        }
+
 
         .tutor-image {
-            width: 100px;
-            height: 100px;
+            width: 150px;
+            height: 150px;
+            object-fit: cover;
             border-radius: 50%;
-            margin-bottom: 10px;
+            margin-bottom: 20px;
         }
 
-        .course-slider {
-            display: flex;
-            overflow-x: auto;
-            padding: 10px;
-            gap: 10px;
-            cursor: pointer;
+        .tutor-name {
+            font-size: 1.5em;
+            font-weight: bold;
+            color: #2980b9;
         }
+
+        .tutor-specialization {
+            font-size: 1.1em;
+            color: #7f8c8d;
+            margin-bottom: 20px;
+        }
+
+        .bio-btn {
+            background-color: #2980b9;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+
+
+        .bio-btn:hover {
+            background-color: #3498db;
+        }
+
+        /* Course Section */
+        .course-slider {
+            margin-top: 40px;
+
+        }
+
+        /* Center the section titles */
+        .section-title {
+            text-align: center;
+            margin-top: 40px;
+            font-size: 2em;
+            /* font-weight: bold; */
+        }
+
 
         .course-item {
-            flex: 0 0 auto;
-            margin: 0 10px;
+            padding: 15px;
+            background-color: #ffffff;
+            border-radius: 10px;
+            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.1);
             text-align: center;
-            transition: transform 0.3s;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
         }
 
         .course-item:hover {
-            transform: translateX(-10px);
+            transform: translateY(-10px);
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.15);
         }
 
-        .course-image {
-            width: 80px;
-            height: 80px;
-            margin-bottom: 10px;
+        .course-item img {
+            width: 100%;
+            border-radius: 8px;
+            max-height: 200px;
+            object-fit: cover;
+            margin-bottom: 15px;
+
+
         }
 
         .course-title {
+            font-size: 1.1em;
             font-weight: bold;
             color: #34495e;
         }
 
-        .why-choose-us {
-            background: rgba(173, 216, 230, 0.1);
-            padding: 15px;
-            border-radius: 8px;
-            list-style: none;
-            color: #2c3e50;
-            margin: 10px auto;
+        /* Why Choose Us Section */
+        .why-choose-us-cards {
+            display: flex;
+            gap: 40px;
+            min-width: 300px;
+            justify-content: center;
+            flex-wrap: wrap;
+            margin-top: 40px;
+
         }
 
-        .why-choose-us li {
-            margin: 10px 0;
+
+        .why-card {
+            background-color: #ecf0f1;
+            padding: 20px;
+            border-radius: 10px;
+            width: 300px;
+            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.1);
+            text-align: center;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .why-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.15);
+        }
+
+        .why-card img {
+            width: 100px;
+            margin-bottom: 15px;
+        }
+
+        .why-card h3 {
+            font-size: 1.3em;
             font-weight: bold;
-            padding: 10px;
-            background: lightgray;
-            border-radius: 5px;
             color: #2980b9;
         }
 
-        .why-choose-us li:hover {
-            background: #2980b9;
-            /* Light blue background on hover */
-            color: white;
-            /* White text color on hover */
+        .why-card p {
+            font-size: 1em;
+            color: #34495e;
         }
     </style>
 </head>
@@ -270,23 +430,24 @@ include 'footer.php';
             $('.tutors-section').slick({
                 slidesToShow: 2,
                 slidesToScroll: 1,
-                autoplay:true,
+                autoplay: true,
                 autoplaySpeed: 2000,
                 responsive: [{
-                    breakpoint: 768,
-                    settings: {
-                        slidesToShow: 1,
-                        slidesToScroll: 1,
-                    } ,
-                    
-                } ,
-                {
+                        breakpoint: 768,
+                        settings: {
+                            slidesToShow: 1,
+                            slidesToScroll: 1,
+                        },
+
+                    },
+                    {
                         breakpoint: 1024,
                         settings: {
                             slidesToShow: 2,
                             slidesToScroll: 1,
                         }
-                    }]
+                    }
+                ]
 
             });
         });
@@ -298,4 +459,3 @@ include 'footer.php';
 </body>
 
 </html>
-

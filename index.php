@@ -21,12 +21,13 @@ include 'header.php';
 //     die('Query Error: ' . mysqli_error($conn)); // Error handling
 // }
 // $tutors_count = mysqli_fetch_assoc($tutors_count_result)['count'];
-// ?>
+// 
+?>
 
 <!-- Hero Section with Parallax Effect -->
 <div class="hero-section text-center py-5 mb-5 parallax-window" data-parallax="scroll" data-image-src="assets/images/hero-bg.jpg" style="background-size: cover; background-position: center;">
     <div class="container">
-        <h1 class="display-4 mb-4 animate__animated animate__fadeInDown">Welcome to Ultrakey  Learning</h1>
+        <h1 class="display-4 mb-4 animate__animated animate__fadeInDown">Welcome to Ultrakey Learning</h1>
         <p class="lead mb-4 animate__animated animate__fadeInUp">Empower your future with our cutting-edge online courses</p>
         <?php if (!is_logged_in()): ?>
             <a href="register.php" class="btn btn-primary btn-lg me-2 animate__animated animate__fadeInLeft">Get Started</a>
@@ -79,47 +80,47 @@ include 'header.php';
     </section>
 
     <div id="explore">
-    <section class="course-categories mb-5">
-        <h2 class="text-center mb-4">Explore Our Course Categories</h2>
-        <div class="row">
-            <div class="col-md-3 col-sm-6 mb-4">
-                <div class="category-card">
-                    <img src="assets/images/programming.jpg" alt="Programming" class="img-fluid">
-                    <div class="category-overlay">
-                        <h3>Programming</h3>
-                        <a href="courses.php?category=programming" class="btn btn-light">Explore</a>
+        <section class="course-categories mb-5">
+            <h2 class="text-center mb-4">Explore Our Course Categories</h2>
+            <div class="row">
+                <div class="col-md-3 col-sm-6 mb-4">
+                    <div class="category-card">
+                        <img src="assets/images/programming.jpg" alt="Programming" class="img-fluid">
+                        <div class="category-overlay">
+                            <h3>Programming</h3>
+                            <a href="courses.php?category=programming" class="btn btn-light">Explore</a>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-3 col-sm-6 mb-4">
+                    <div class="category-card">
+                        <img src="assets/images/design.jpg" alt="Design" class="img-fluid">
+                        <div class="category-overlay">
+                            <h3>Design</h3>
+                            <a href="courses.php?category=design" class="btn btn-light">Explore</a>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-3 col-sm-6 mb-4">
+                    <div class="category-card">
+                        <img src="assets/images/business.jpg" alt="Business" class="img-fluid">
+                        <div class="category-overlay">
+                            <h3>Business</h3>
+                            <a href="courses.php?category=business" class="btn btn-light">Explore</a>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-3 col-sm-6 mb-4">
+                    <div class="category-card">
+                        <img src="assets/images/language.jpg" alt="Language" class="img-fluid">
+                        <div class="category-overlay">
+                            <h3>Language</h3>
+                            <a href="courses.php?category=language" class="btn btn-light">Explore</a>
+                        </div>
                     </div>
                 </div>
             </div>
-            <div class="col-md-3 col-sm-6 mb-4">
-                <div class="category-card">
-                    <img src="assets/images/design.jpg" alt="Design" class="img-fluid">
-                    <div class="category-overlay">
-                        <h3>Design</h3>
-                        <a href="courses.php?category=design" class="btn btn-light">Explore</a>
-                    </div>
-                </div>
-            </div>
-            <div class="col-md-3 col-sm-6 mb-4">
-                <div class="category-card">
-                    <img src="assets/images/business.jpg" alt="Business" class="img-fluid">
-                    <div class="category-overlay">
-                        <h3>Business</h3>
-                        <a href="courses.php?category=business" class="btn btn-light">Explore</a>
-                    </div>
-                </div>
-            </div>
-            <div class="col-md-3 col-sm-6 mb-4">
-                <div class="category-card">
-                    <img src="assets/images/language.jpg" alt="Language" class="img-fluid">
-                    <div class="category-overlay">
-                        <h3>Language</h3>
-                        <a href="courses.php?category=language" class="btn btn-light">Explore</a>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </section>
+        </section>
     </div>
 
     <section class="featured-courses mb-5">
@@ -137,15 +138,15 @@ include 'header.php';
             <div class="row">
                 <?php while ($course = mysqli_fetch_assoc($result)): ?>
                     <div class="col-md-4 mb-4">
-                        <div class="card h-100 animate__animated animate__fadeIn" style="height: 300px;">
+                        <div class="card h-100 animate__animated animate__fadeIn" style="height: 150px; overflow: hidden;">
                             <img
-                            src="assets/images/<?php echo htmlspecialchars($course['title'], ENT_QUOTES, 'UTF-8'); ?>.jpg">
-                            <div class="card-body">
-                                <h5 class="card-title"><?php echo htmlspecialchars($course['title']); ?></h5>
-                                <p class="card-text"><?php echo htmlspecialchars(substr($course['description'], 0, 100)) . '...'; ?></p>
-                                <p class="card-text"><small class="text-muted">Tutor: <?php echo htmlspecialchars($course['tutor_name']); ?></small></p>
+                                src="assets/images/<?php echo htmlspecialchars($course['title'], ENT_QUOTES, 'UTF-8'); ?>.jpg" style="height: 180px; width: 100%; object-fit: cover;">
+                            <div class="card-body" style="padding: 40px;">
+                                <h5 class="card-title" style="font-size: 14px;"><?php echo htmlspecialchars($course['title']); ?></h5>
+                                <p class="card-text" style="font-size: 12px;"><?php echo htmlspecialchars(substr($course['description'], 0, 60)) . '...'; ?></p>
+                                <p class="card-text" style="font-size: 10px;"><small class="text-muted">Tutor: <?php echo htmlspecialchars($course['tutor_name']); ?></small></p>
                             </div>
-                            <div class="card-footer bg-transparent border-0">
+                            <div class="card-footer bg-transparent border-0" style="padding: 5px;">
                                 <?php if (is_logged_in()): ?>
                                     <a href="course.php?id=<?php echo $course['id']; ?>" class="btn btn-primary btn-sm">View Course</a>
                                     <a href="courses.php" class="btn btn-success btn-sm">Enroll</a>
@@ -157,6 +158,7 @@ include 'header.php';
                     </div>
                 <?php endwhile; ?>
             </div>
+
             <div class="text-center">
                 <a href="courses.php" class="btn btn-outline-primary">View All Courses</a>
             </div>
@@ -221,7 +223,6 @@ include 'header.php';
             </div>
         </div>
     </section>
-
     <section class="testimonials mb-5">
         <h2 class="text-center mb-4">What Our Students Say</h2>
         <div class="row">
@@ -300,36 +301,35 @@ include 'header.php';
 </div>
 
 <script>
-function animateCounter(element, start, end, duration) {
-    let startTimestamp = null;
-    const step = (timestamp) => {
-        if (!startTimestamp) startTimestamp = timestamp;
-        const progress = Math.min((timestamp - startTimestamp) / duration, 1);
-        element.innerText = Math.floor(progress * (end - start) + start);
-        if (progress < 1) {
-            requestAnimationFrame(step);
-        }
-    };
-    requestAnimationFrame(step);
-}
+    function animateCounter(element, start, end, duration) {
+        let startTimestamp = null;
+        const step = (timestamp) => {
+            if (!startTimestamp) startTimestamp = timestamp;
+            const progress = Math.min((timestamp - startTimestamp) / duration, 1);
+            element.innerText = Math.floor(progress * (end - start) + start);
+            if (progress < 1) {
+                requestAnimationFrame(step);
+            }
+        };
+        requestAnimationFrame(step);
+    }
 
-document.addEventListener('DOMContentLoaded', () => {
-    const studentsCountElement = document.querySelector('.count[data-count="<?php echo $students_count; ?>"]');
-    animateCounter(studentsCountElement, 0, <?php echo $students_count; ?>, 2000); // Animate from 0 to the actual count
-    const countriesCountElement = document.getElementById('countries-count');
-    animateCounter(countriesCountElement, 0, 12, 2000); // Animate from 0 to 12 over 2 seconds
-    const coursesCountElement = document.querySelector('.count[data-count="<?php echo $courses_count; ?>"]');
-    animateCounter(coursesCountElement, 0, <?php echo $courses_count; ?>, 2000); // Animate from 0 to the actual count
-    const tutorsCountElement = document.querySelector('.count[data-count="<?php echo $tutors_count; ?>"]');
-    animateCounter(tutorsCountElement, 0, <?php echo $tutors_count; ?>, 2000); // Animate from 0 to the actual count
-});
+    document.addEventListener('DOMContentLoaded', () => {
+        const studentsCountElement = document.querySelector('.count[data-count="<?php echo $students_count; ?>"]');
+        animateCounter(studentsCountElement, 0, <?php echo $students_count; ?>, 2000); // Animate from 0 to the actual count
+        const countriesCountElement = document.getElementById('countries-count');
+        animateCounter(countriesCountElement, 0, 12, 2000); // Animate from 0 to 12 over 2 seconds
+        const coursesCountElement = document.querySelector('.count[data-count="<?php echo $courses_count; ?>"]');
+        animateCounter(coursesCountElement, 0, <?php echo $courses_count; ?>, 2000); // Animate from 0 to the actual count
+        const tutorsCountElement = document.querySelector('.count[data-count="<?php echo $tutors_count; ?>"]');
+        animateCounter(tutorsCountElement, 0, <?php echo $tutors_count; ?>, 2000); // Animate from 0 to the actual count
+    });
 </script>
-
 <style>
-    #explore{
+    #explore {
         background-color: #87CEEB;
         padding: 20px;
-        border-radius: 10px;    
+        border-radius: 10px;
         width: 100%;
     }
 </style>

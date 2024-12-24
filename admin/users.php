@@ -11,7 +11,8 @@ if (!is_admin_logged_in()) {
 
 $current_page = 'users';
 
-function user_exists($conn, $username, $email) {
+function user_exists($conn, $username, $email)
+{
     $query = "SELECT * FROM tutors WHERE username = ? OR email = ?";
     $stmt = mysqli_prepare($conn, $query);
     mysqli_stmt_bind_param($stmt, "ss", $username, $email);
@@ -50,7 +51,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                           VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
                 $stmt = mysqli_prepare($conn, $query);
                 mysqli_stmt_bind_param($stmt, "ssssssss", $username, $email, $password, $full_name, $bio, $specialization, $resume_path, $certificate_path);
-                
+
                 if (mysqli_stmt_execute($stmt)) {
                     $success = "Tutor added successfully.";
                 } else {
@@ -106,7 +107,8 @@ $result = mysqli_query($conn, $query);
 $tutors = mysqli_fetch_all($result, MYSQLI_ASSOC);
 
 // Function to render tutors in grid view
-function renderTutorsGrid($tutors) {
+function renderTutorsGrid($tutors)
+{
     $output = '<div class="row">';
     foreach ($tutors as $tutor) {
         $output .= '<div class="col-md-4 mb-4">
@@ -153,7 +155,8 @@ function renderTutorsGrid($tutors) {
 }
 
 // Function to render tutors in list view as a table
-function renderTutorsList($tutors) {
+function renderTutorsList($tutors)
+{
     $output = '<table class="table table-striped">';
     $output .= '<thead>
                     <tr>
@@ -206,6 +209,7 @@ $view = isset($_GET['view']) ? $_GET['view'] : 'grid';
 
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -216,25 +220,30 @@ $view = isset($_GET['view']) ? $_GET['view'] : 'grid';
 <style>
     .row {
         margin-left: 0px;
-        
+
     }
+
     .card {
         height: 200px;
     }
+
     .btn-navy {
         background-color: navy;
         color: white;
         border-radius: 0.6px;
         border: none;
     }
+
     .btn-navy:hover {
         background-color: white;
         color: black;
     }
+
     .table {
         background-color: transparent;
     }
 </style>
+
 <body>
     <!-- Navigation Bar -->
     <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
@@ -265,7 +274,7 @@ $view = isset($_GET['view']) ? $_GET['view'] : 'grid';
             <main class="col-md-9 ms-sm-auto col-lg-10 px-md-4">
                 <div class="container mt-4">
                     <h1 class="mb-4">Tutors</h1>
-                    
+
                     <!-- Add Tutor Button -->
                     <div class="mb-3">
                         <button type="button" class="btn btn-navy" data-bs-toggle="modal" data-bs-target="#addTutorModal">
@@ -323,7 +332,7 @@ $view = isset($_GET['view']) ? $_GET['view'] : 'grid';
                     </div>
 
                     <!-- Add View Toggle Buttons -->
-                    <div class="mb-3">
+                    <div class="mb-3" style="margin-left: 760px;">
                         <a href="?view=grid" class="btn btn-primary">Grid View</a>
                         <a href="?view=list" class="btn btn-secondary">List View</a>
                     </div>
@@ -346,4 +355,5 @@ $view = isset($_GET['view']) ? $_GET['view'] : 'grid';
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
 </body>
+
 </html>

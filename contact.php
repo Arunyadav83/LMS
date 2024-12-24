@@ -1,20 +1,3 @@
-<?php
-// Check if the form is submitted
-if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    // Retrieve form data
-    $name = $_POST['name'];
-    $email = $_POST['email'];
-    $message = $_POST['message'];
-
-    // Process form data (e.g., save to database)
-    // Example: Assume a successful save
-    // TODO: Add your database connection and insertion logic here
-
-    // Redirect to user dashboard or thank you page
-    header("Location: index.php");
-    exit;
-}
-?>
 <!DOCTYPE html>
 <html lang="en">
 
@@ -22,13 +5,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Contact Us - Ultrakey</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css" rel="stylesheet">
     <style>
-        /* Styling same as before */
+        /* General Styling */
         body {
-            position: relative;
             font-family: Arial, sans-serif;
             margin: 0;
             padding: 0;
+            overflow-x: hidden;
+            color: #333;
         }
 
         body::before {
@@ -45,171 +30,174 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             z-index: -1;
         }
 
-        .main-container {
-            width: 100vw;
-            padding: 20px 0;
+        
+        footer {
+            text-align: center;
+            padding: 20px;
+            background-color: #333;
+            color: white;
+            font-size: 14px;
+            position: relative;
         }
 
-        .container {
-            max-width: 1200px;
-            margin: 50px;
-            padding: 20px;
-            backdrop-filter: blur(10px);
-            background-color: rgba(0, 0, 0, 0.5);
-            border-radius: 10px;
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        footer a {
+            color: #4facfe;
+            text-decoration: none;
+        }
+
+        footer a:hover {
+            text-decoration: underline;
+        }
+
+        h1, h2 {
+            color: #fff;
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        .main-container {
             display: flex;
-            flex-direction: row;
-            justify-content: space-between;
+            justify-content: center;
+            align-items: center;
+            padding: 10px;
+        }
+
+        /* Contact Container */
+        .container {
+            display: flex;
+            max-width: 1100px;
+            margin: 20px auto;
+        }
+
+        .contact-info, .contact-form {
+            flex: 1;
+            padding: 30px;
+            color: #fff;
+            width: 100%;
+            height: auto;
         }
 
         .contact-info {
-            flex: 1;
-            margin-left: 20px;
-            color: white;
+            background: rgba(0, 0, 0, 0.7);
+            border-radius: 20px; 
         }
 
         .contact-info div {
             margin-bottom: 20px;
+            font-size: 16px;
+            margin-top: 8%;
+            margin-left: 70px;
         }
 
-        .contact-form {
-            flex: 1;
-            padding: 0px auto;
-            color: white;
+        .contact-form form {
             display: flex;
             flex-direction: column;
-            align-items: center;
-            justify-content: flex-start;
-            height: auto;
+            margin-left: 23px;
+            
         }
 
-        .contact-form input,
-        .contact-form textarea {
-            width: 60%;
-            padding: 12px;
-            margin: 10px 0;
-            margin-left: 95px;
+        .contact-form input, .contact-form textarea {
+            width: 90%;
+            padding: 10px;
+            margin-bottom: 15px;
             border: 1px solid #ccc;
             border-radius: 5px;
-            margin-bottom: 10px;
-            position: relative;
-            bottom: 40px;
+            font-size: 16px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
         }
 
         .contact-form button {
-            padding: 12px 24px;
             background-color: #4a90e2;
-            border: none;
-            border-radius: 10px;
             color: white;
-            cursor: pointer;
-            transition: background-color 0.3s, transform 0.3s;
+            border: none;
+            padding: 12px;
             font-size: 16px;
-            width: 20%;
-            margin-left: 205px;
-            margin-top: 20px;
-            position: relative;
-            bottom: 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            width: 50%;
+            margin: 10px auto 0;
         }
 
+        .contact-form button:hover {
+            background-color: #357ab7;
+            transform: scale(1.05);
+        }
+
+        /* Locations Section */
         .locations-section {
-            padding: 20px;
+            margin-top: 20px;
+            text-align: center;
         }
 
         .locations-container {
             display: flex;
-            justify-content: space-around;
+            justify-content: space-evenly;
             flex-wrap: wrap;
-            margin-bottom: 20px;
         }
 
         .location-card {
-            background: #ecf0f1;
-            padding: 15px;
+            background: #f9f9f9;
+            border-radius: 10px;
+            padding: 20px;
             margin: 10px;
-            border-radius: 8px;
-            text-align: center;
+            width: 45%;
             box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-            width: 30%;
-            color: black;
+            transition: all 0.3s ease;
         }
 
-        .map-container {
+        .location-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+        }
+
+        iframe {
+            border-radius: 8px;
             margin-top: 10px;
+            width: 100%;
+            height: 200px;
         }
 
-        .section-title {
-            color: white;
-            text-align: center;
-            margin-bottom: 50px;
-            font-size: 35px;
-        }
-
-        h2 {
-            color: white;
-            text-align: center;
-            margin-bottom: 50px;
-            font-size: 35px;
-        }
-
+        /* Responsive Design */
         @media (max-width: 768px) {
-            .location-card {
-                width: 100%;
-            }
-
             .container {
                 flex-direction: column;
             }
 
-            .contact-form input,
-            .contact-form textarea {
-                margin-left: 45px;
-                position: relative;
-                top: 10px;
+            .contact-form input, .contact-form textarea {
+                width: 100%;
+                
             }
 
             .contact-form button {
-                margin-left: 70px;
-                width: 40%;
-            }
-
-            .main-container {
                 width: 100%;
-                height: 100%;
             }
 
-            .contact-form h2 {
-                margin-bottom: 10px;
+            .location-card {
+                width: 90%;
             }
         }
     </style>
+    <link rel="icon" type="image/x-icon" href="assets/images/apple-touch-icon.png">
+
 </head>
 
 <body>
+<?php include 'header.php'; ?>
     <div class="main-container">
         <div class="container">
             <div class="contact-info">
                 <h1>Contact Us</h1>
-                <div>
-                    <i class="fas fa-map-marker-alt"></i>
-                    <strong>Address:</strong> Flat No: 204, 2nd Floor, Cyber Residency, above Indian Bank, Indira Nagar, Gachibowli, Hyderabad, Telangana 500032
-                </div>
-                <div>
-                    <i class="fas fa-phone"></i>
-                    <strong>Phone:</strong> 6300440316
-                </div>
-                <div>
-                    <i class="fas fa-envelope"></i>
-                    <a href="mailto:support@ultrakeyIt.com" style="color: white;"><strong>Email:</strong> support@ultrakeyIt.com</a>
-                </div>
+                <div><i class="fas fa-map-marker-alt"></i> <strong>Address:</strong> Flat No: 204, 2nd Floor, Cyber Residency, Gachibowli, Hyderabad</div>
+                <div><i class="fas fa-phone-alt"></i> <strong>Phone:</strong> 6300440316</div>
+                <div><i class="fas fa-envelope"></i> <strong>Email:</strong> <a href="mailto:support@ultrakeyIt.com" style="color: #4a90e2;">support@ultrakeyIt.com</a></div>
             </div>
             <div class="contact-form">
                 <h2>Send Message</h2>
                 <form action="submit_message.php" method="POST">
                     <input type="text" name="name" placeholder="Full Name" required>
                     <input type="email" name="email" placeholder="Email" required>
-                    <textarea name="message" placeholder="Type your Message..." rows="4" required></textarea>
+                    <textarea name="message" placeholder="Type your message..." rows="4" required></textarea>
                     <button type="submit">Send</button>
                 </form>
             </div>
@@ -217,38 +205,21 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     </div>
 
     <div class="locations-section">
-        <h2 class="section-title">Our Locations</h2>
+        <h2>Our Locations</h2>
         <div class="locations-container">
             <div class="location-card">
                 <h3>Gachibowli</h3>
-                <p>Flat No: 204, 2nd Floor, Cyber Residency, above Indian Bank, Indira Nagar, Gachibowli, Hyderabad, Telangana 500032</p>
-                <div class="map-container">
-                    <iframe
-                        src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3806.3760464279485!2d78.35711507369068!3d17.441706501240915!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x4f7a26b96d6c0b61%3A0x6b3acb732ef5e3!2sUltrakey%20IT%20Solutions%20Private%20Limited!5e0!3m2!1sen!2sin!4v1732775159454!5m2!1sen!2sin"
-                        width="300"
-                        height="200"
-                        style="border:0;"
-                        allowfullscreen=""
-                        loading="lazy">
-                    </iframe>
-                </div>
+                <p>Flat No: 204, 2nd Floor, Cyber Residency, Hyderabad</p>
+                <iframe src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3806.3760464279485!2d78.35711507369068!3d17.441706501240915!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x4f7a26b96d6c0b61%3A0x6b3acb732ef5e3!2sUltrakey%20IT%20Solutions%20Private%20Limited!5e0!3m2!1sen!2sin!4v1734329910448!5m2!1sen!2sin" width="600" height="450" style="border:0;" allowfullscreen="" loading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe>
             </div>
             <div class="location-card">
                 <h3>KPHB Colony</h3>
-                <p>Flat No. 301, 3rd Floor, Manyavar Building, Rd Number 2, Hyderabad, Telangana, 500085</p>
-                <div class="map-container">
-                    <iframe
-                        src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d315217.9999999999!2d78.3872!3d17.385044!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x3bcb93e1e1e1e1e1%3A0x0e1c9c918791b8f!2sKPHB%20Colony%20Road!5e0!3m2!1sen!2sin!4v1644537905478!5m2!1sen!2sin"
-                        width="300"
-                        height="200"
-                        style="border:0;"
-                        allowfullscreen=""
-                        loading="lazy">
-                    </iframe>
-                </div>
+                <p>Flat No. 301, 3rd Floor, Manyavar Building, Hyderabad</p>
+                <iframe src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d30443.899783221506!2d78.37001637262352!3d17.48422837218086!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x3bcb91b5be1f29c3%3A0xf5af71d23e422328!2sKukatpally%20Housing%20Board%20Colony%2C%20Kukatpally%2C%20Hyderabad%2C%20Telangana!5e0!3m2!1sen!2sin!4v1734329865253!5m2!1sen!2sin" width="600" height="450" style="border:0;" allowfullscreen="" loading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe>
             </div>
         </div>
     </div>
+    <?php include 'footer.php'; ?>
 </body>
 
 </html>

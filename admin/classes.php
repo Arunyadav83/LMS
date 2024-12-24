@@ -126,7 +126,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         $online_link = mysqli_real_escape_string($conn, $_POST['online_link'] ?? '');
         $schedule_time = mysqli_real_escape_string($conn, $_POST['schedule_time'] ?? '');
            // Clean up the bio (remove \r characters)
-         $bio = str_replace("\r", "", $bio);
+        //  $bio = str_replace("\r", "", $bio);
  
         $query = "INSERT INTO classes (course_id, tutor_id, class_name, description, video_path, is_online, online_link, schedule_time)
         VALUES (?, ?, ?, ?, ?, ?, ?, ?)";

@@ -8,6 +8,21 @@
         a{
             text-decoration: none;
         }
+        
+        footer {
+            text-align: center;
+            padding: 20px;
+            background-color: #333;
+            color: white;
+            font-size: 14px;
+            position: relative;
+        }
+
+       
+
+        footer a:hover {
+            text-decoration: underline;
+        }
 
     </style>
 </head>

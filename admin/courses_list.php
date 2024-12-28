@@ -65,62 +65,63 @@ if (isset($_POST['delete_course'])) {
 
 // Handle update action
 if (isset($_POST['update_course'])) {
-    // Removed the tutor_id check
-    // Now we can directly use the tutor_id if it exists
-    $tutor_id = isset($_POST['tutor_id']) ? (int)$_POST['tutor_id'] : null; // Set to null if not provided
-
     $course_id = (int)$_POST['course_id'];
     $course_title = mysqli_real_escape_string($conn, $_POST['course_title']);
     $course_description = mysqli_real_escape_string($conn, $_POST['course_description']);
     $course_topics = mysqli_real_escape_string($conn, $_POST['course_topics']);
-    $course_prize = (float)$_POST['course_prize']; // Assuming price is a float
+    $course_prize = (float)$_POST['course_prize'];
+    $tutor_id = isset($_POST['tutor_id']) ? (int)$_POST['tutor_id'] : null;
 
-    // Check if the tutor and title exist (add your validation logic here)
+    // Check if tutor_id exists in the users table
     if ($tutor_id !== null) {
-        $tutor_exists_query = "SELECT COUNT(*) FROM tutors WHERE id = $tutor_id";
+        $tutor_exists_query = "SELECT COUNT(*) FROM tutor WHERE id = $tutor_id";
         $tutor_exists_result = mysqli_query($conn, $tutor_exists_query);
-        
-        // Check if the query was successful
+
         if (!$tutor_exists_result) {
-            echo "<div class='alert alert-danger'>Error checking tutor: " . mysqli_error($conn) . "</div>";
+            echo "<script>Swal.fire('Error', 'Error checking tutor: " . mysqli_error($conn) . "', 'error');</script>";
             exit();
         }
-        
+
         $tutor_exists = mysqli_fetch_row($tutor_exists_result)[0] > 0;
-    } else {
-        $tutor_exists = true; // If tutor_id is not provided, consider it valid
-    }
 
-    $title_exists_query = "SELECT COUNT(*) FROM courses  WHERE id = (SELECT id FROM courses WHERE id = $course_id)";
-    $title_exists_result = mysqli_query($conn, $title_exists_query);
-    
-    // Check if the query was successful
-    if (!$title_exists_result) {
-        echo "<div class='alert alert-danger'>Error checking title: " . mysqli_error($conn) . "</div>";
-        exit();
-    }
-
-    $title_exists = mysqli_fetch_row($title_exists_result)[0] > 0;
-
-    if (!$tutor_exists || !$title_exists) {
-        echo "<div class='alert alert-danger'>Invalid tutor or title selected.</div>";
-    } else {
-        // Ensure the course ID is valid before executing the update query
-        if ($course_id > 0) {
-            $update_query = "UPDATE courses SET title = '$course_title', description = '$course_description', course_prize = $course_prize WHERE id = $course_id";
-            
-            if (mysqli_query($conn, $update_query)) {
-                if (mysqli_affected_rows($conn) > 0) {
-                    echo "<div class='alert alert-success'>Course updated successfully.</div>";
-                } else {
-                    echo "<div class='alert alert-danger'>No changes made or course not found.</div>";
-                }
-            } else {
-                echo "<div class='alert alert-danger'>Error updating course: " . mysqli_error($conn) . "</div>";
-            }
-        } else {
-            echo "<div class='alert alert-danger'>Invalid course ID.</div>";
+        if (!$tutor_exists) {
+            echo "<script>Swal.fire('Error', 'Tutor ID does not exist. Please add the tutor first.', 'error');</script>";
+            exit();
         }
+    }
+
+    // Ensure course_id is valid and proceed with update
+    if ($course_id > 0) {
+        $update_query = "
+            UPDATE courses 
+            SET 
+                title = '$course_title', 
+                description = '$course_description', 
+                topics = '$course_topics', 
+                course_prize = $course_prize, 
+                tutor_id = $tutor_id 
+            WHERE id = $course_id
+        ";
+
+        if (mysqli_query($conn, $update_query)) {
+            if (mysqli_affected_rows($conn) > 0) {
+                $successMessage = json_encode("Course updated successfully."); // Safely encode message
+                $redirectURL = json_encode("courses.php"); // Safely encode URL
+                echo "<script>
+                    Swal.fire('Success', $successMessage, 'success').then(() => {
+                        window.location.href = $redirectURL; // Redirect after success
+                    });
+                </script>";
+            } else {
+                $warningMessage = json_encode("No changes made or course not found.");
+                echo "<script>
+                    Swal.fire('Warning', $warningMessage, 'warning');
+                </script>";
+            }
+        }
+            
+    } else {
+        echo "<script>Swal.fire('Error', 'Invalid course ID.', 'error');</script>";
     }
 }
 
@@ -142,6 +143,8 @@ $courses = mysqli_fetch_all($result, MYSQLI_ASSOC);
     <title>Courses List - LMS Admin</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
 </head>
 <style>
     .card {
@@ -183,12 +186,12 @@ $courses = mysqli_fetch_all($result, MYSQLI_ASSOC);
                         <a href="add_course.php" class="btn btn-success">Add New Course</a>
                     </div>
                     
-                    <div style="margin-left: 700px;">
+                    <div style="margin-left: 800px;">
                     <button id="listViewBtn" class="btn btn-primary" onclick="showListView()">
-                        <i class="fas fa-list"></i> List View
+                        <i class="fas fa-list"></i>
                     </button>
                     <button id="gridViewBtn" class="btn btn-secondary" onclick="showGridView()">
-                        <i class="fas fa-th"></i> Grid View
+                        <i class="fas fa-th"></i> 
                     </button>
                     </div>
 

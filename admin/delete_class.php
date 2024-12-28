@@ -8,6 +8,26 @@ if (!isset($_SESSION['user_id']) || !isset($_SESSION['role']) || $_SESSION['role
     header("Location: login.php");
     exit();
 }
+header("Location: classes.php?action=deleted");
+
+
+
+// Perform the deletion logic
+$id = $_GET['id']; // Assuming the ID is passed as a GET parameter
+
+if ($id) {
+    // Example deletion query
+    $delete_query = "DELETE FROM classes WHERE id = $id";
+    $result = mysqli_query($conn, $delete_query);
+
+    if ($result) {
+        // Redirect with the action parameter after a successful deletion
+        header("Location: classes.php?action=deleted");
+        exit; // Ensure no further processing
+    } else {
+        echo "Error deleting class: " . mysqli_error($conn); // Optional error handling
+    }
+}
 
 if (isset($_GET['id'])) {
     $class_id = (int)$_GET['id'];

@@ -25,8 +25,26 @@ include 'header.php';
 ?>
 
 <!-- Hero Section with Parallax Effect -->
-<div class="hero-section text-center py-5 mb-5 parallax-window" data-parallax="scroll" data-image-src="assets/images/hero-bg.jpg" style="background-size: cover; background-position: center;">
+<!-- <div class="hero-section text-center py-5 mb-5 parallax-window" data-parallax="scroll" data-image-src="assets/images/hero-bg.jpg" style="background-size: cover; background-position: center;">
     <div class="container">
+        <h1 class="display-4 mb-4 animate__animated animate__fadeInDown">Welcome to Ultrakey Learning</h1>
+        <p class="lead mb-4 animate__animated animate__fadeInUp">Empower your future with our cutting-edge online courses</p>
+        <?php if (!is_logged_in()): ?>
+            <a href="register.php" class="btn btn-primary btn-lg me-2 animate__animated animate__fadeInLeft">Get Started</a>
+            <a href="login.php" class="btn btn-outline-light btn-lg animate__animated animate__fadeInRight">Login</a>
+        <?php endif; ?>
+    </div>
+</div> -->
+<!-- Hero Section with Parallax Effect -->
+<div 
+    class="hero-section text-center py-5 mb-5 parallax-window" 
+    data-parallax="scroll" 
+    style="background-size: cover; background-position: center; margin-bottom: 10%; position: relative; top: -20px; overflow: hidden;"
+>
+    <!-- Overlay for opacity -->
+    <div class="hero-overlay"></div>
+
+    <div class="container position-relative">
         <h1 class="display-4 mb-4 animate__animated animate__fadeInDown">Welcome to Ultrakey Learning</h1>
         <p class="lead mb-4 animate__animated animate__fadeInUp">Empower your future with our cutting-edge online courses</p>
         <?php if (!is_logged_in()): ?>
@@ -332,5 +350,26 @@ include 'header.php';
         border-radius: 10px;
         width: 100%;
     }
+    .hero-section {
+    background-image: url('assets/images/hero-bg.jpg');
+    background-size: cover;
+    background-position: center;
+    position: relative;
+}
+
+.hero-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(100, 113, 122, 0.5); /* Adjust opacity here */
+    z-index: 1;
+}
+
+.container {
+    position: relative;
+    z-index: 2; /* Ensure content appears above the overlay */
+}
 </style>
 <?php include 'footer.php'; ?>

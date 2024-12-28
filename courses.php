@@ -136,9 +136,23 @@ $razorpayKey = 'rzp_test_Bvq9kiuaq8gkcs'; // Your Razorpay API key
             dataType: 'json',
             success: function(response) {
                 if (response.success) {
-                    swal("Success!", response.message, "success");
+                    swal({
+                        title: "Success!",
+                        text: response.message,
+                        icon: "success",
+                        timer: 2000, // Time in milliseconds (3 seconds)
+                        button: false, // Disable the OK button
+                        className: "green-bg"
+                    });
                 } else {
-                    swal("Failed!", response.message, "error");
+                    swal({
+                        title: "Failed!",
+                        text: response.message,
+                        icon: "error",
+                        timer: 3000, // Time in milliseconds (3 seconds)
+                        button: false, // Disable the OK button
+                        className: "red-bg"
+                    });
                 }
             },
             error: function(xhr, status, error) {
@@ -153,6 +167,7 @@ $razorpayKey = 'rzp_test_Bvq9kiuaq8gkcs'; // Your Razorpay API key
             title: "Enrollment Successful!",
             text: "You have successfully enrolled in the course.",
             icon: "success",
+            timer: 2000,
             button: "OK",
             className: "green-bg"
         })

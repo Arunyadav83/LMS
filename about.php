@@ -88,14 +88,15 @@ class About
         echo "<div class='course-slider'>";
 
         foreach ($this->courses as $course) {
+            // Format image name: lowercase, spaces replaced with underscores
             $image_name = strtolower(str_replace(' ', '_', $course['title'])) . '.jpg';
             echo "<div class='course-item'>";
-            echo "<img src='assets/images/{$image_name}' alt='{$course['title']}' class='course-image'>";
-            echo "<p class='course-title'>{$course['title']}</p>";
+            echo "<img src='assets/images/{$image_name}' alt='" . htmlspecialchars($course['title']) . "' class='course-image'>";
+            echo "<p class='course-title'>" . htmlspecialchars($course['title']) . "</p>";
             echo "</div>";
         }
 
-        echo "</div>";
+        echo "</div>";  // Close courses slider
     }
 
     public function displayWelcomeMessage()

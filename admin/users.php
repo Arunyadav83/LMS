@@ -332,14 +332,21 @@ $view = isset($_GET['view']) ? $_GET['view'] : 'grid';
                     </div>
 
                     <!-- Add View Toggle Buttons -->
-                    <div class="mb-3" style="margin-left: 760px;">
-                        <a href="?view=grid" class="btn btn-primary">Grid View</a>
-                        <a href="?view=list" class="btn btn-secondary">List View</a>
+                    <div class="mb-3" style="margin-left: 840px; margin-top: -7%;">
+                        <a href="?view=grid" class="btn btn-primary">
+                            <i class="fa fa-th-large"></i>
+                        </a>
+                        <a href="?view=list" class="btn btn-secondary">
+                            <i class="fa fa-list"></i>
+                        </a>
                     </div>
+
+
+
 
                     <!-- Render Tutors Based on Selected View -->
                     <div class="container mt-4">
-                        <h2>Tutor List</h2>
+                        <!-- <h2>Tutor List</h2> -->
                         <?php
                         if ($view === 'list') {
                             echo renderTutorsList($tutors);

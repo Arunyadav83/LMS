@@ -212,11 +212,11 @@
                 <p>Flat No: 204, 2nd Floor, Cyber Residency, Hyderabad</p>
                 <iframe src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3806.3760464279485!2d78.35711507369068!3d17.441706501240915!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x4f7a26b96d6c0b61%3A0x6b3acb732ef5e3!2sUltrakey%20IT%20Solutions%20Private%20Limited!5e0!3m2!1sen!2sin!4v1734329910448!5m2!1sen!2sin" width="600" height="450" style="border:0;" allowfullscreen="" loading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe>
             </div>
-            <div class="location-card">
+            <!-- <div class="location-card">
                 <h3>KPHB Colony</h3>
                 <p>Flat No. 301, 3rd Floor, Manyavar Building, Hyderabad</p>
                 <iframe src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d30443.899783221506!2d78.37001637262352!3d17.48422837218086!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x3bcb91b5be1f29c3%3A0xf5af71d23e422328!2sKukatpally%20Housing%20Board%20Colony%2C%20Kukatpally%2C%20Hyderabad%2C%20Telangana!5e0!3m2!1sen!2sin!4v1734329865253!5m2!1sen!2sin" width="600" height="450" style="border:0;" allowfullscreen="" loading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe>
-            </div>
+            </div> -->
         </div>
     </div>
     <?php include 'footer.php'; ?>

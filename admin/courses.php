@@ -24,6 +24,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         $title_id = (int)$_POST['title_id'];
         $description = mysqli_real_escape_string($conn, $_POST['description']);
         $tutor_id = (int)$_POST['tutor_id'];
+        // $topics=mysql_real_escape_string($conn, $_POST['topics']);
 
         // Validate tutor_id
         $stmt = $conn->prepare("SELECT id FROM tutors WHERE id = ? AND role = 'instructor'");
@@ -69,15 +70,50 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                           WHERE id = $id";
 
                 if (mysqli_query($conn, $query)) {
-                    echo "Course updated successfully.";
+                    echo "<script src='https://cdn.jsdelivr.net/npm/sweetalert2@11'></script>";
+                    echo "<script>
+            document.addEventListener('DOMContentLoaded', function () {
+                Swal.fire({
+                    title: 'Success',
+                    text: 'Course updated successfully!',
+                    icon: 'success',
+                    confirmButtonText: 'OK'
+                }).then(() => {
+                    window.location.href = 'courses.php'; // Redirect to course list
+                });
+            });
+        </script>";
                 } else {
-                    echo "Error updating course: " . mysqli_error($conn);
+                    echo "<script>
+            document.addEventListener('DOMContentLoaded', function () {
+                Swal.fire({
+                    title: 'Error',
+                    text: 'Error updating course: " . mysqli_error($conn) . "',
+                    icon: 'error',
+                    confirmButtonText: 'Try Again'
+                });
+            });
+        </script>";
                 }
             } else {
-                echo "No changes were made as the tutor is the same.";
+                echo "<script>
+                    Swal.fire({
+                        title: 'Warning',
+                        text: 'No changes were made as the tutor is the same.',
+                        icon: 'warning',
+                        confirmButtonText: 'OK'
+                    });
+                </script>";
             }
         } else {
-            echo "Invalid tutor selected.";
+            echo "<script>
+                Swal.fire({
+                    title: 'Error',
+                    text: 'Invalid tutor selected.',
+                    icon: 'error',
+                    confirmButtonText: 'OK'
+                });
+            </script>";
         }
     } elseif (isset($_POST['delete_course'])) {
         $id = (int)$_POST['id'];
@@ -85,16 +121,52 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         // Delete the enrollments associated with the course first
         $enrollment_Delete_query = "DELETE FROM enrollments WHERE course_id = $id";
         $payment_delete_query = "DELETE FROM payments WHERE course_id = $id";
+
         if (mysqli_query($conn, $enrollment_Delete_query) && mysqli_query($conn, $payment_delete_query)) {
             // If successful, delete the course
             $query = "DELETE FROM courses WHERE id = $id";
             if (mysqli_query($conn, $query)) {
-                echo "Course deleted successfully.";
+                // Display success SweetAlert
+                echo "<script src='https://cdn.jsdelivr.net/npm/sweetalert2@11'></script>";
+                echo "<script>
+                    document.addEventListener('DOMContentLoaded', function () {
+                        Swal.fire({
+                            title: 'Deleted!',
+                            text: 'The course has been deleted successfully.',
+                            icon: 'success',
+                            confirmButtonText: 'OK'
+                        }).then(() => {
+                            window.location.href = 'courses_list.php'; // Redirect to course list
+                        });
+                    });
+                </script>";
             } else {
-                echo "Error deleting course: " . mysqli_error($conn);
+                // Display error SweetAlert for course deletion
+                echo "<script src='https://cdn.jsdelivr.net/npm/sweetalert2@11'></script>";
+                echo "<script>
+                    document.addEventListener('DOMContentLoaded', function () {
+                        Swal.fire({
+                            title: 'Error!',
+                            text: 'Error deleting course: " . mysqli_error($conn) . "',
+                            icon: 'error',
+                            confirmButtonText: 'Try Again'
+                        });
+                    });
+                </script>";
             }
         } else {
-            echo "Error deleting enrollments or payments: " . mysqli_error($conn);
+            // Display error SweetAlert for enrollments or payments deletion
+            echo "<script src='https://cdn.jsdelivr.net/npm/sweetalert2@11'></script>";
+            echo "<script>
+                document.addEventListener('DOMContentLoaded', function () {
+                    Swal.fire({
+                        title: 'Error!',
+                        text: 'Error deleting enrollments or payments: " . mysqli_error($conn) . "',
+                        icon: 'error',
+                        confirmButtonText: 'Try Again'
+                    });
+                });
+            </script>";
         }
     }
 }
@@ -112,6 +184,7 @@ $result = mysqli_query($conn, $query);
 $course_titles = mysqli_fetch_all($result, MYSQLI_ASSOC);
 ?>
 
+
 <!DOCTYPE html>
 <html lang="en">
 
@@ -119,8 +192,11 @@ $course_titles = mysqli_fetch_all($result, MYSQLI_ASSOC);
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Courses - LMS Admin</title>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+
+
     <style>
         #a {
             color: #00CED1;
@@ -213,8 +289,8 @@ $course_titles = mysqli_fetch_all($result, MYSQLI_ASSOC);
                     <!-- Courses List -->
                     <h2>Courses List</h2>
                     <div class="view-toggle text-end mb-3">
-                        <button class="btn btn-outline-primary" id="grid-view-btn"><i class="fas fa-th"></i> Grid</button>
-                        <button class="btn btn-primary" id="list-view-btn"><i class="fas fa-list"></i> List</button>
+                        <button class="btn btn-outline-primary" id="grid-view-btn"><i class="fas fa-th"></i></button>
+                        <button class="btn btn-primary" id="list-view-btn"><i class="fas fa-list"></i> </button>
                     </div>
 
                     <!-- List View -->
@@ -237,12 +313,18 @@ $course_titles = mysqli_fetch_all($result, MYSQLI_ASSOC);
                                         <td><?php echo htmlspecialchars($course['description']); ?></td>
                                         <td><?php echo htmlspecialchars($course['tutor_name']); ?></td>
                                         <td>
-                                            <button type="button" class="btn btn-sm btn-primary" data-bs-toggle="modal" data-bs-target="#editCourse<?php echo $course['id']; ?>">Edit</button>
-                                            <form method="POST" style="display:inline;">
-                                                <input type="hidden" name="id" value="<?php echo $course['id']; ?>">
-                                                <button type="submit" name="delete_course" class="btn btn-sm btn-danger">Delete</button>
-                                            </form>
+                                            <div class="d-flex">
+                                                <!-- Edit Button -->
+                                                <button type="button" class="btn btn-sm btn-primary me-2" data-bs-toggle="modal" data-bs-target="#editCourse<?php echo $course['id']; ?>">Edit</button>
+
+                                                <!-- Delete Button -->
+                                                <form method="POST" style="display:inline;">
+                                                    <input type="hidden" name="id" value="<?php echo $course['id']; ?>">
+                                                    <button type="submit" name="delete_course" class="btn btn-sm btn-danger">Delete</button>
+                                                </form>
+                                            </div>
                                         </td>
+
                                     </tr>
                                 <?php endforeach; ?>
                             </tbody>
@@ -351,4 +433,3 @@ $course_titles = mysqli_fetch_all($result, MYSQLI_ASSOC);
 </body>
 
 </html>
-

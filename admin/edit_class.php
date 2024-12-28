@@ -183,5 +183,26 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             <button type="submit" class="btn btn-primary">Update Class</button>
         </form>
     </div>
+    <?php
+// update_class.php
+$update_success=0;
+
+// Perform the update logic
+if ($update_success) { // Set this flag after a successful update
+    echo "<script src='https://cdn.jsdelivr.net/npm/sweetalert2@11'></script>";
+    echo "<script>
+    Swal.fire({
+        icon: 'success',
+        title: 'Class Updated Successfully!',
+        text: 'Your class details have been updated.',
+        showConfirmButton: false,
+        timer: 1500
+    }).then(() => {
+        window.location.href = 'classes.php'; // Redirect back to classes page
+    });
+    </script>";
+}
+?>
+
 </body>
 </html>

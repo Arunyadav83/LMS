@@ -56,8 +56,8 @@ $razorpayKey = 'rzp_test_Bvq9kiuaq8gkcs'; // Your Razorpay API key
 <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
 
 <!-- Include SweetAlert CSS and JS -->
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/sweetalert/1.1.3/sweetalert.min.css">
-<script src="https://cdnjs.cloudflare.com/ajax/libs/sweetalert/1.1.3/sweetalert.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
 
 <!-- <script>
     function showSuccessAlert() {
@@ -88,7 +88,7 @@ $razorpayKey = 'rzp_test_Bvq9kiuaq8gkcs'; // Your Razorpay API key
                         currency: 'INR',
                         name: 'Course Enrollment',
                         description: 'Enroll in ' + response.title,
-                        image: 'assets/images/logo.png',
+                        image: 'assets/images/logo2.png',
                         order_id: response.order_id,
                         handler: function(paymentResponse) {
                             verifyPayment(paymentResponse, response, courseId, userId);
@@ -136,14 +136,8 @@ $razorpayKey = 'rzp_test_Bvq9kiuaq8gkcs'; // Your Razorpay API key
             dataType: 'json',
             success: function(response) {
                 if (response.success) {
-                    swal({
-                        title: "Success!",
-                        text: response.message,
-                        icon: "success",
-                        timer: 2000, // Time in milliseconds (3 seconds)
-                        button: false, // Disable the OK button
-                        className: "green-bg"
-                    });
+
+                    showSuccessAlert();
                 } else {
                     swal({
                         title: "Failed!",
@@ -163,15 +157,16 @@ $razorpayKey = 'rzp_test_Bvq9kiuaq8gkcs'; // Your Razorpay API key
     }
 
     function showSuccessAlert() {
-        swal({
-            title: "Enrollment Successful!",
-            text: "You have successfully enrolled in the course.",
-            icon: "success",
-            timer: 2000,
-            button: "OK",
-            className: "green-bg"
-        })
-    }
+    Swal.fire({
+        title: "Enrollment Successful!",
+        text: "Payment Verified and Enrollment Successful!",
+        icon: "success", // Ensures the green tick mark is shown
+        timer: 4000, // Duration of the alert in milliseconds
+        showConfirmButton: true, // "OK" button
+        confirmButtonText: "OK", // Button text
+    });
+}
+
 
     function showErrorAlert(title, message) {
         swal({

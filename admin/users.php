@@ -161,7 +161,7 @@ function renderTutorsList($tutors)
     $output .= '<thead>
                     <tr>
                         <th>Tutor Name</th>
-                        <th>ID</th>
+                        <th>ID</th> 
                         <th>Email</th>
                         <th>Specialization</th>
                         <th>Actions</th>
@@ -198,10 +198,12 @@ function renderTutorsList($tutors)
                         </td>
                     </tr>';
     }
+    
     $output .= '</tbody>';
     $output .= '</table>';
     return $output;
 }
+
 
 // Toggle view
 $view = isset($_GET['view']) ? $_GET['view'] : 'grid';
@@ -216,6 +218,13 @@ $view = isset($_GET['view']) ? $_GET['view'] : 'grid';
     <title>Tutors - LMS Admin</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
+
+    <!-- Bootstrap JS and dependencies -->
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.6/dist/umd/popper.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.min.js"></script>
+
 </head>
 <style>
     .row {
@@ -242,6 +251,44 @@ $view = isset($_GET['view']) ? $_GET['view'] : 'grid';
     .table {
         background-color: transparent;
     }
+    #addTutorOffCanvas{
+        width: 700px;
+    }
+
+    @media (max-width: 768px) {
+            .card-title {
+                font-size: 1rem;
+            }
+
+            .card-text {
+                font-size: 0.9rem;
+            }
+
+            .table th, .table td {
+                font-size: 0.85rem;
+            }
+        }
+
+        @media (max-width: 576px) {
+            .card-title {
+                font-size: 0.9rem;
+            }
+
+            .card-text {
+                font-size: 0.8rem;
+            }
+
+            .dropdown-menu {
+                font-size: 0.85rem;
+            }
+
+            .table th, .table td {
+                font-size: 0.75rem;
+            }
+
+            .navbar-brand {
+                font-size: 1rem;
+            }
 </style>
 
 <body>
@@ -277,59 +324,56 @@ $view = isset($_GET['view']) ? $_GET['view'] : 'grid';
 
                     <!-- Add Tutor Button -->
                     <div class="mb-3">
-                        <button type="button" class="btn btn-navy" data-bs-toggle="modal" data-bs-target="#addTutorModal">
+                        <button type="button" class="btn btn-navy" data-bs-toggle="offcanvas" data-bs-target="#addTutorOffCanvas" aria-controls="addTutorOffCanvas">
                             Add Tutor
                         </button>
                     </div>
 
-                    <!-- Add Tutor Modal -->
-                    <div class="modal fade" id="addTutorModal" tabindex="-1" aria-labelledby="addTutorModalLabel" aria-hidden="true">
-                        <div class="modal-dialog">
-                            <div class="modal-content">
-                                <div class="modal-header">
-                                    <h5 class="modal-title" id="addTutorModalLabel">Add New Tutor</h5>
-                                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    <!-- Off-Canvas for Add Tutor -->
+                    <div class="offcanvas offcanvas-end" tabindex="-1" id="addTutorOffCanvas" aria-labelledby="addTutorOffCanvasLabel">
+                        <div class="offcanvas-header">
+                            <h5 id="addTutorOffCanvasLabel">Add New Tutor</h5>
+                            <button type="button" class="btn-close" data-bs-dismiss="offcanvas" aria-label="Close"></button>
+                        </div>
+                        <div class="offcanvas-body">
+                            <form action="" method="post" enctype="multipart/form-data">
+                                <div class="mb-3">
+                                    <label for="username" class="form-label">Username</label>
+                                    <input type="text" class="form-control" id="username" name="username" required>
                                 </div>
-                                <div class="modal-body">
-                                    <form action="" method="post" enctype="multipart/form-data">
-                                        <div class="mb-3">
-                                            <label for="username" class="form-label">Username</label>
-                                            <input type="text" class="form-control" id="username" name="username" required>
-                                        </div>
-                                        <div class="mb-3">
-                                            <label for="email" class="form-label">Email</label>
-                                            <input type="email" class="form-control" id="email" name="email" required>
-                                        </div>
-                                        <div class="mb-3">
-                                            <label for="password" class="form-label">Password</label>
-                                            <input type="password" class="form-control" id="password" name="password" required>
-                                        </div>
-                                        <div class="mb-3">
-                                            <label for="full_name" class="form-label">Full Name</label>
-                                            <input type="text" class="form-control" id="full_name" name="full_name" required>
-                                        </div>
-                                        <div class="mb-3">
-                                            <label for="bio" class="form-label">Bio</label>
-                                            <textarea class="form-control" id="bio" name="bio" rows="3"></textarea>
-                                        </div>
-                                        <div class="mb-3">
-                                            <label for="specialization" class="form-label">Specialization</label>
-                                            <input type="text" class="form-control" id="specialization" name="specialization">
-                                        </div>
-                                        <div class="mb-3">
-                                            <label for="resume" class="form-label">Resume</label>
-                                            <input type="file" class="form-control" id="resume" name="resume">
-                                        </div>
-                                        <div class="mb-3">
-                                            <label for="certificate" class="form-label">Certificate</label>
-                                            <input type="file" class="form-control" id="certificate" name="certificate">
-                                        </div>
-                                        <button type="submit" name="add_tutor" class="btn btn-navy">Add Tutor</button>
-                                    </form>
+                                <div class="mb-3">
+                                    <label for="email" class="form-label">Email</label>
+                                    <input type="email" class="form-control" id="email" name="email" required>
                                 </div>
-                            </div>
+                                <div class="mb-3">
+                                    <label for="password" class="form-label">Password</label>
+                                    <input type="password" class="form-control" id="password" name="password" required>
+                                </div>
+                                <div class="mb-3">
+                                    <label for="full_name" class="form-label">Full Name</label>
+                                    <input type="text" class="form-control" id="full_name" name="full_name" required>
+                                </div>
+                                <div class="mb-3">
+                                    <label for="bio" class="form-label">Bio</label>
+                                    <textarea class="form-control" id="bio" name="bio" rows="3"></textarea>
+                                </div>
+                                <div class="mb-3">
+                                    <label for="specialization" class="form-label">Specialization</label>
+                                    <input type="text" class="form-control" id="specialization" name="specialization">
+                                </div>
+                                <div class="mb-3">
+                                    <label for="resume" class="form-label">Resume</label>
+                                    <input type="file" class="form-control" id="resume" name="resume">
+                                </div>
+                                <div class="mb-3">
+                                    <label for="certificate" class="form-label">Certificate</label>
+                                    <input type="file" class="form-control" id="certificate" name="certificate">
+                                </div>
+                                <button type="submit" name="add_tutor" class="btn btn-navy">Add Tutor</button>
+                            </form>
                         </div>
                     </div>
+
 
                     <!-- Add View Toggle Buttons -->
                     <div class="mb-3" style="margin-left: 840px; margin-top: -7%;">

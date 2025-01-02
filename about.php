@@ -61,10 +61,12 @@ class About
             return [];
         }
     }
-
     public function displayAbout()
     {
-        echo "<h2 class='section-title' >Tutors</h2>";
+        echo "<h2 class='section-title'>
+                <span class='subtitle'>World-Class Instructors</span><br>
+                Classes Taught By Real Creators
+              </h2>";
         echo "<div class='tutors-section'>";
 
         foreach ($this->tutors as $tutor) {
@@ -88,12 +90,11 @@ class About
         echo "<div class='course-slider'>";
 
         foreach ($this->courses as $course) {
-            // Format image name: lowercase, spaces replaced with underscores
             $image_name = strtolower(str_replace(' ', '_', $course['title'])) . '.jpg';
-            echo "<div class='course-item'>";
-            echo "<img src='assets/images/{$image_name}' alt='" . htmlspecialchars($course['title']) . "' class='course-image'>";
-            echo "<p class='course-title'>" . htmlspecialchars($course['title']) . "</p>";
-            echo "</div>";
+            echo "<div class='course-item'>
+                    <img src='assets/images/{$image_name}' alt='" . htmlspecialchars($course['title']) . "' class='course-image'>
+                    <p class='course-title'>" . htmlspecialchars($course['title']) . "</p>
+                  </div>";
         }
 
         echo "</div>";  // Close courses slider
@@ -187,21 +188,25 @@ include 'footer.php';
         }
 
         footer a {
-            color: #4facfe;
+            color:rgb(163, 187, 207);
             text-decoration: none;
+            font-size: larger;
         }
 
         footer a:hover {
             text-decoration: underline;
         }
 
-        /* Welcome Section */
         .welcome-section {
-            background-color: rgb(202, 228, 247);
-            padding: 50px;
-            width: 100%;
-            /* margin: 20px; */
-            box-shadow: 0 6px 12px rgba(117, 113, 113, 0.1);
+            position: relative;
+            color: white;
+            text-align: center;
+            padding: 50px 20px;
+            background: linear-gradient(rgba(0, 0, 0, 0.7), rgba(0, 0, 0, 0.7)),
+                url('assets/images/about_us_background.jpg') no-repeat center/cover;
+            background-attachment: fixed;
+            opacity: 0.9;
+            animation: slideIn 1.5s ease-out forwards;
         }
 
         .welcome-section h1 {
@@ -233,9 +238,26 @@ include 'footer.php';
             padding: 10px;
         }
 
+
         .tutor-card {
+            background: #ffffff;
             margin: 0 15px;
-            /* Horizontal space between tutor cards */
+            border-radius: 8px;
+            max-width: 300px;
+            padding: 20px;
+            text-align: center;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1)
+                /* box-shadow: 0 4
+            px 6px rgba(0, 0, 0, 0.1);
+            
+            text-align: center;
+            max-width: 300px;
+            transition: transform 0.3s, box-shadow 0.3s; */
+        }
+
+        .tutor-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
         }
 
 
@@ -248,23 +270,27 @@ include 'footer.php';
                 gap: 15px;
                 /* Reduced gap for smaller screens */
             }
-           
+
         }
+
         @media (max-width: 480px) {
-            .welcome-section{
+            .welcome-section {
                 padding: 0px;
                 width: 100%;
             }
-            .why-card{
+
+            .why-card {
                 width: 250px !important;
             }
-            .why-choose-us-cards {
-       
-            min-width: 0px;
-           
 
+            .why-choose-us-cards {
+
+                min-width: 0px;
+
+
+            }
         }
-        }
+
         /* Responsive for very small screens */
         @media (max-width: 480px) {
             .tutors-section {
@@ -346,12 +372,24 @@ include 'footer.php';
         }
 
 
-        /* Center the section titles */
         .section-title {
             text-align: center;
-            margin-top: 40px;
-            font-size: 2em;
-            /* font-weight: bold; */
+            font-size: 2.5em;
+            color: #2c3e50;
+            font-weight: 900;
+            letter-spacing: 0.1em;
+            line-height: 0.5;
+            margin: 40px 0;
+            font-family: 'Montserrat', sans-serif;
+        }
+
+        .subtitle {
+            color: #e74c3c;
+            font-size: 0.8em;
+            text-transform: uppercase;
+            letter-spacing: 0.15em;
+            margin-bottom: 10px;
+            display: block;
         }
 
 
@@ -456,9 +494,10 @@ include 'footer.php';
                             slidesToShow: 2,
                             slidesToScroll: 2,
                         }
-                    }]
+                    }
+                ]
             });
-        
+
 
             $('.tutors-section').slick({
                 slidesToShow: 2,

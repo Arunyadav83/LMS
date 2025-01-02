@@ -48,9 +48,9 @@ if (isset($_GET['export']) && $_GET['export'] == 'excel') {
     header('Content-Type: application/vnd.ms-excel');
     header('Content-Disposition: attachment;filename="quiz_results.xls"');
     header('Cache-Control: max-age=0');
-    
+
     echo "ID\tStudent\tClass\tCourse\tTutor\tScore\tTotal Questions\tPercentage\tSubmitted At\n";
-    
+
     mysqli_data_seek($result, 0);
     while ($row = mysqli_fetch_assoc($result)) {
         echo implode("\t", [
@@ -67,10 +67,21 @@ if (isset($_GET['export']) && $_GET['export'] == 'excel') {
     }
     exit;
 }
+$query = "SELECT full_name FROM tutors"; // Modify this query based on your table and column names
+$tutors_result = mysqli_query($conn, $query);
+
+if (!$tutors_result) {
+    die("Error fetching tutors: " . mysqli_error($conn));
+}
+
+// Check if tutor filter is set (optional)
+$tutor_filter = isset($_GET['tutor']) ? $_GET['tutor'] : '';
+
 ?>
 
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -78,6 +89,7 @@ if (isset($_GET['export']) && $_GET['export'] == 'excel') {
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
 </head>
+
 <body>
     <!-- Navigation Bar -->
     <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
@@ -115,12 +127,14 @@ if (isset($_GET['export']) && $_GET['export'] == 'excel') {
                             <div class="col-md-4">
                                 <input type="text" name="search" class="form-control" placeholder="Search..." value="<?php echo htmlspecialchars($search); ?>">
                             </div>
+
+
                             <div class="col-md-3">
                                 <select name="tutor" class="form-select">
                                     <option value="">All Tutors</option>
                                     <?php while ($tutor = mysqli_fetch_assoc($tutors_result)): ?>
-                                        <option value="<?php echo htmlspecialchars($tutor['tutor_name']); ?>" <?php echo $tutor_filter == $tutor['tutor_name'] ? 'selected' : ''; ?>>
-                                            <?php echo htmlspecialchars($tutor['tutor_name']); ?>
+                                        <option value="<?php echo htmlspecialchars($tutor['full_name']); ?>" <?php echo $tutor_filter == $tutor['full_name'] ? 'selected' : ''; ?>>
+                                            <?php echo htmlspecialchars($tutor['full_name']); ?>
                                         </option>
                                     <?php endwhile; ?>
                                 </select>
@@ -142,7 +156,9 @@ if (isset($_GET['export']) && $_GET['export'] == 'excel') {
                     </form>
 
                     <!-- Export to Excel Button -->
-                    <a href="?export=excel<?php echo $search ? '&search=' . urlencode($search) : ''; echo $tutor_filter ? '&tutor=' . urlencode($tutor_filter) : ''; echo $course_filter ? '&course=' . urlencode($course_filter) : ''; ?>" class="btn btn-success mb-3">Export to Excel</a>
+                    <a href="?export=excel<?php echo $search ? '&search=' . urlencode($search) : '';
+                                            echo $tutor_filter ? '&tutor=' . urlencode($tutor_filter) : '';
+                                            echo $course_filter ? '&course=' . urlencode($course_filter) : ''; ?>" class="btn btn-success mb-3">Export to Excel</a>
 
                     <!-- Quiz Results Table -->
                     <table class="table table-striped">
@@ -182,4 +198,5 @@ if (isset($_GET['export']) && $_GET['export'] == 'excel') {
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
 </body>
+
 </html>

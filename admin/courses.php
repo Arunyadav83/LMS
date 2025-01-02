@@ -47,75 +47,79 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         }
     } elseif (isset($_POST['edit_course'])) {
         $id = (int)$_POST['id'];
-        $title_id = mysqli_real_escape_string($conn, $_POST['title']);
+        $title = mysqli_real_escape_string($conn, $_POST['title']);
         $description = mysqli_real_escape_string($conn, $_POST['description']);
         $tutor_id = (int)$_POST['tutor_id'];
-
-        // Ensure the tutor is valid and an instructor
-        $tutor_query = "SELECT full_name FROM tutors WHERE id = $tutor_id AND role = 'instructor'";
+        
+        // Ensure the tutor exists and has the 'instructor' role
+        $tutor_query = "SELECT id, role FROM tutors WHERE id = $tutor_id AND role = 'instructor'";
         $tutor_result = mysqli_query($conn, $tutor_query);
-
+        
         if (mysqli_num_rows($tutor_result) > 0) {
-            // Fetch the current tutor ID to check if a change is being made
-            $current_tutor_query = "SELECT tutor_id FROM courses WHERE id = $id";
-            $current_tutor_result = mysqli_query($conn, $current_tutor_query);
-            $current_tutor = mysqli_fetch_assoc($current_tutor_result)['tutor_id'];
-
-            if ($current_tutor != $tutor_id) {
-                // Update the course with new details
-                $query = "UPDATE courses 
-                          SET title = '$title_id', 
-                              description = '$description', 
-                              tutor_id = $tutor_id 
-                          WHERE id = $id";
-
-                if (mysqli_query($conn, $query)) {
-                    echo "<script src='https://cdn.jsdelivr.net/npm/sweetalert2@11'></script>";
-                    echo "<script>
-            document.addEventListener('DOMContentLoaded', function () {
-                Swal.fire({
-                    title: 'Success',
-                    text: 'Course updated successfully!',
-                    icon: 'success',
-                    confirmButtonText: 'OK'
-                }).then(() => {
-                    window.location.href = 'courses.php'; // Redirect to course list
-                });
-            });
-        </script>";
-                } else {
-                    echo "<script>
-            document.addEventListener('DOMContentLoaded', function () {
-                Swal.fire({
-                    title: 'Error',
-                    text: 'Error updating course: " . mysqli_error($conn) . "',
-                    icon: 'error',
-                    confirmButtonText: 'Try Again'
-                });
-            });
-        </script>";
-                }
-            } else {
+            // Tutor exists, update the course
+            $query = "UPDATE courses 
+                      SET title = '$title', 
+                          description = '$description', 
+                          tutor_id = $tutor_id 
+                      WHERE id = $id";
+        
+            if (mysqli_query($conn, $query)) {
+                echo '<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>';
                 echo "<script>
-                    Swal.fire({
-                        title: 'Warning',
-                        text: 'No changes were made as the tutor is the same.',
-                        icon: 'warning',
-                        confirmButtonText: 'OK'
+                    document.addEventListener('DOMContentLoaded', function() {
+                        Swal.fire({
+                            title: 'Success',
+                            text: 'Course updated successfully!',
+                            icon: 'success',
+                            confirmButtonText: 'OK'
+                        }).then(() => {
+                            window.location.href = 'courses.php'; // Redirect
+                        });
+                    });
+                </script>";
+            } else {
+                echo '<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>';
+                echo "<script>
+                    document.addEventListener('DOMContentLoaded', function() {
+                        Swal.fire({
+                            title: 'Error',
+                            text: 'Error updating course: " . mysqli_error($conn) . "',
+                            icon: 'error',
+                            confirmButtonText: 'Try Again'
+                        });
                     });
                 </script>";
             }
         } else {
+            echo '<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>';
             echo "<script>
-                Swal.fire({
-                    title: 'Error',
-                    text: 'Invalid tutor selected.',
-                    icon: 'error',
-                    confirmButtonText: 'OK'
+                document.addEventListener('DOMContentLoaded', function() {
+                    Swal.fire({
+                        title: 'Error',
+                        text: 'The selected tutor does not exist or is not an instructor.',
+                        icon: 'error',
+                        confirmButtonText: 'Try Again'
+                    });
                 });
             </script>";
         }
-    } elseif (isset($_POST['delete_course'])) {
+    }
+     else {
+            echo '<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>';
+            echo "<script>
+                document.addEventListener('DOMContentLoaded', function() {
+                    Swal.fire({
+                        title: 'Error',
+                        text: 'Invalid tutor selected.',
+                        icon: 'error',
+                        confirmButtonText: 'OK'
+                    });
+                });
+            </script>";
+        }
+    }
+    
+    elseif (isset($_POST['delete_course'])) {
         $id = (int)$_POST['id'];
 
         // Delete the enrollments associated with the course first
@@ -169,7 +173,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             </script>";
         }
     }
-}
+
 
 // Fetch all courses with tutor details
 $query = "SELECT c.*, t.full_name as tutor_name 

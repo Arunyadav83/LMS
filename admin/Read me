@@ -11,7 +11,7 @@ email and Username: nehakumari@gmail.com &Neha
 password=neha@1234 , 
 
 email and Username: srivani@gmail.com &srivani
-password=Srivani@123 , 
+password=Chitti@1234 , 
 
 user:ShivaMani
 password:shivamani@1234
@@ -19,12 +19,12 @@ password:shivamani@1234
 email: rohithpatel@gmail.com user:Rohith Patel
 password:rohith@1234
 user:Saikumar
-password:saikumar@123
+password:Sai@1234
 
 email:ramana@gmail.com user:Ramana
 password:Ramana@1234
 email:arun@gmail.com user:Arun
-password:Arun@1234
+password:Arun@8309
 email:naveen@gmail.com user:Naveen
 password:naveen@1234
 1. For the existing 'admin' user:
@@ -39,7 +39,8 @@ For the newly created 'admin2' user (if you added it):
 Email: admin2@example.com
 Password: password
 
-
+User :Srivani Kodimyala
+password: K.Srivani@1234
 
 
 classes login details

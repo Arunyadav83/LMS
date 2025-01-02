@@ -3,6 +3,15 @@ session_start();
 
 require_once '../config.php';
 require_once '../functions.php';
+if (isset($_GET['logout']) && $_GET['logout'] == 1) {
+    // Destroy the session
+    session_unset();
+    session_destroy();
+
+    // Redirect to index.php
+    header("Location: index.php");
+    exit();
+}
 
 // At the beginning of your PHP script, add this function:
 function ensure_directory_exists($path)
@@ -116,6 +125,7 @@ if (!isset($_SESSION['user_id']) || !isset($_SESSION['role']) || $_SESSION['role
     exit();
 }
 
+
 $tutor_id = $_SESSION['user_id'];
 $tutor_name = $_SESSION['full_name'];
 
@@ -155,28 +165,74 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         // Handle quiz questions
         if (isset($_POST['questions'])) {
             foreach ($_POST['questions'] as $index => $question) {
+                // Sanitize and escape input to prevent SQL injection
                 $question_text = mysqli_real_escape_string($conn, $question);
                 $correct_answer = mysqli_real_escape_string($conn, $_POST['correct_answers'][$index]);
 
-                $query = "INSERT INTO quiz_questions (class_id, question_text, correct_answer) 
-                          VALUES (?, ?, ?)";
+                // Assuming you have a video_id to associate with the question
+                $video_id = isset($_POST['video_id'][$index]) ? mysqli_real_escape_string($conn, $_POST['video_id'][$index]) : null;
+
+                // Check if the required fields are filled
+                if (empty($question_text) || empty($correct_answer)) {
+                    echo "Error: Question or correct answer is empty!";
+                    continue; // Skip the current question if it's empty
+                }
+
+                // Prepare the INSERT statement for the quiz question
+                $query = "INSERT INTO quiz_questions (class_id, question_text, correct_answer, video_id) 
+                  VALUES (?, ?, ?, ?)";
                 $stmt = mysqli_prepare($conn, $query);
-                mysqli_stmt_bind_param($stmt, "iss", $class_id, $question_text, $correct_answer);
-                mysqli_stmt_execute($stmt);
 
-                $question_id = mysqli_insert_id($conn);
+                if (!$stmt) {
+                    echo "Error preparing statement for quiz question: " . mysqli_error($conn);
+                    continue;
+                }
 
-                // Insert answer options and feedback
-                foreach ($_POST['answers'][$index] as $answer_index => $answer) {
-                    $answer_text = mysqli_real_escape_string($conn, $answer);
-                    $feedback_text = mysqli_real_escape_string($conn, $_POST['feedback'][$index][$answer_index]);
-                    $query = "INSERT INTO quiz_answers (question_id, answer_text, feedback) 
+                // Bind parameters and execute the statement
+                mysqli_stmt_bind_param($stmt, "isss", $class_id, $question_text, $correct_answer, $video_id);
+
+                // Execute the query and check if successful
+                if (mysqli_stmt_execute($stmt)) {
+                    // Get the last inserted question_id
+                    $question_id = mysqli_insert_id($conn);
+
+                    // Insert answer options and feedback
+                    if (isset($_POST['answers'][$index]) && isset($_POST['feedback'][$index])) {
+                        foreach ($_POST['answers'][$index] as $answer_index => $answer) {
+                            $answer_text = mysqli_real_escape_string($conn, $answer);
+                            $feedback_text = mysqli_real_escape_string($conn, $_POST['feedback'][$index][$answer_index]);
+
+                            // Check if the answer or feedback is empty
+                            if (empty($answer_text) || empty($feedback_text)) {
+                                echo "Error: Answer or feedback is empty!";
+                                continue; // Skip the current answer if it's empty
+                            }
+
+                            // Prepare the INSERT statement for quiz answers
+                            $query = "INSERT INTO quiz_answers (question_id, answer_text, feedback) 
                               VALUES (?, ?, ?)";
-                    $stmt = mysqli_prepare($conn, $query);
-                    mysqli_stmt_bind_param($stmt, "iss", $question_id, $answer_text, $feedback_text);
-                    mysqli_stmt_execute($stmt);
+                            $stmt = mysqli_prepare($conn, $query);
+
+                            if (!$stmt) {
+                                echo "Error preparing statement for quiz answer: " . mysqli_error($conn);
+                                continue;
+                            }
+
+                            // Bind parameters and execute the query
+                            mysqli_stmt_bind_param($stmt, "iss", $question_id, $answer_text, $feedback_text);
+
+                            // Execute the query and check if successful
+                            if (!mysqli_stmt_execute($stmt)) {
+                                echo "Error executing query for quiz answer: " . mysqli_error($conn);
+                            }
+                        }
+                    }
+                } else {
+                    echo "Error inserting quiz question: " . mysqli_error($conn);
                 }
             }
+        } else {
+            echo "No quiz questions submitted.";
         }
     }
 }
@@ -211,7 +267,24 @@ $classes = mysqli_fetch_all($result, MYSQLI_ASSOC);
     <title>Classes - LMS</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <!-- Bootstrap Bundle with Popper --><!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
+
+
+
 </head>
+
+<style>
+    #addClassOffcanvas {
+        width: 700px;
+        /* Set your desired width */
+    }
+</style>
 
 <body>
     <!-- Navigation Bar -->
@@ -228,9 +301,14 @@ $classes = mysqli_fetch_all($result, MYSQLI_ASSOC);
                             <i class="fas fa-user"></i> <?php echo htmlspecialchars($tutor_name); ?>
                         </a>
                         <ul class="dropdown-menu" aria-labelledby="navbarDropdown">
-                            <li><a class="dropdown-item" href="?logout=1"><i class="fas fa-sign-out-alt"></i> Logout</a></li>
+                            <li>
+                                <a class="dropdown-item" href="?logout=1">
+                                    <i class="fas fa-sign-out-alt"></i> Logout
+                                </a>
+                            </li>
                         </ul>
                     </li>
+
                 </ul>
             </div>
         </div>
@@ -248,55 +326,64 @@ $classes = mysqli_fetch_all($result, MYSQLI_ASSOC);
         }
         ?>
         <h1 class="mb-4">Classes - Tutor: <?php echo htmlspecialchars($tutor_name); ?></h1>
+        <!-- Button to Open the Offcanvas -->
+        <button class="btn btn-primary" type="button" data-bs-toggle="offcanvas" data-bs-target="#addClassOffcanvas" aria-controls="addClassOffcanvas">
+            Add New Class
+        </button>
 
-        <!-- Add Class Form -->
-        <h2>Add New Class</h2>
-        <form action="" method="post" enctype="multipart/form-data" id="addClassForm">
-            <div class="mb-3">
-                <label for="course_id" class="form-label">Course</label>
-                <select class="form-control" id="course_id" name="course_id" required>
-                    <option value="">Select Course</option>
-                    <?php foreach ($courses as $course): ?>
-                        <option value="<?php echo $course['id']; ?>"><?php echo htmlspecialchars($course['title']); ?></option>
-                    <?php endforeach; ?>
-                </select>
+        <!-- Offcanvas for Adding a New Class -->
+        <div class="offcanvas offcanvas-end" tabindex="-1" id="addClassOffcanvas" aria-labelledby="addClassOffcanvasLabel">
+            <div class="offcanvas-header">
+                <h5 id="addClassOffcanvasLabel">Add New Class</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="offcanvas" aria-label="Close"></button>
             </div>
-            <div class="mb-3">
-                <label for="class_name" class="form-label">Class Name</label>
-                <input type="text" class="form-control" id="class_name" name="class_name" required>
+            <div class="offcanvas-body">
+                <form action="" method="post" enctype="multipart/form-data" id="addClassForm">
+                    <div class="mb-3">
+                        <label for="course_id" class="form-label">Course</label>
+                        <select class="form-control" id="course_id" name="course_id" required>
+                            <option value="">Select Course</option>
+                            <?php foreach ($courses as $course): ?>
+                                <option value="<?php echo $course['id']; ?>"><?php echo htmlspecialchars($course['title']); ?></option>
+                            <?php endforeach; ?>
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <label for="class_name" class="form-label">Class Name</label>
+                        <input type="text" class="form-control" id="class_name" name="class_name" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="description" class="form-label">Description</label>
+                        <textarea class="form-control" id="description" name="description" rows="3"></textarea>
+                    </div>
+                    <div class="mb-3">
+                        <label for="class_video" class="form-label">Class Video</label>
+                        <input type="file" class="form-control" id="class_video" name="class_video">
+                    </div>
+                    <div class="mb-3 form-check">
+                        <input type="checkbox" class="form-check-input" id="is_online" name="is_online">
+                        <label class="form-check-label" for="is_online">Online Class</label>
+                    </div>
+                    <div id="onlineClassDetails" style="display: none;">
+                        <div class="mb-3">
+                            <label for="online_link" class="form-label">Online Class Link</label>
+                            <input type="text" class="form-control" id="online_link" name="online_link">
+                        </div>
+                        <div class="mb-3">
+                            <label for="schedule_time" class="form-label">Schedule Time</label>
+                            <input type="datetime-local" class="form-control" id="schedule_time" name="schedule_time">
+                        </div>
+                    </div>
+                    <h3>Quiz Questions</h3>
+                    <div id="quizQuestions">
+                        <!-- Initial question will be added here -->
+                    </div>
+                    <button type="button" class="btn btn-secondary mb-3" id="addQuestion">Add Question</button>
+                    <button type="submit" name="add_class" class="btn btn-primary">Add Class</button>
+                </form>
             </div>
-            <div class="mb-3">
-                <label for="description" class="form-label">Description</label>
-                <textarea class="form-control" id="description" name="description" rows="3"></textarea>
-            </div>
-            <div class="mb-3">
-                <label for="class_video" class="form-label">Class Video</label>
-                <input type="file" class="form-control" id="class_video" name="class_video">
-            </div>
-            <div class="mb-3 form-check">
-                <input type="checkbox" class="form-check-input" id="is_online" name="is_online">
-                <label class="form-check-label" for="is_online">Online Class</label>
-            </div>
-            <div id="onlineClassDetails" style="display: none;">
-                <div class="mb-3">
-                    <label for="online_link" class="form-label">Online Class Link</label>
-                    <input type="text" class="form-control" id="online_link" name="online_link">
-                </div>
-                <div class="mb-3">
-                    <label for="schedule_time" class="form-label">Schedule Time</label>
-                    <input type="datetime-local" class="form-control" id="schedule_time" name="schedule_time">
-                </div>
-            </div>
+        </div>
 
-            <!-- Quiz Questions -->
-            <h3>Quiz Questions</h3>
-            <div id="quizQuestions">
-                <!-- Initial question will be added here -->
-            </div>
-            <button type="button" class="btn btn-secondary mb-3" id="addQuestion">Add Question</button>
-
-            <button type="submit" name="add_class" class="btn btn-primary">Add Class</button>
-        </form>
 
         <!-- Your Classes List -->
         <h2 class="mt-5">Your Classes</h2>
@@ -310,7 +397,7 @@ $classes = mysqli_fetch_all($result, MYSQLI_ASSOC);
         <!-- Include SweetAlert2 -->
         <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
-       
+
         <!-- List View -->
         <div id="listView" class="d-block">
             <?php if (empty($classes)): ?>
@@ -376,14 +463,22 @@ $classes = mysqli_fetch_all($result, MYSQLI_ASSOC);
                     }
                 });
             }
+            document.getElementById("is_online").addEventListener("change", function() {
+                const details = document.getElementById("onlineClassDetails");
+                if (this.checked) {
+                    details.style.display = "block";
+                } else {
+                    details.style.display = "none";
+                }
+            });
         </script>
 
         <?php
-         // Initialize success flags
-         $delete_success = false;
-         $update_success = false;
+        // Initialize success flags
+        $delete_success = false;
+        $update_success = false;
         // After deletion is successful in your delete_class.php file
-        
+
         if (isset($_GET['action'])) {
             if ($_GET['action'] === 'deleted') {
                 echo "<script src='https://cdn.jsdelivr.net/npm/sweetalert2@11'></script>";
@@ -408,7 +503,7 @@ $classes = mysqli_fetch_all($result, MYSQLI_ASSOC);
             }
         }
         ?>
-        
+
         <!-- Grid View -->
         <div id="gridView" class="row d-none">
             <?php if (empty($classes)): ?>

@@ -344,18 +344,26 @@ include 'header.php';
     });
 </script>
 <style>
-    #explore {
-        background-color: #87CEEB;
-        padding: 20px;
-        border-radius: 10px;
-        width: 100%;
-    }
+  #explore {
+    background-color:rgb(233, 245, 247); /* Light Cyan */
+    padding: 20px;
+    border-radius: 10px;
+    width: 100%;
+}
+
     .hero-section {
     background-image: url('assets/images/hero-bg.jpg');
     background-size: cover;
     background-position: center;
     position: relative;
 }
+.stats-counter {
+    background: linear-gradient(135deg,rgb(166, 208, 250),rgb(124, 244, 224)); /* Blue and Green Gradient */
+    color: black; /* Ensures text remains readable */
+    padding: 50px 0;
+    border-radius: 10px; /* Optional: Adds rounded corners for a modern touch */
+}
+
 
 .hero-overlay {
     position: absolute;
@@ -369,7 +377,9 @@ include 'header.php';
 
 .container {
     position: relative;
-    z-index: 2; /* Ensure content appears above the overlay */
+    z-index: 2; 
+
+    /* Ensure content appears above the overlay */
 }
 </style>
 <?php include 'footer.php'; ?>

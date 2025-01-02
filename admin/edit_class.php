@@ -184,24 +184,62 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         </form>
     </div>
     <?php
-// update_class.php
-$update_success=0;
 
-// Perform the update logic
-if ($update_success) { // Set this flag after a successful update
+
+if (isset($_SESSION[''])) {
+    if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+       
+
+        // Perform the update logic here (e.g., updating the course in the database).
+        $update_success = updateCourse($_POST);
+
+        // If the update is successful, redirect with the `action=updated` parameter.
+        if ($update_success) {
+            header("Location: edit_class.php?id=" . $_GET['id'] . "&action=updated");
+            exit;
+        } else {
+            echo "Failed to update the course.";
+        }
+    }
+}
+
+function updateCourse($data) {
+    // Include your database connection
+    include 'config.php';
+
+    // Prepare the SQL query to update the course
+    $course_id = $_GET['id'];
+    $course_name = $data['course_name'];
+    $course_description = $data['course_description'];
+
+    $query = "UPDATE courses SET name = ?, description = ? WHERE id = ?";
+    $stmt = $conn->prepare($query);
+    $stmt->bind_param("ssi", $course_name, $course_description, $course_id);
+
+    // Execute the query and return success or failure
+    if ($stmt->execute()) {
+        return true;
+    } else {
+        return false;
+    }
+}
+
+
+
+
+if (isset($_GET['action']) && $_GET['action'] === 'updated') {
     echo "<script src='https://cdn.jsdelivr.net/npm/sweetalert2@11'></script>";
     echo "<script>
     Swal.fire({
         icon: 'success',
         title: 'Class Updated Successfully!',
-        text: 'Your class details have been updated.',
         showConfirmButton: false,
         timer: 1500
-    }).then(() => {
-        window.location.href = 'classes.php'; // Redirect back to classes page
     });
     </script>";
 }
+
+
 ?>
 
 </body>

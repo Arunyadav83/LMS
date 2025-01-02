@@ -40,7 +40,10 @@ if (isset($_POST['delete_course'])) {
             echo "<div class='alert alert-danger'>Error deleting related enrollments: " . mysqli_error($conn) . "</div>";
         }
 
-        $delete_payments_query = "DELETE FROM payments WHERE course_id = $course_id"; if (!mysqli_query($conn, $delete_payments_query)) { echo "<div class='alert alert-danger'>Error deleting related payments: " . mysqli_error($conn) . "</div>"; }
+        $delete_payments_query = "DELETE FROM payments WHERE course_id = $course_id";
+        if (!mysqli_query($conn, $delete_payments_query)) {
+            echo "<div class='alert alert-danger'>Error deleting related payments: " . mysqli_error($conn) . "</div>";
+        }
         // Finally, delete related records in the classes table
         $delete_classes_query = "DELETE FROM classes WHERE course_id = $course_id";
         if (!mysqli_query($conn, $delete_classes_query)) {
@@ -63,6 +66,9 @@ if (isset($_POST['delete_course'])) {
     }
 }
 
+// Include SweetAlert2 script only once
+echo '<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>';
+
 // Handle update action
 if (isset($_POST['update_course'])) {
     $course_id = (int)$_POST['course_id'];
@@ -72,56 +78,89 @@ if (isset($_POST['update_course'])) {
     $course_prize = (float)$_POST['course_prize'];
     $tutor_id = isset($_POST['tutor_id']) ? (int)$_POST['tutor_id'] : null;
 
-    // Check if tutor_id exists in the users table
-    if ($tutor_id !== null) {
-        $tutor_exists_query = "SELECT COUNT(*) FROM tutor WHERE id = $tutor_id";
-        $tutor_exists_result = mysqli_query($conn, $tutor_exists_query);
-
-        if (!$tutor_exists_result) {
-            echo "<script>Swal.fire('Error', 'Error checking tutor: " . mysqli_error($conn) . "', 'error');</script>";
-            exit();
-        }
-
-        $tutor_exists = mysqli_fetch_row($tutor_exists_result)[0] > 0;
-
-        if (!$tutor_exists) {
-            echo "<script>Swal.fire('Error', 'Tutor ID does not exist. Please add the tutor first.', 'error');</script>";
-            exit();
-        }
+    // Handle image upload (optional)
+    $image_path = null;
+    if (isset($_FILES['image']['name']) && !empty($_FILES['image']['name'])) {
+        $image_path = 'uploads/' . basename($_FILES['image']['name']);
+        move_uploaded_file($_FILES['image']['tmp_name'], $image_path);
     }
 
     // Ensure course_id is valid and proceed with update
     if ($course_id > 0) {
-        $update_query = "
-            UPDATE courses 
-            SET 
-                title = '$course_title', 
-                description = '$course_description', 
-                topics = '$course_topics', 
-                course_prize = $course_prize, 
-                tutor_id = $tutor_id 
-            WHERE id = $course_id
-        ";
+        // Prepare the updated_at timestamp
+        $updated_at = date('Y-m-d H:i:s');
 
+        // Start building the update query dynamically
+        $update_query_parts = [];
+
+        // Add fields to update dynamically if they are not empty or null
+        if (!empty($course_title)) {
+            $update_query_parts[] = "title = '$course_title'";
+        }
+        if (!empty($course_description)) {
+            $update_query_parts[] = "description = '$course_description'";
+        }
+        if (!empty($course_topics)) {
+            $update_query_parts[] = "topics = '$course_topics'";
+        }
+        if ($course_prize > 0) {
+            $update_query_parts[] = "course_prize = $course_prize";
+        }
+        if ($tutor_id !== null) {
+            $update_query_parts[] = "tutor_id = $tutor_id";
+        }
+
+        // Always update the updated_at field
+        $update_query_parts[] = "updated_at = '$updated_at'";
+
+        // Add image_path if available
+        if ($image_path !== null) {
+            $update_query_parts[] = "image_path = '$image_path'";
+        }
+
+        // Join the parts with commas to form the SET clause
+        $update_query = "UPDATE courses SET " . implode(", ", $update_query_parts) . " WHERE id = $course_id";
+
+        // Execute the query
         if (mysqli_query($conn, $update_query)) {
             if (mysqli_affected_rows($conn) > 0) {
-                $successMessage = json_encode("Course updated successfully."); // Safely encode message
-                $redirectURL = json_encode("courses.php"); // Safely encode URL
+                $successMessage = "Course updated successfully.";
+                $redirectURL = "courses_list.php";
                 echo "<script>
-                    Swal.fire('Success', $successMessage, 'success').then(() => {
-                        window.location.href = $redirectURL; // Redirect after success
+                window.onload = function() {
+                    Swal.fire({
+                        title: 'Success',
+                        text: " . json_encode($successMessage) . ", 
+
+                        icon: 'success'
+                    }).then(() => {
+                        window.location.href = '$redirectURL';
+                    
                     });
+                };
                 </script>";
             } else {
-                $warningMessage = json_encode("No changes made or course not found.");
+                $warningMessage = "No changes made or course not found.";
                 echo "<script>
-                    Swal.fire('Warning', $warningMessage, 'warning');
+                    document.addEventListener('DOMContentLoaded', function() {
+                        Swal.fire('Warning', " . json_encode($warningMessage) . ", 'warning');
+                    });
                 </script>";
             }
+        } else {
+            $errorMessage = "Error updating course: " . mysqli_error($conn);
+            echo "<script>
+                document.addEventListener('DOMContentLoaded', function() {
+                    Swal.fire('Error', " . json_encode($errorMessage) . ", 'error');
+                });
+            </script>";
         }
-            
     } else {
-        echo "<script>Swal.fire('Error', 'Invalid course ID.', 'error');</script>";
+        echo "<script>
+            document.addEventListener('DOMContentLoaded', function() {
+                Swal.fire('Error', 'Invalid course ID.', 'error');
+            });
+        </script>";
     }
 }
 
@@ -137,6 +176,7 @@ $courses = mysqli_fetch_all($result, MYSQLI_ASSOC);
 
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -148,9 +188,11 @@ $courses = mysqli_fetch_all($result, MYSQLI_ASSOC);
 </head>
 <style>
     .card {
-        margin-bottom: 20px; /* Adjust this value as needed */
+        margin-bottom: 20px;
+        /* Adjust this value as needed */
     }
 </style>
+
 <body>
     <!-- Navigation Bar -->
     <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
@@ -181,18 +223,18 @@ $courses = mysqli_fetch_all($result, MYSQLI_ASSOC);
             <main class="col-md-9 ms-sm-auto col-lg-10 px-md-4">
                 <div class="container mt-4">
                     <h1 class="mb-4">Courses List</h1>
-                       <!-- Add this just before the table in the main content section -->
-                       <div class="mb-3">
+                    <!-- Add this just before the table in the main content section -->
+                    <div class="mb-3">
                         <a href="add_course.php" class="btn btn-success">Add New Course</a>
                     </div>
-                    
+
                     <div style="margin-left: 800px;">
-                    <button id="listViewBtn" class="btn btn-primary" onclick="showListView()">
-                        <i class="fas fa-list"></i>
-                    </button>
-                    <button id="gridViewBtn" class="btn btn-secondary" onclick="showGridView()">
-                        <i class="fas fa-th"></i> 
-                    </button>
+                        <button id="listViewBtn" class="btn btn-primary" onclick="showListView()">
+                            <i class="fas fa-list"></i>
+                        </button>
+                        <button id="gridViewBtn" class="btn btn-secondary" onclick="showGridView()">
+                            <i class="fas fa-th"></i>
+                        </button>
                     </div>
 
                     <!-- List View -->
@@ -210,36 +252,36 @@ $courses = mysqli_fetch_all($result, MYSQLI_ASSOC);
                             </thead>
                             <tbody>
                                 <?php foreach ($courses as $course): ?>
-                                <tr>
-                                    <td><?php echo htmlspecialchars($course['id']); ?></td>
-                                    <td><?php echo htmlspecialchars($course['title']); ?></td>
-                                    <td><?php echo htmlspecialchars($course['description']); ?></td>
-                                    <td><?php echo htmlspecialchars($course['topics']); ?></td>
-                                    <td>
-                                        <div class="dropdown">
-                                            <button class="btn btn-secondary" type="button" id="dropdownMenuButton" data-bs-toggle="dropdown" aria-expanded="false">
-                                                <i class="fas fa-ellipsis-v"></i>
-                                            </button>
-                                            <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="dropdownMenuButton">
-                                                <li>
-                                                    <button class="dropdown-item edit-btn" data-bs-toggle="modal" data-bs-target="#editModal" 
-                                                            data-id="<?php echo $course['id']; ?>" 
-                                                            data-title="<?php echo htmlspecialchars($course['title']); ?>" 
-                                                            data-description="<?php echo htmlspecialchars($course['description']); ?>" 
-                                                            data-topics="<?php echo htmlspecialchars($course['topics']); ?>" 
+                                    <tr>
+                                        <td><?php echo htmlspecialchars($course['id']); ?></td>
+                                        <td><?php echo htmlspecialchars($course['title']); ?></td>
+                                        <td><?php echo htmlspecialchars($course['description']); ?></td>
+                                        <td><?php echo htmlspecialchars($course['topics']); ?></td>
+                                        <td>
+                                            <div class="dropdown">
+                                                <button class="btn btn-secondary" type="button" id="dropdownMenuButton" data-bs-toggle="dropdown" aria-expanded="false">
+                                                    <i class="fas fa-ellipsis-v"></i>
+                                                </button>
+                                                <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="dropdownMenuButton">
+                                                    <li>
+                                                        <button class="dropdown-item edit-btn" data-bs-toggle="modal" data-bs-target="#editModal"
+                                                            data-id="<?php echo $course['id']; ?>"
+                                                            data-title="<?php echo htmlspecialchars($course['title']); ?>"
+                                                            data-description="<?php echo htmlspecialchars($course['description']); ?>"
+                                                            data-topics="<?php echo htmlspecialchars($course['topics']); ?>"
                                                             data-prize="<?php echo isset($course['course_prize']) ? htmlspecialchars($course['course_prize']) : ''; ?>">Edit</button>
-                                                </li>
-                                                <li>
-                                                    <form action="" method="post" class="d-inline" onsubmit="return confirm('Are you sure you want to delete this course?');">
-                                                        <input type="hidden" name="course_id" value="<?php echo $course['id']; ?>">
-                                                        <button type="submit" name="delete_course" class="dropdown-item">Delete</button>
-                                                    </form>
-                                                </li>
-                                            </ul>
-                                        </div>
-                                    </td>   
+                                                    </li>
+                                                    <li>
+                                                        <form action="" method="post" class="d-inline" onsubmit="return confirm('Are you sure you want to delete this course?');">
+                                                            <input type="hidden" name="course_id" value="<?php echo $course['id']; ?>">
+                                                            <button type="submit" name="delete_course" class="dropdown-item">Delete</button>
+                                                        </form>
+                                                    </li>
+                                                </ul>
+                                            </div>
+                                        </td>
 
-                                </tr>
+                                    </tr>
                                 <?php endforeach; ?>
                             </tbody>
                         </table>
@@ -250,36 +292,36 @@ $courses = mysqli_fetch_all($result, MYSQLI_ASSOC);
                         <h2>Grid View</h2>
                         <div class="row g-4" id="enrollmentGrid">
                             <?php foreach ($courses as $course): ?>
-                            <div class="col-md-4 mb-4">
-                                <div class="card">
-                                    <div class="card-body">
-                                        <div class="dropdown float-end">
-                                            <a class="btn btn-secondary" type="button" id="dropdownMenuButton" data-bs-toggle="dropdown" aria-expanded="false">
-                                                <i class="fas fa-ellipsis-v"></i>
-                                            </a>
-                                            <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="dropdownMenuButton">
-                                                <li>
-                                                    <button class="dropdown-item edit-btn" data-bs-toggle="modal" data-bs-target="#editModal" 
-                                                            data-id="<?php echo $course['id']; ?>" 
-                                                            data-title="<?php echo htmlspecialchars($course['title']); ?>" 
-                                                            data-description="<?php echo htmlspecialchars($course['description']); ?>" 
-                                                            data-topics="<?php echo htmlspecialchars($course['topics']); ?>" 
-                                                            data-prize="<?php  isset($course['course_prize']) ? htmlspecialchars($course['course_prize']) : ''; ?>">Edit</button>
-                                                </li>
-                                                <li>
-                                                    <form action="" method="post" class="d-inline" onsubmit="return confirm('Are you sure you want to delete this course?');">
-                                                        <input type="hidden" name="course_id" value="<?php echo $course['id']; ?>">
-                                                        <button type="submit" name="delete_course" class="dropdown-item">Delete</button>
-                                                    </form>
-                                                </li>
-                                            </ul>
+                                <div class="col-md-4 mb-4">
+                                    <div class="card">
+                                        <div class="card-body">
+                                            <div class="dropdown float-end">
+                                                <a class="btn btn-secondary" type="button" id="dropdownMenuButton" data-bs-toggle="dropdown" aria-expanded="false">
+                                                    <i class="fas fa-ellipsis-v"></i>
+                                                </a>
+                                                <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="dropdownMenuButton">
+                                                    <li>
+                                                        <button class="dropdown-item edit-btn" data-bs-toggle="modal" data-bs-target="#editModal"
+                                                            data-id="<?php echo $course['id']; ?>"
+                                                            data-title="<?php echo htmlspecialchars($course['title']); ?>"
+                                                            data-description="<?php echo htmlspecialchars($course['description']); ?>"
+                                                            data-topics="<?php echo htmlspecialchars($course['topics']); ?>"
+                                                            data-prize="<?php isset($course['course_prize']) ? htmlspecialchars($course['course_prize']) : ''; ?>">Edit</button>
+                                                    </li>
+                                                    <li>
+                                                        <form action="" method="post" class="d-inline" onsubmit="return confirm('Are you sure you want to delete this course?');">
+                                                            <input type="hidden" name="course_id" value="<?php echo $course['id']; ?>">
+                                                            <button type="submit" name="delete_course" class="dropdown-item">Delete</button>
+                                                        </form>
+                                                    </li>
+                                                </ul>
+                                            </div>
+                                            <h5 class="card-title"><?php echo htmlspecialchars($course['title']); ?></h5>
+                                            <p class="card-text"><?php echo htmlspecialchars($course['description']); ?></p>
+                                            <p class="card-text"><strong>Topics Covered:</strong> <?php echo htmlspecialchars($course['topics']); ?></p>
                                         </div>
-                                        <h5 class="card-title"><?php echo htmlspecialchars($course['title']); ?></h5>
-                                        <p class="card-text"><?php echo htmlspecialchars($course['description']); ?></p>
-                                        <p class="card-text"><strong>Topics Covered:</strong> <?php echo htmlspecialchars($course['topics']); ?></p>
                                     </div>
                                 </div>
-                            </div>
                             <?php endforeach; ?>
                         </div>
                     </div>
@@ -287,7 +329,7 @@ $courses = mysqli_fetch_all($result, MYSQLI_ASSOC);
             </main>
         </div>
     </div>
-    
+
     <!-- Add Course Modal -->
     <div class="modal fade" id="addCourseModal" tabindex="-1" aria-labelledby="addCourseModalLabel" aria-hidden="true">
         <div class="modal-dialog">
@@ -356,6 +398,13 @@ $courses = mysqli_fetch_all($result, MYSQLI_ASSOC);
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+
+    <!-- <script> -->
+    <!-- document.addEventListener('DOMContentLoaded', () => {
+            // Test Swal.fire to ensure it's working
+            Swal.fire('Test', 'SweetAlert2 is loaded and working!', 'success');
+        }); -->
+    </script>
     <script>
         // Show List View
         function showListView() {
@@ -379,7 +428,7 @@ $courses = mysqli_fetch_all($result, MYSQLI_ASSOC);
 
         // Populate the edit modal with course data
         const editModal = document.getElementById('editModal');
-        editModal.addEventListener('show.bs.modal', function (event) {
+        editModal.addEventListener('show.bs.modal', function(event) {
             const button = event.relatedTarget; // Button that triggered the modal
             const courseId = button.getAttribute('data-id');
             const courseTitle = button.getAttribute('data-title');
@@ -409,4 +458,5 @@ $courses = mysqli_fetch_all($result, MYSQLI_ASSOC);
         });
     </script>
 </body>
+
 </html>

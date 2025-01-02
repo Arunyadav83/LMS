@@ -53,7 +53,7 @@ if (session_status() === PHP_SESSION_NONE) {
                     </li>
                     <?php if (is_logged_in()): ?>
                         <li class="nav-item">
-                            <a class="nav-link" href="index.php"><i class="fas fa-tachometer-alt"></i> Dashboard</a>
+                            <a class="nav-link" href="dashboard.php"><i class="fas fa-tachometer-alt"></i> Dashboard</a>
                         </li>
                         <li class="nav-item dropdown">
                             <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="true">

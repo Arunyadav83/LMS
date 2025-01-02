@@ -55,7 +55,7 @@ $query = "SELECT c.id, c.title, c.description, t.full_name AS tutor_name
 $result = mysqli_query($conn, $query);
 ?>
 
-<h2>Student Login</h2>
+
 
 <!-- Display SweetAlert2 based on success or error -->
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
@@ -70,10 +70,10 @@ $result = mysqli_query($conn, $query);
             timer: 2000, // Set a timer of 2 seconds before redirect
             timerProgressBar: true, // Optionally show a progress bar
         }).then((result) => {
-            if (result.dismiss === Swal.DismissReason.timer) {
+           
                 window.location.href = 'index.php'; // Redirect to the homepage after timer
             }
-        });
+        );
     </script>
 <?php elseif ($error): ?>
     <script>
@@ -85,19 +85,126 @@ $result = mysqli_query($conn, $query);
         });
     </script>
 <?php endif; ?>
+<!-- Bootstrap 5 -->
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
+<style>
+    /* Centering the form */
+    .login-container {
+    max-width: 400px;
+    margin: 130px auto 50px auto; /* Increased top margin */
+    padding: 30px;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    background-color: #f9f9f9;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
 
-<form action="login.php" method="post">
-    <div class="mb-3">
-        <label for="username" class="form-label">Username</label>
-        <input type="text" class="form-control" id="username" name="username" required>
-    </div>
-    <div class="mb-3">
-        <label for="password" class="form-label">Password</label>
-        <input type="password" class="form-control" id="password" name="password" required>
-    </div>
-    <button type="submit" class="btn btn-primary">Login</button>
-</form>
 
-<p class="mt-3">Don't have an account? <a href="register.php">Register here</a></p>
+    .login-container h2 {
+        text-align: center;
+        margin-bottom: 20px;
+        font-size: 24px;
+        color: #333;
+    }
 
-<?php include 'footer.php'; ?>
+    .form-control {
+        width: 100%;
+        max-width: 350px;
+    }
+
+    /* Styling the buttons */
+    .btn-primary {
+        width: 100%;
+        padding: 10px;
+        font-size: 16px;
+        border-radius: 5px;
+    }
+
+    .btn-link {
+        color: #007bff;
+        font-size: 14px;
+        text-decoration: none;
+    }
+
+    .btn-link:hover {
+        text-decoration: underline;
+    }
+
+    /* Add some space between the buttons */
+    .mb-3 {
+        margin-bottom: 20px;
+    }
+
+    /* Add margin for the register link */
+    .register-link {
+        text-align: center;
+        margin-top: 20px;
+        font-size: 14px;
+    }
+
+    img {
+        width: 100px;
+        height: 6%;
+        margin-right: 14%;
+
+    }
+    /* Styling the buttons */
+.btn-primary, .btn-link {
+    padding: 10px;
+    font-size: 16px;
+    border-radius: 5px;
+    width: 48%; /* Adjust the width to fit the buttons side by side */
+}
+
+.btn-primary {
+    background-color: #007bff;
+    color: white;
+}
+
+.btn-link {
+    color: #007bff;
+    font-size: 14px;
+    text-decoration: none;
+}
+
+.btn-link:hover {
+    text-decoration: underline;
+}
+
+/* Add some space between the buttons */
+.btn-container {
+    display: flex;
+    justify-content: space-between;
+    gap: 10px; /* Optional gap between buttons */
+}
+
+/* Add space between form inputs */
+.mb-3 {
+    margin-bottom: 20px;
+}
+
+</style>
+
+<div class="login-container">
+    <h2>
+        <img src="assets/images/logo2.png" alt="Logo"> Student Login
+    </h2>
+    <form action="login.php" method="post">
+        <div class="mb-3">
+            <label for="username" class="form-label">Username</label>
+            <input type="text" class="form-control" id="username" name="username" required>
+        </div>
+        <div class="mb-3">
+            <label for="password" class="form-label">Password</label>
+            <input type="password" class="form-control" id="password" name="password" required>
+        </div>
+        <div class="btn-container">
+            <button type="submit" class="btn btn-primary">Login</button>
+            <button type="button" class="btn btn-link" onclick="window.location.href='forgot_password.php';">Forgot Password</button>
+        </div>
+                <p class="register-link">Don't have an account? <a href="register.php">Register here</a></p>
+    </form>
+</div>
+
+<!-- Bootstrap 5 JavaScript -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>

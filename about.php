@@ -93,8 +93,9 @@ class About
             $image_name = strtolower(str_replace(' ', '_', $course['title'])) . '.jpg';
             echo "<div class='course-item'>
                     <img src='assets/images/{$image_name}' alt='" . htmlspecialchars($course['title']) . "' class='course-image'>
-                    <p class='course-title'>" . htmlspecialchars($course['title']) . "</p>
+                <!-- <p class='course-title'>" . htmlspecialchars($course['title']) . "</p> -->
                   </div>";
+
         }
 
         echo "</div>";  // Close courses slider
@@ -165,11 +166,11 @@ include 'footer.php';
 
         h1,
         h2 {
-            color: #2980b9;
+            color: rgb(227, 234, 239);
         }
 
         h3 {
-            color: #34495e;
+            color:rgb(153, 202, 251);
         }
 
         a {
@@ -188,7 +189,7 @@ include 'footer.php';
         }
 
         footer a {
-            color:rgb(163, 187, 207);
+            color: rgb(163, 187, 207);
             text-decoration: none;
             font-size: larger;
         }
@@ -202,21 +203,46 @@ include 'footer.php';
             color: white;
             text-align: center;
             padding: 50px 20px;
-            background: linear-gradient(rgba(0, 0, 0, 0.7), rgba(0, 0, 0, 0.7)),
-                url('assets/images/about_us_background.jpg') no-repeat center/cover;
+            background: linear-gradient(rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.5)),
+                url('assets/images/about_us_background.jpg') no-repeat center center;
+            background-size: cover;
             background-attachment: fixed;
-            opacity: 0.9;
             animation: slideIn 1.5s ease-out forwards;
         }
 
+        /* Ensure proper rendering on smaller screens */
+        @media (max-width: 768px) {
+            .welcome-section {
+                background-attachment: scroll;
+                /* Avoid fixed issues on mobile */
+                background-size: cover;
+                /* Ensure the image scales properly */
+                background-position: center center;
+                /* Keep the image centered */
+                background-repeat: no-repeat;
+                /* Prevent tiling */
+            }
+        }
+
+        /* Additional support for very small screens */
+        @media (max-width: 480px) {
+            .welcome-section {
+                padding: 30px 15px;
+                /* Adjust padding for smaller devices */
+                font-size: 1rem;
+                /* Scale down text size */
+            }
+        }
+
+
         .welcome-section h1 {
             text-align: center;
-            font-weight: bold;
+            font-size: 30px;
         }
 
         .welcome-section p {
             text-align: center;
-            font-size: 1.2em;
+            font-size: 0.7em;
             margin-top: 20px;
 
         }
@@ -326,9 +352,9 @@ include 'footer.php';
         }
 
         .tutor-name {
-            font-size: 1.5em;
+            font-size: 13px;
             font-weight: bold;
-            color: #2980b9;
+            color:rgb(10, 171, 241);
         }
 
         .tutor-specialization {
@@ -371,26 +397,46 @@ include 'footer.php';
             /* Remove padding if any */
         }
 
-
         .section-title {
             text-align: center;
-            font-size: 2.5em;
+            font-size:1.5rem;
+            /* Use rem for scalability */
             color: #2c3e50;
-            font-weight: 900;
+            font-weight: 300;
             letter-spacing: 0.1em;
-            line-height: 0.5;
+            line-height: 1.2;
+            /* Adjusted line height to prevent overlap */
             margin: 40px 0;
             font-family: 'Montserrat', sans-serif;
         }
 
         .subtitle {
             color: #e74c3c;
-            font-size: 0.8em;
+            font-size: 1rem;
+            /* Increased size for better readability */
             text-transform: uppercase;
             letter-spacing: 0.15em;
-            margin-bottom: 10px;
+            margin-bottom: 20px;
+            /* Added space to separate elements */
             display: block;
         }
+
+        /* Responsive styles */
+        @media (max-width: 768px) {
+            .section-title {
+                font-size: 1.8rem;
+                /* Reduced size for smaller screens */
+                line-height: 1.3;
+                /* Adjusted line height */
+            }
+
+            .subtitle {
+                font-size: 0.9rem;
+                /* Adjusted subtitle size */
+                margin-bottom: 15px;
+            }
+        }
+
 
 
         .course-item {
@@ -417,11 +463,11 @@ include 'footer.php';
 
         }
 
-        .course-title {
+        /* .course-title {
             font-size: 1.1em;
             font-weight: bold;
             color: #34495e;
-        }
+        } */
 
         /* Why Choose Us Section */
         .why-choose-us-cards {
@@ -452,11 +498,25 @@ include 'footer.php';
 
         .why-card img {
             width: 100px;
+            /* Fixed width */
+            height: 100px;
+            /* Fixed height */
+            object-fit: cover;
+            /* Ensures the image scales proportionally and fills the dimensions */
             margin-bottom: 15px;
+            /* Adds spacing below the image */
+            border-radius: 8px;
+            /* Optional: Adds rounded corners */
+            display: block;
+            /* Ensures the image is treated as a block element */
+            margin-left: auto;
+            /* Centers the image horizontally */
+            margin-right: auto;
         }
 
+
         .why-card h3 {
-            font-size: 1.3em;
+            font-size: 0.8em;
             font-weight: bold;
             color: #2980b9;
         }

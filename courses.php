@@ -161,7 +161,7 @@ $razorpayKey = 'rzp_test_Bvq9kiuaq8gkcs'; // Your Razorpay API key
         title: "Enrollment Successful!",
         text: "Payment Verified and Enrollment Successful!",
         icon: "success", // Ensures the green tick mark is shown
-        timer: 4000, // Duration of the alert in milliseconds
+        // timer: 1000, // Duration of the alert in milliseconds
         showConfirmButton: true, // "OK" button
         confirmButtonText: "OK", // Button text
     });

@@ -46,24 +46,30 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             echo "Invalid tutor selected.";
         }
     } elseif (isset($_POST['edit_course'])) {
-        $id = (int)$_POST['id'];
+        $id = (int)$_POST['id']; // Course ID
         $title = mysqli_real_escape_string($conn, $_POST['title']);
         $description = mysqli_real_escape_string($conn, $_POST['description']);
-        $tutor_id = (int)$_POST['tutor_id'];
-        
-        // Ensure the tutor exists and has the 'instructor' role
-        $tutor_query = "SELECT id, role FROM tutors WHERE id = $tutor_id AND role = 'instructor'";
-        $tutor_result = mysqli_query($conn, $tutor_query);
-        
-        if (mysqli_num_rows($tutor_result) > 0) {
-            // Tutor exists, update the course
+        $tutor_id = (int)$_POST['tutor_id']; // Ensure tutor_id is an integer
+    
+        // Verify if tutor exists in the tutors table
+        $query = "SELECT id FROM tutors WHERE id = ?";
+        $stmt = mysqli_prepare($conn, $query);
+        mysqli_stmt_bind_param($stmt, 'i', $tutor_id);
+        mysqli_stmt_execute($stmt);
+        $result = mysqli_stmt_get_result($stmt);
+    
+        if (mysqli_num_rows($result) > 0) {
+            // Tutor exists in the tutors table, proceed to update course
             $query = "UPDATE courses 
-                      SET title = '$title', 
-                          description = '$description', 
-                          tutor_id = $tutor_id 
-                      WHERE id = $id";
-        
-            if (mysqli_query($conn, $query)) {
+                      SET title = ?, 
+                          description = ?, 
+                          tutor_id = ? 
+                      WHERE id = ?";
+            $update_stmt = mysqli_prepare($conn, $query);
+            mysqli_stmt_bind_param($update_stmt, 'ssii', $title, $description, $tutor_id, $id);
+    
+            if (mysqli_stmt_execute($update_stmt)) {
+                // Successfully updated the course
                 echo '<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>';
                 echo "<script>
                     document.addEventListener('DOMContentLoaded', function() {
@@ -73,11 +79,12 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                             icon: 'success',
                             confirmButtonText: 'OK'
                         }).then(() => {
-                            window.location.href = 'courses.php'; // Redirect
+                            window.location.href = 'courses.php'; // Redirect to courses page
                         });
                     });
                 </script>";
             } else {
+                // Error updating the course
                 echo '<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>';
                 echo "<script>
                     document.addEventListener('DOMContentLoaded', function() {
@@ -91,12 +98,13 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                 </script>";
             }
         } else {
+            // Tutor does not exist in tutors table, handle error
             echo '<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>';
             echo "<script>
                 document.addEventListener('DOMContentLoaded', function() {
                     Swal.fire({
                         title: 'Error',
-                        text: 'The selected tutor does not exist or is not an instructor.',
+                        text: 'The selected tutor does not exist in the tutors table.',
                         icon: 'error',
                         confirmButtonText: 'Try Again'
                     });
@@ -104,21 +112,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             </script>";
         }
     }
-     else {
-            echo '<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>';
-            echo "<script>
-                document.addEventListener('DOMContentLoaded', function() {
-                    Swal.fire({
-                        title: 'Error',
-                        text: 'Invalid tutor selected.',
-                        icon: 'error',
-                        confirmButtonText: 'OK'
-                    });
-                });
-            </script>";
-        }
-    }
-    
+}       
     elseif (isset($_POST['delete_course'])) {
         $id = (int)$_POST['id'];
 
@@ -260,11 +254,11 @@ $course_titles = mysqli_fetch_all($result, MYSQLI_ASSOC);
             <!-- Main Content -->
             <main class="col-md-9 ms-sm-auto col-lg-10 px-md-4">
                 <div class="container mt-4">
-                    <h1 class="mb-4">Courses</h1>
+                    <!-- <h1 class="mb-4">Courses</h1> -->
 
                     <!-- Add Course Form -->
-                    <h2 id="a">Add New Course</h2>
-                    <form action="" method="post" class="mb-4 add-course-form">
+                    <!-- <h2 id="a">Add New Course</h2> -->
+                    <!-- <form action="" method="post" class="mb-4 add-course-form">
                         <div class="mb-3">
                             <label for="title_id" class="form-label">Title</label>
                             <select class="form-control" id="title_id" name="title_id" required>
@@ -288,7 +282,7 @@ $course_titles = mysqli_fetch_all($result, MYSQLI_ASSOC);
                             </select>
                         </div>
                         <button type="submit" name="add_course" class="btn btn-primary">Add Course</button>
-                    </form>
+                    </form> -->
 
                     <!-- Courses List -->
                     <h2>Courses List</h2>

@@ -1,4 +1,5 @@
-<nav class="col-md-3 col-lg-2 d-md-block bg-light sidebar">
+<!-- Sidebar -->
+<nav class="col-md-3 col-lg-2 d-md-block bg-gradient sidebar">
     <div class="position-sticky">
         <ul class="nav flex-column">
             <li class="nav-item">
@@ -59,3 +60,44 @@
         </ul>
     </div>
 </nav>
+
+<!-- Custom CSS
+<style>
+    .sidebar {
+        background: linear-gradient(135deg,rgb(186, 134, 241),rgb(98, 149, 236));
+        min-height: 100vh;
+        color: #fff;
+        box-shadow: 2px 0 5px rgba(0, 0, 0, 0.1);
+    }
+
+    .nav-link {
+        font-size: 1.1rem;
+        padding: 15px;
+        color:rgb(18, 84, 150);
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        transition: all 0.3s ease;
+    }
+
+    .nav-link:hover {
+        background: rgba(147, 136, 136, 0.1);
+        color: darkturquoise;
+        border-radius: 5px;
+    }
+
+    .nav-link i {
+        font-size: 1.3rem;
+    }
+
+    .nav-link.active {
+        background: rgba(255, 255, 255, 0.2);
+        color:violet;
+        font-weight: bold;
+        border-left: 4px solid #f8c102;
+    }
+
+    .nav-item {
+        margin-bottom: 10px;
+    }
+</style> -->

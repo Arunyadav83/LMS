@@ -10,7 +10,7 @@ $articles = [
     [
         "title" => "Success Stories from UltraKey Users",
         "description" => "Read testimonials and stories of how UltraKey transformed students' skills.",
-        "link" => "addSuccess.php",
+        "link" => "successstory.php",
         "image" => "assets/images/success-stories.jpg",
     ],
     [

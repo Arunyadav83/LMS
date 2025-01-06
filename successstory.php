@@ -15,7 +15,7 @@
             display: flex;
             flex-wrap: wrap; /* Allow wrapping to the next line */
             justify-content: center; /* Center the cards */
-            margin: 20px;
+            margin: 0px;
         }
         .card {
             border: 1px solid #ccc;
@@ -33,11 +33,29 @@
             border-radius: 50%;
             margin-bottom: 16px;
         }
+        .add-story-btn {
+            margin: 38px 0; /*Add space above and below the button */
+            padding: 10px 10px;
+            font-size: 16px;
+            margin-right: 314px;
+            border: none;
+            border-radius: 5px;
+            background-color:rgb(41, 190, 231);
+            color: white;
+            cursor: pointer;
+            text-decoration: none;
+            text-align: center;
+        }
+        .add-story-btn:hover {
+            background-color:rgb(231, 238, 244);
+        }
     </style>
 </head>
 <body>
+    
 
     <h1>Success Stories</h1>
+    <a href="addsuccess.php" class="add-story-btn">Add Your Success Story</a>
     <div class="card-container">
         <?php
         include 'header.php'; 
@@ -56,10 +74,10 @@
         }
 
         // Fetch success stories
-        $sql = "SELECT id, name, successtory, image_path, image_path FROM student_success_stories";
+        $sql = "SELECT id, name, successtory, image_path FROM student_success_stories";
         $result = $conn->query($sql);
 
-        // Check for SQL errors
+       
         if (!$result) {
             die("SQL Error: " . $conn->error); // Display the SQL error
         }

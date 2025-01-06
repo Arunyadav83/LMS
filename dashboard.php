@@ -11,7 +11,6 @@
     <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
 </head>
 <style>
-    /* General Reset */
     * {
         margin: 0;
         padding: 0;
@@ -69,17 +68,23 @@
     /* Hero Section */
     header {
         background-image: url('assets/images/Landing.jpg');
-        /* Add your own background image */
         background-size: cover;
         background-position: center;
         padding: 100px 0;
+        margin: 30px 0px ;
         text-align: center;
         color: white;
+        margin-bottom:3%; 
+        position: relative; 
+        top: -47px; 
+        overflow: hidden
     }
 
     .hero-content h1 {
         font-size: 50px;
         font-weight: 700;
+        margin-top: 0; /* Or reduce this value */
+        padding-top: 0;
     }
 
     .hero-content p {

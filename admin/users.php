@@ -126,18 +126,18 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     // Delete tutor
     elseif (isset($_POST['delete_tutor'])) {
         $id = intval($_POST['id']);
-    
+
         // First, delete the related enrollments
         $enrollment_query = "DELETE FROM enrollments WHERE tutor_id = ?";
         $enrollment_stmt = mysqli_prepare($conn, $enrollment_query);
         mysqli_stmt_bind_param($enrollment_stmt, "i", $id);
         mysqli_stmt_execute($enrollment_stmt);
-    
+
         // Now, delete the tutor
         $query = "DELETE FROM tutors WHERE id = ?";
         $stmt = mysqli_prepare($conn, $query);
         mysqli_stmt_bind_param($stmt, "i", $id);
-    
+
         if (mysqli_stmt_execute($stmt)) {
             header("Location: users.php?success=Tutor and related enrollments deleted successfully");
             exit();
@@ -146,7 +146,6 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             exit();
         }
     }
-    
 }
 
 // Fetch all tutors
@@ -198,8 +197,8 @@ function renderTutorsGrid($tutors)
                         </div>
                     </div>';
 
-  // Add modal for editing the tutor (inside the loop)
-    $output .= '<div class="modal fade" id="editTutor' . $tutor['id'] . '" tabindex="-1" aria-labelledby="editTutorLabel' . $tutor['id'] . '" aria-hidden="true">
+        // Add modal for editing the tutor (inside the loop)
+        $output .= '<div class="modal fade" id="editTutor' . $tutor['id'] . '" tabindex="-1" aria-labelledby="editTutorLabel' . $tutor['id'] . '" aria-hidden="true">
    <div class="modal-dialog">
     <div class="modal-content">
         <div class="modal-header">
@@ -230,7 +229,7 @@ function renderTutorsGrid($tutors)
                     <input type="text" class="form-control" id="specialization" name="specialization" value="' . htmlspecialchars($tutor['specialization'] ?? '') . '" required>
                 </div>
                 <div class="mb-3">
-                    <label for="resume" class="form-label">Resume (PDF)</label>
+                    <label for="resume" class="form-label">Resume (PDF)</label> 
                     <input type="file" class="form-control" id="resume" name="resume" accept=".pdf">
                 </div>
                 <div class="mb-3">
@@ -248,8 +247,8 @@ function renderTutorsGrid($tutors)
 </div>';
     }
 
-$output .= '</div>';
-return $output;
+    $output .= '</div>';
+    return $output;
 }
 
 
@@ -387,11 +386,13 @@ $view = isset($_GET['view']) ? $_GET['view'] : 'grid';
 <style>
     .row {
         margin-left: 0px;
+        /* gap: 20px; */
 
     }
 
     .card {
         height: 200px;
+        margin: 20px;
     }
 
     .btn-navy {
@@ -407,7 +408,10 @@ $view = isset($_GET['view']) ? $_GET['view'] : 'grid';
     }
 
     .table {
+
         background-color: transparent;
+        margin-top: 4%;
+
     }
 
     #addTutorOffCanvas {
@@ -420,7 +424,17 @@ $view = isset($_GET['view']) ? $_GET['view'] : 'grid';
         }
 
         .card-text {
+
             font-size: 0.9rem;
+
+            
+                /* font-size: 0.9rem; */
+                line-height: 1.5;
+                /* Adjust the spacing between lines */
+                margin-bottom: 10px;
+                /* Add space between paragraphs or elements inside the card */
+            
+
         }
 
         .table th,

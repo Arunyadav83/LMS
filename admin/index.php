@@ -49,8 +49,46 @@ if ($result_unread) {
     $unread_count = 0; // Set to 0 or handle as needed
 }
 
-// Function to format the date
-function time_ago($datetime, $full = false) {
+
+// Query to fetch total revenue from the payments table
+$query_revenue = "SELECT SUM(amount) AS total_revenue FROM payments WHERE status = 'success'"; // Adjust 'completed' status if necessary
+$result_revenue = mysqli_query($conn, $query_revenue);
+
+// Fetch the total revenue result
+$row_revenue = mysqli_fetch_assoc($result_revenue);
+$total_revenue = $row_revenue['total_revenue'] ? $row_revenue['total_revenue'] : 0;
+// Fetch most enrolled courses
+$query = "
+    SELECT 
+        course_id, 
+        course_name, 
+        COUNT(*) as total_enrollments 
+    FROM enrollments 
+    GROUP BY course_id, course_name 
+    ORDER BY total_enrollments DESC 
+    LIMIT 3";
+$result = mysqli_query($conn, $query);
+
+if ($result) {
+    $most_enrolled_courses = mysqli_fetch_all($result, MYSQLI_ASSOC);
+} else {
+    echo "Error: " . mysqli_error($conn);
+    $most_enrolled_courses = []; // Handle as needed
+}
+$query = "
+    SELECT 
+        enrollments.user_id,
+        courses.title AS course_title,
+        enrollments.enrolled_at
+    FROM 
+        enrollments
+    INNER JOIN courses ON enrollments.course_id = courses.id
+    ORDER BY enrollments.enrolled_at DESC
+    LIMIT 3
+";
+$recent_enrollments =mysqli_query($conn, $query);
+function time_ago($datetime, $full = false)
+{
     $now = new DateTime();
     $ago = new DateTime($datetime);
     $diff = $now->diff($ago);
@@ -70,8 +108,9 @@ function time_ago($datetime, $full = false) {
         return $diff->i . ' minute' . ($diff->i > 1 ? 's' : '') . ' ago'; // Show minutes for activities within the last 30 minutes
     }
 
-    $diff->w = floor($diff->d / 7);
-    $diff->d -= $diff->w * 7;
+    // Manually calculate weeks based on days
+    $weeks = floor($diff->d / 7);
+    $diff->d -= $weeks * 7; // Update days after calculating weeks
 
     $string = [];
     $units = [
@@ -84,19 +123,26 @@ function time_ago($datetime, $full = false) {
         's' => 'second',
     ];
 
-    foreach ($units as $k => &$v) {
-        if ($diff->$k) {
+    foreach ($units as $k => $v) {
+        if ($k === 'w' && $weeks) {
+            $string[] = $weeks . ' ' . $v . ($weeks > 1 ? 's' : '');
+        } elseif ($k !== 'w' && $diff->$k) {
             $string[] = $diff->$k . ' ' . $v . ($diff->$k > 1 ? 's' : '');
         }
     }
 
-    if (!$full) $string = array_slice($string, 0, 1);
+    if (!$full) {
+        $string = array_slice($string, 0, 1);
+    }
+
     return $string ? implode(', ', $string) . ' ago' : 'just now';
 }
+
 ?>
 
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -107,15 +153,15 @@ function time_ago($datetime, $full = false) {
         :root {
             --sidebar-width: 250px;
         }
-        
+
         body {
             background-color: #f8f9fa;
             padding-top: 56px;
         }
-        
+
         /* Navbar Styling */
         .navbar {
-            box-shadow: 0 2px 4px rgba(0,0,0,.1);
+            box-shadow: 0 2px 4px rgba(0, 0, 0, .1);
             background: linear-gradient(to right, #1a237e, #0d47a1) !important;
             position: fixed;
             top: 0;
@@ -123,66 +169,68 @@ function time_ago($datetime, $full = false) {
             right: 0;
             z-index: 1000;
         }
-        
+
         .navbar-brand {
             font-weight: 700;
             font-size: 1.5rem;
         }
-        
+
         /* Sidebar Styling */
         .sidebar {
             width: var(--sidebar-width);
             background: white;
-            box-shadow: 2px 0 5px rgba(0,0,0,.1);
+            box-shadow: 2px 0 5px rgba(0, 0, 0, .1);
             height: calc(100vh - 56px);
             position: fixed;
             transition: all 0.3s;
         }
-        
+
         /* Main Content */
         .main-content {
             margin-left: var(--sidebar-width);
             padding: 2rem;
             transition: all 0.3s;
         }
-        
+
         /* Dashboard Cards */
         .dashboard-card {
             border: none;
             border-radius: 10px;
-            box-shadow: 0 4px 6px rgba(0,0,0,.1);
+            box-shadow: 0 4px 6px rgba(0, 0, 0, .1);
             transition: transform 0.3s;
             margin-bottom: 30px;
         }
-        
+
         .dashboard-card:hover {
             transform: translateY(-5px);
         }
-        
+
         .card-icon {
             font-size: 2.5rem;
             margin-bottom: 1rem;
         }
-        
-        .card.dashboard-card {
-    margin-bottom: 30px; /* Adjust this value to increase or decrease the space */
-}
 
-/* Optional: If you want to specifically target the Quick Actions card */
-.quick-actions-card {
-    margin-top: 20px; /* Adjust this value for additional spacing above the Quick Actions card */
-}
+        .card.dashboard-card {
+            margin-bottom: 30px;
+            /* Adjust this value to increase or decrease the space */
+        }
+
+        /* Optional: If you want to specifically target the Quick Actions card */
+        .quick-actions-card {
+            margin-top: 20px;
+            /* Adjust this value for additional spacing above the Quick Actions card */
+        }
 
         /* Responsive Design */
         @media (max-width: 768px) {
             .sidebar {
                 margin-left: calc(var(--sidebar-width) * -1);
             }
-            
+
             .main-content {
                 margin-left: 0;
             }
-            
+
             .sidebar.active {
                 margin-left: 0;
             }
@@ -228,19 +276,53 @@ function time_ago($datetime, $full = false) {
 
         /* Add this CSS class for the smaller navbar */
         .navbar.scrolled {
-            padding: 0.5rem 1rem; /* Adjust padding as needed */
-            transition: padding 0.3s; /* Smooth transition */
+            padding: 0.7rem 1rem;
+            /* Adjust padding as needed */
+            transition: padding 0.3s;
+            /* Smooth transition */
         }
 
         .badge {
-            background-color: red; /* Set badge color to red */
+            background-color: red;
+            /* Set badge color to red */
+        }
+
+        .navbar {
+            background-color: #16308b;
         }
 
         .text-right {
             float: right;
         }
+
+        .navbar-link {
+            color: white;
+            padding-inline: 20px;
+            text-decoration: none;
+
+        }
+
+        .navbar-link:hover {
+            color: white;
+            text-decoration: underline;
+        }
+
+        .button {
+            padding-inline: 10px;
+            text-decoration: none;
+            color: #0433c3;
+            padding-block: 10px;
+
+        }
+
+        .button:hover {
+            background-color: #0433c3;
+            color: white;
+            border-radius: 30px !important;
+        }
     </style>
 </head>
+
 <body>
     <!-- Navigation Bar -->
     <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
@@ -252,13 +334,13 @@ function time_ago($datetime, $full = false) {
             <div class="collapse navbar-collapse" id="navbarNav">
                 <ul class="navbar-nav ms-auto">
                     <li class="nav-item">
-                        <a class="nav-link" href="profile.php"><i class="fas fa-user"></i> Profile</a>
+                        <a class="navbar-link" href="profile.php"><i class="fas fa-user"></i> Profile</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="logout.php"><i class="fas fa-sign-out-alt"></i> Logout</a>
-                    </li> 
+                        <a class="navbar-link" href="logout.php"><i class="fas fa-sign-out-alt"></i> Logout</a>
+                    </li>
                     <li class="nav-item">
-                        <a class="nav-link position-relative" href="fetchmessages.php" id="notificationLink">
+                        <a class="navbar-link position-relative" href="fetchmessages.php" id="notificationLink">
                             <i class="fas fa-bell"></i>
                             <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill" id="messageCount" style="display: <?php echo $unread_count > 0 ? 'inline' : 'none'; ?>;"><?php echo $unread_count; ?></span>
                         </a>
@@ -276,107 +358,146 @@ function time_ago($datetime, $full = false) {
             <!-- Main Content -->
             <main class="col main-content">
                 <div class="container-fluid">
-                    <h1 class="mb-4 fw-bold" style="color:#00CED1">Admin Dashboard</h1>
-                    
+                    <h3 class=" fw-bold" style="color:#16308b; margin-bottom:45px">Admin Dashboard</h3>
+
                     <!-- Statistics Cards Row -->
                     <div class="row g-4 mb-4">
                         <div class="col-12 col-sm-6 col-xl-3">
-                            <div class="card dashboard-card  text-white" style="background-color: #d63384; color: white;">
+                            <div class="card dashboard-card text-white" style="background-color: #ff8c00; color: white;">
                                 <div class="card-body text-center">
-                                    <i class="fas fa-users card-icon"></i>
-                                    <h3 class="card-title"><?php echo $total_users; ?></h3>
-                                    <p class="card-text">Total Users</p>
+                                    <i class="fas fa-rupee-sign card-icon" style="font-size: 1.5rem;"></i>
+                                    <!-- Title for Revenue -->
+                                    <p class="card-text" style="font-size: 1rem; margin-top: -10px;">Total Revenue</p>
+                                    <!-- Revenue Amount with increased font size -->
+                                    <h3 class="card-title" style="font-size: 2.2rem; font-weight: bold; margin-top: -10px;">
+                                        ₹<?php echo number_format($total_revenue, 0); ?> <!-- Display total revenue -->
+                                    </h3>
+                                    <!-- Additional description text -->
+                                    <small  style="font-size: 0.9rem; color: white;">As of Today</small>
+
                                 </div>
                             </div>
                         </div>
+
+
+
                         <div class="col-12 col-sm-6 col-xl-3">
-                            <div class="card dashboard-card  text-white" style="background-color: #fd7e14; color: white;">
+                            <div class="card dashboard-card  text-white" style="background-color:#8314fd; color: white;">
                                 <div class="card-body text-center">
                                     <i class="fas fa-user-graduate card-icon"></i>
-                                    <h3 class="card-title"><?php echo $total_students; ?></h3>
-                                    <p class="card-text">Total Students</p>
+                                    <p class="card-text" style="font-size: 1rem; margin-top: -5px;">Total Students</p>
+                                    <h3 class="card-title" style="font-size: 2rem; font-weight: bold; margin-top: -10px;"><?php echo $total_students; ?></h3>
                                 </div>
                             </div>
                         </div>
                         <div class="col-12 col-sm-6 col-xl-3">
-                            <div class="card dashboard-card  text-white" style="background-color: #20c997; color: white;">
+                            <div class="card dashboard-card  text-white" style="background-color: #0433c3; color: white;">
                                 <div class="card-body text-center">
                                     <i class="fas fa-chalkboard-teacher card-icon"></i>
-                                    <h3 class="card-title"><?php echo $total_instructors; ?></h3>
-                                    <p class="card-text">Total Instructors</p>
+                                    <p class="card-text" style="font-size: 1rem; margin-top: -5px;">Total Instructors</p>
+                                    <h3 class="card-title" style="font-size: 2rem; font-weight: bold; margin-top: -10px;"><?php echo $total_instructors; ?></h3>
                                 </div>
                             </div>
                         </div>
                         <div class="col-12 col-sm-6 col-xl-3">
-                            <div class="card dashboard-card  text-white " style="background-color: #0dcaf0; color: white;">
+                            <div class="card dashboard-card  text-white " style="background-color:#9e00db; color: white;">
                                 <div class="card-body text-center">
                                     <i class="fas fa-book card-icon"></i>
-                                    <h3 class="card-title"><?php echo $total_courses; ?></h3>
-                                    <p class="card-text">Total Courses</p>
+                                    <p class="card-text" style="font-size: 1rem; margin-top: -5px;">Total Courses</p>
+                                    <h3 class="card-title" style="font-size: 2rem; font-weight: bold; margin-top: -10px;"><?php echo $total_courses; ?></h3>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-12 quick-actions-card">
+                        <div class="card dashboard-card">
+                            <div class="card-header bg-white">
+                                <h5 class="card-title mb-0" style="color: #0433c3;">Quick Actions</h5>
+                            </div>
+                            <div class="card-body">
+                                <div class="d-flex justify-content-around flex-wrap gap-2">
+                                    <a href="add_course.php" class="button">
+                                        <i class="fas fa-plus"></i> Add New Course
+                                    </a>
+                                    <a href="users.php" class="button ">
+                                        <i class="fas fa-user-plus"></i> Add New User
+                                    </a>
+                                    <a href="settings.php" class="button">
+                                        <i class="fas fa-cog"></i> Settings
+                                    </a>
                                 </div>
                             </div>
                         </div>
                     </div>
 
                     <!-- Recent Activity Section -->
-                    <div class="row mb-4">
-                        <div class="col-12 col-xl-8 mb-4" style="margin-top: 40px" , >
-                            <div class="card dashboard-card">
-                                <div class="card-header bg-white">
-                                    <h5 class="card-title mb-0">Recent Activities</h5>
-                                </div>
-                                <div class="card-body">
-                                    <div class="list-group list-group-flush">
-                                        <?php if (!empty($recent_courses)): ?>
-                                            <?php foreach ($recent_courses as $course): ?>
-                                                <div class="list-group-item d-flex justify-content-between align-items-center">
-                                                    <div>
-                                                        <h6 class="mb-1">New course added: <?php echo htmlspecialchars($course['title']); ?></h6>
-                                                        <small class="text-muted"><?php echo time_ago($course['created_at']); ?></small>
-                                                    </div>
-                                                    <span class="badge bg-primary rounded-pill">New</span>
-                                                </div>
-                                            <?php endforeach; ?>
-                                        <?php else: ?>
-                                            <div class="list-group-item">No recent activities.</div>
-                                        <?php endif; ?>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
+                    <div class="card dashboard-card">
+    <div class="card-header bg-white">
+        <h5 class="card-title mb-0" style="color: #0433c3;">Recent Activities</h5>
+    </div>
+    <div class="card-body">
+        <div class="d-flex align-items-center flex-wrap gap-4">
+            <!-- Heading on the left -->
+            <div class="text-left">
+                <h6 class="mb-1">Recent Enrollments:</h6>
+            </div>
 
-                        <div class="col-12 col-xl-4 mb-4 quick-actions-card">
-                            <div class="card dashboard-card">
-                                <div class="card-header bg-white">
-                                    <h5 class="card-title mb-0">Quick Actions</h5>
-                                </div>
-                                <div class="card-body">
-                                    <div class="d-grid gap-2">
-                                        <a href="add_course.php"><button class="btn btn-primary"><i class="fas fa-plus"></i> Add New Course</button></a>
-                                        <a href="users.php"><button class="btn btn-success"><i class="fas fa-user-plus"></i> Add New User</button></a>
-                                        <a href="settings.php"><button class="btn btn-info"><i class="fas fa-cog"></i> Settings</button></a>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Messages Section -->
-                    <div class="row mb-4">
-                        <div class="col-12">
-                            <div class="card dashboard-card">
-                                <div class="card-header bg-white">
-                                    <h5 class="card-title mb-0">Messages</h5>
-                                </div>
-                                <div class="card-body">
-                                    <div id="messagesContainer" class="messages-container">
-                                        <!-- Messages will be dynamically inserted here -->
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
+            <!-- Loop through enrollments -->
+            <?php foreach ($recent_enrollments as $enrollment): ?>
+                <div class="d-flex flex-row gap-2 justify-items-between align-items-center text-center activity-item">
+                    <p class="text-muted mb-1">
+                        <?php echo htmlspecialchars($enrollment['user_id']); ?> 
+                        enrolled in 
+                        "<?php echo htmlspecialchars($enrollment['course_title']); ?>"
+                    </p>
+                    <small class="text-muted">
+                        <?php echo time_ago($enrollment['enrolled_at']); ?>
+                    </small>
                 </div>
+            <?php endforeach; ?>
+        </div>
+    </div>
+</div>
+
+                    <div class="card dashboard-card">
+                        <div class="card-header bg-white">
+                            <h5 class="card-title mb-0" style="color: #0433c3;">Most Enrolled Courses</h5>
+                        </div>
+                        <div class="card-body">
+                            <div class="d-flex align-items-center flex-wrap gap-4">
+                                <!-- Heading on the left -->
+                                <div class="text-left">
+                                    <!-- <h6 class="mb-1">Top Courses:</h6> -->
+                                </div>
+
+                                <!-- Loop through most enrolled courses -->
+                                <?php foreach ($most_enrolled_courses as $course): ?>
+                                    <div class="d-flex flex-column align-items-center text-center activity-item" style="margin-bottom: 20px;background: #f8f9fa; border-radius: 10px; padding: 15px;">
+                                        <!-- Course Image -->
+                                        <img
+                                            src="../assets/images/<?php echo htmlspecialchars($course['course_name']); ?>.jpg"
+                                            alt="<?php echo htmlspecialchars($course['course_name']); ?>"
+                                            class="rounded"
+                                            style="width: 180px; height: 100px; object-fit: contain; margin-bottom: 10px;" />
+
+                                        <!-- Course Name -->
+                                        <p class="mb-1 font-weight-bold"><?php echo htmlspecialchars($course['course_name']); ?></p>
+
+                                        <!-- Total Enrollments -->
+                                        <small class="text-muted mb-1"><?php echo $course['total_enrollments']; ?> Enrollments</small>
+
+                                        <!-- Static Star Rating -->
+                                        <div style="color: #FFD700; font-size: 16px; margin-top: 5px;">
+                                            ★ ★ ★ ★ ☆
+                                        </div>
+                                    </div>
+                                <?php endforeach; ?>
+
+                            </div>
+                        </div>
+                    </div>
+
             </main>
         </div>
     </div>
@@ -464,4 +585,5 @@ function time_ago($datetime, $full = false) {
         setInterval(fetchNewMessages, 5000);
     </script>
 </body>
+
 </html>

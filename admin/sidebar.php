@@ -60,44 +60,63 @@
         </ul>
     </div>
 </nav>
-
-<!-- Custom CSS
 <style>
+    /* Sidebar Styling */
     .sidebar {
-        background: linear-gradient(135deg,rgb(186, 134, 241),rgb(98, 149, 236));
+        background: linear-gradient(135deg, rgb(186, 134, 241), rgb(98, 149, 236));
         min-height: 100vh;
         color: #fff;
         box-shadow: 2px 0 5px rgba(0, 0, 0, 0.1);
+        padding: 10px 0;
     }
 
+    /* Navigation Link Styling */
     .nav-link {
         font-size: 1.1rem;
-        padding: 15px;
-        color:rgb(18, 84, 150);
+        padding: 15px 20px;
+        color: rgb(18, 84, 150);
         display: flex;
         align-items: center;
         gap: 10px;
+        text-decoration: none;
         transition: all 0.3s ease;
     }
 
+    /* Hover Effect for Links */
     .nav-link:hover {
-        background: rgba(147, 136, 136, 0.1);
-        color: darkturquoise;
+        background:#16308b;
+        color: white;
         border-radius: 5px;
     }
 
+    /* Icon Size */
     .nav-link i {
         font-size: 1.3rem;
     }
 
+    /* Active Link Styling */
     .nav-link.active {
-        background: rgba(255, 255, 255, 0.2);
-        color:violet;
-        font-weight: bold;
+        background:#16308b;
+        color: white;
+        font-weight:bolder;
         border-left: 4px solid #f8c102;
+        border-radius: 5px;
     }
 
+    /* Navigation Item Spacing */
     .nav-item {
         margin-bottom: 10px;
     }
-</style> -->
+
+    /* Responsive Sidebar */
+    @media (max-width: 768px) {
+        .sidebar {
+            min-height: auto;
+            padding: 20px;
+        }
+
+        .nav-link {
+            font-size: 1rem;
+        }
+    }
+</style>

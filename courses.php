@@ -6,10 +6,11 @@ require_once 'functions.php';
 include 'header.php';
 
 // Fetch all courses from the database
-$query = "SELECT c.id, c.title, c.description, t.full_name AS tutor_name 
+$query = "SELECT c.id, c.title, c.description, c.course_prize, t.full_name AS tutor_name 
           FROM courses c
           LEFT JOIN tutors t ON c.tutor_id = t.id
           ORDER BY c.created_at DESC";
+
 $result = mysqli_query($conn, $query);
 
 // Razorpay API key from the config
@@ -23,7 +24,7 @@ $razorpayKey = 'rzp_test_Bvq9kiuaq8gkcs'; // Your Razorpay API key
         <div class="row">
             <?php while ($course = mysqli_fetch_assoc($result)): ?>
                 <div class="col-12 col-sm-6 col-md-3 mb-3">
-                    <div class="card h-60" style="padding: 0px;!important">
+                     <div class="card h-60" style="padding: 0px;!important">
                         <img
                             src="assets/images/<?php echo htmlspecialchars($course['title'], ENT_QUOTES, 'UTF-8'); ?>.jpg"
                             class="card-img-top img-fluid"
@@ -33,15 +34,22 @@ $razorpayKey = 'rzp_test_Bvq9kiuaq8gkcs'; // Your Razorpay API key
                             <h5 class="card-title"><?php echo htmlspecialchars($course['title']); ?></h5>
                             <p class="card-text" style="max-height: 50px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;"><?php echo htmlspecialchars($course['description']); ?></p>
                             <p class="card-text"><small class="text-muted">Tutor: <?php echo htmlspecialchars($course['tutor_name']); ?></small></p>
+                            <p class="card-text"><strong>Price:</strong> ₹<?php echo number_format((float)$course['course_prize'], 2); ?></p>
                         </div>
                         <div class="card-footer bg-transparent border-0">
                             <?php if (is_logged_in()): ?>
-                                <a href="course.php?id=<?php echo $course['id']; ?>" class="btn btn-primary btn-sm">View Course</a>
-                                <a href="javascript:void(0)" onclick="enrollCourse(<?php echo $course['id']; ?>, <?php echo $_SESSION['user_id']; ?>)" class="btn btn-success btn-sm">Enroll</a>
+                                <a href="course.php?id=<?php echo $course['id']; ?>"
+                                    class="btn btn-primary btn-sm">View Course</a>
+                                <a href="javascript:void(0)"
+                                    onclick="enrollCourse(<?php echo $course['id']; ?>, <?php echo $_SESSION['user_id']; ?>)"
+                                    class="btn btn-success btn-sm">Enroll</a>
                             <?php else: ?>
-                                <a href="login.php" class="btn btn-secondary btn-sm">Login to Enroll</a>
+                                <a href="login.php"
+                                    class="btn btn-secondary btn-sm">Login to Enroll</a>
                             <?php endif; ?>
                         </div>
+
+
                     </div>
                 </div>
             <?php endwhile; ?>
@@ -65,6 +73,15 @@ $razorpayKey = 'rzp_test_Bvq9kiuaq8gkcs'; // Your Razorpay API key
     }
 </script> -->
 
+<style>
+    .card-footer .btn {
+        margin-left: 6px;
+    }
+
+    .card-footer .btn-success {
+        width: 100px;
+    }
+</style>
 <script>
     var username = '<?php echo isset($_SESSION['username']) ? htmlspecialchars($_SESSION['username'], ENT_QUOTES, 'UTF-8') : ''; ?>';
 </script>
@@ -157,15 +174,15 @@ $razorpayKey = 'rzp_test_Bvq9kiuaq8gkcs'; // Your Razorpay API key
     }
 
     function showSuccessAlert() {
-    Swal.fire({
-        title: "Enrollment Successful!",
-        text: "Payment Verified and Enrollment Successful!",
-        icon: "success", // Ensures the green tick mark is shown
-        // timer: 1000, // Duration of the alert in milliseconds
-        showConfirmButton: true, // "OK" button
-        confirmButtonText: "OK", // Button text
-    });
-}
+        Swal.fire({
+            title: "Enrollment Successful!",
+            text: "Payment Verified and Enrollment Successful!",
+            icon: "success", // Ensures the green tick mark is shown
+            // timer: 1000, // Duration of the alert in milliseconds
+            showConfirmButton: true, // "OK" button
+            confirmButtonText: "OK", // Button text
+        });
+    }
 
 
     function showErrorAlert(title, message) {

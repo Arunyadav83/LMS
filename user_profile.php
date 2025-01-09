@@ -20,14 +20,17 @@ $user_email = $_SESSION['user_email'] ?? '';
 $user_username = $_SESSION['user_username'] ?? '';
 
 // Initialize variables to avoid undefined variable warnings
+$name = '';
+$email = '';
+$username = '';
 $father_name = '';
 $phone_number = '';
 $emergency_number = '';
 
 // Fetch user details from the database
-if ($user_email) {
-    $stmt = $conn->prepare("SELECT name, email, username, father_name, phone_number, emergency_number FROM users WHERE user_id = ? OR username = ?");
-    $stmt->bind_param("ss", $user_id, $user_username);
+if ($user_email || $user_username) {
+    $stmt = $conn->prepare("SELECT name, email, username, father_name, phone_number, emergency_number FROM users WHERE email = ? OR username = ?");
+    $stmt->bind_param("ss", $user_email, $user_username);
     $stmt->execute();
     $stmt->bind_result($name, $email, $username, $father_name, $phone_number, $emergency_number);
     $stmt->fetch();
@@ -39,12 +42,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $father_name = $_POST['father_name'] ?? '';
     $phone_number = $_POST['phone_number'] ?? '';
     $emergency_number = $_POST['emergency_number'] ?? '';
-    $email = $_POST['email'] ?? '';
-    $username = $_POST['username'] ?? '';
-    $name = $_POST['name'] ?? '';
     
-    // Save these details to the database or process as needed
-    // ...
+    // Update details in the database
+    if ($user_email || $user_username) {
+        $stmt = $conn->prepare("UPDATE users SET father_name = ?, phone_number = ?, emergency_number = ? WHERE email = ? OR username = ?");
+        $stmt->bind_param("sssss", $father_name, $phone_number, $emergency_number, $user_email, $user_username);
+        $stmt->execute();
+        $stmt->close();
+    }
 }
 $conn->close();
 ?>
@@ -76,13 +81,13 @@ $conn->close();
     <div id="additional-details" style="display: none;">
         <form method="POST">
             <label for="father_name">Father's Name:</label>
-            <input type="text" id="father_name" name="father_name" required><br>
+            <input type="text" id="father_name" name="father_name" value="<?php echo htmlspecialchars($father_name); ?>" required><br>
 
             <label for="phone_number">Phone Number:</label>
-            <input type="text" id="phone_number" name="phone_number" required><br>
+            <input type="text" id="phone_number" name="phone_number" value="<?php echo htmlspecialchars($phone_number); ?>" required><br>
 
             <label for="emergency_number">Emergency Number:</label>
-            <input type="text" id="emergency_number" name="emergency_number" required><br>
+            <input type="text" id="emergency_number" name="emergency_number" value="<?php echo htmlspecialchars($emergency_number); ?>" required><br>
 
             <input type="submit" value="Save Details">
         </form>

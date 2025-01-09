@@ -28,4 +28,4 @@ if (isset($_POST['class_id'])) {
 
 header("Location: course.php?id=" . $_GET['id']); // Redirect back to the course page
 exit();
-?>  -->
+?> 

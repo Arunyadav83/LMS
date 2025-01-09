@@ -32,7 +32,7 @@
         }
 
         header h1 {
-            font-size: 2.5rem;
+            font-size: 1rem;
             margin-bottom: 10px;
         }
 
@@ -78,9 +78,11 @@
             transform: translateY(-5px);
         }
 
-        h2 {
+        h3 {
             color: #3498db;
             margin-bottom: 20px;
+            font-size: smaller;
+            
         }
 
         button {
@@ -133,7 +135,7 @@
 
         .class-card h3 {
             margin-bottom: 12px;
-            font-size: 20px;
+            /* font-size: 20px; */
             color: #34495e;
             font-weight: bold;
         }
@@ -383,25 +385,25 @@
 
     <main>
         <section id="live-classes">
-            <h2>Live Classes</h2>
+            <h3 >Live Classes</h3>
             <p>Join our interactive live classes and learn directly from expert instructors.</p>
             <button onclick="joinLiveClass()">Join Now</button>
             <p id="live-class-message"></p>
         </section>
         <section id="recorded-classes">
-            <h2>Recorded Classes</h2>
+            <h3>Recorded Classes</h3>
             <p>Access our extensive library of recorded classes at your convenience.</p>
             <button onclick="viewRecordedClasses()" class="view-classes-btn">View Classes</button>
             <div id="recorded-classes-list" class="class-grid"></div>
         </section>
         <section id="student-interaction">
-            <h2>Student Interaction</h2>
+            <h3>Student Interaction</h3>
             <p>Connect with peers, participate in discussions, and collaborate on projects.</p>
             <button onclick="openForum()">Open Forum</button>
         </section>
 
         <section id="motivation">
-            <h2>Motivational Tools</h2>
+            <h3>Motivational Tools</h3>
             <p>Track your progress, earn badges, and stay motivated throughout your learning journey.</p>
             <button onclick="viewAchievements()">View Achievements</button>
         </section>
@@ -410,7 +412,7 @@
     <div id="achievementsModal" class="modal">
         <div class="modal-content">
             <span class="close">&times;</span>
-            <h2>Ultrakey's Journey and Achievements</h2>
+            <h3>Ultrakey's Journey and Achievements</h3>
             <div class="timeline">
                 <div class="timeline-item left">
                     <div class="timeline-content">
@@ -456,7 +458,7 @@
     <div id="forumModal" class="modal">
         <div class="modal-content">
             <span class="close">&times;</span>
-            <h2>Student Forum</h2>
+            <h3>Student Forum</h3>
             <ul class="forum-list">
                 <li class="forum-item">
                     <h3>Welcome to Ultrakey!</h3>

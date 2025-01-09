@@ -61,8 +61,11 @@ class About
             return [];
         }
     }
+
+
     public function displayAbout()
     {
+        echo "<div class='container-fluid'>";
         echo "<h2 class='section-title'>
                 <span class='subtitle'>World-Class Instructors</span><br>
                 Classes Taught By Real Creators
@@ -84,7 +87,7 @@ class About
                 </div>";
         }
 
-        echo "</div>";
+        echo "</div>"; // Close tutors section
 
         echo "<h2 class='section-title'>Courses Offered</h2>";
         echo "<div class='course-slider'>";
@@ -92,26 +95,24 @@ class About
         foreach ($this->courses as $course) {
             $image_name = strtolower(str_replace(' ', '_', $course['title'])) . '.jpg';
             echo "<div class='course-item'>
-                    <img src='assets/images/{$image_name}' alt='" . htmlspecialchars($course['title']) . "' class='course-image'>
-                <!-- <p class='course-title'>" . htmlspecialchars($course['title']) . "</p> -->
-                  </div>";
-
+                    <img src='assets/images/{$image_name}' alt='" . htmlspecialchars($course['title']) . "' class='course-image' >
+                </div>";
         }
 
-        echo "</div>";  // Close courses slider
+        echo "</div>"; // Close courses slider
+        echo "</div>"; // Close container-fluid
     }
 
     public function displayWelcomeMessage()
     {
+        echo "<div class='container-fluid'>";
         echo "<div class='welcome-section'>";
-
         echo "<h1>About Us</h1>";
 
-        echo "<p>Welcome to Ultrakey, your trusted partner in academic success and personal growth!</p>";
+        echo "<p>Welcome to Ultrakey, your trusted partner in academic success and personal growth!<br>
+        Ultrakey Learning is your one-stop destination for quality online courses in a variety of fields. Whether you're looking to upskill, learn a new language, or explore programming, we have the courses you need to succeed.</p>";
 
         echo '<h2 style="text-align: center; margin-top:4%">Why Choose Us?</h2>';
-
-
 
         echo "<div class='why-choose-us-cards'>";
 
@@ -133,8 +134,10 @@ class About
                 <p>A dynamic learning ecosystem for thriving students.</p>
               </div>";
 
+        echo "</div>"; // Close why-choose-us-cards
         echo "</div>";
-        echo "</div>";
+        echo  "</div>";
+        // Close welcome-section
     }
 }
 
@@ -154,14 +157,34 @@ include 'footer.php';
     <title>About Us - Ultrakey</title>
     <link rel="stylesheet" type="text/css" href="https://cdnjs.cloudflare.com/ajax/libs/slick-carousel/1.8.1/slick.min.css" />
     <link rel="stylesheet" type="text/css" href="https://cdnjs.cloudflare.com/ajax/libs/slick-carousel/1.8.1/slick-theme.min.css" />
+    <script>
+        document.onreadystatechange = function() {
+            if (document.readyState == "interactive") {
+                document.body.classList.add('page-loaded');
+            }
+        };
+    </script>
     <style>
+        .page-loaded {
+            opacity: 1;
+            transition: opacity 0.5s ease-in-out;
+        }
+
         body {
             font-family: 'Poppins', sans-serif;
             background-color: #f4f4f4;
             margin: 0;
             padding: 0;
             color: #2c3e50;
+
             overflow-x: hidden;
+        }
+
+        /* Make the content visible after it's loaded */
+        body.loaded {
+            opacity: 1;
+            visibility: visible;
+            transition: opacity 0.5s ease-in-out;
         }
 
         h1,
@@ -170,7 +193,7 @@ include 'footer.php';
         }
 
         h3 {
-            color:rgb(153, 202, 251);
+            color: rgb(153, 202, 251);
         }
 
         a {
@@ -237,13 +260,14 @@ include 'footer.php';
 
         .welcome-section h1 {
             text-align: center;
-            font-size: 30px;
+            font-size: 40px;
         }
 
         .welcome-section p {
             text-align: center;
-            font-size: 0.7em;
+            font-size: 0.9em;
             margin-top: 20px;
+            color: khaki;
 
         }
 
@@ -265,22 +289,26 @@ include 'footer.php';
         }
 
 
-        .tutor-card {
+        /* .tutor-card {
             background: #ffffff;
             margin: 0 15px;
             border-radius: 8px;
             max-width: 300px;
             padding: 20px;
             text-align: center;
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1)
-                /* box-shadow: 0 4
-            px 6px rgba(0, 0, 0, 0.1);
-            
-            text-align: center;
-            max-width: 300px;
-            transition: transform 0.3s, box-shadow 0.3s; */
-        }
+            transition: transform 0.3s, box-shadow 0.3s;
+        } */
 
+        .tutor-card {
+            background-color: #ffffff;
+             margin: 0 15px  ;
+             max-width: 300px;
+            border-radius: 8px;
+            padding: 20px;
+            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.1);
+            text-align: center;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
         .tutor-card:hover {
             transform: translateY(-10px);
             box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
@@ -327,15 +355,7 @@ include 'footer.php';
             }
         }
 
-
-        .tutor-card {
-            background-color: #ffffff;
-            padding: 20px;
-            border-radius: 10px;
-            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.1);
-            text-align: center;
-            transition: transform 0.3s ease, box-shadow 0.3s ease;
-        }
+   
 
         .tutor-card:hover {
             transform: translateY(-10px);
@@ -354,7 +374,7 @@ include 'footer.php';
         .tutor-name {
             font-size: 13px;
             font-weight: bold;
-            color:rgb(10, 171, 241);
+            color: rgb(10, 171, 241);
         }
 
         .tutor-specialization {
@@ -399,7 +419,7 @@ include 'footer.php';
 
         .section-title {
             text-align: center;
-            font-size:1.5rem;
+            font-size: 1.5rem;
             /* Use rem for scalability */
             color: #2c3e50;
             font-weight: 300;
@@ -457,7 +477,7 @@ include 'footer.php';
             width: 100%;
             border-radius: 8px;
             max-height: 200px;
-            object-fit: cover;
+            object-fit: contain;
             margin-bottom: 15px;
 
 

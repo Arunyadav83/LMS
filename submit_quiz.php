@@ -73,8 +73,15 @@ foreach ($_POST as $key => $value) {
         $total_questions++;
     }
 }
+if ($total_questions > 0) {
+    $percentage_score = ($score / $total_questions) * 100;
+} else {
+    $percentage_score = 0; // Set to 0% if no questions were answered
+    $_SESSION['error'] = "No questions were answered or found in the quiz.";
+    header("Location: quiz_result.php?class_id=" . $class_id);
+    exit();
+}
 
-$percentage_score = ($score / $total_questions) * 100;
 
 // Fetch tutor name
 $tutor_query = "SELECT t.full_name AS tutor_name

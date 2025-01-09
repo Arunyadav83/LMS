@@ -96,11 +96,11 @@ foreach ($enrollments as $enrollment) {
                     <h1 class="mb-4">Enrollments</h1>
 
                     <div style="margin-left: 700px;">
-                    <button id="listViewBtn" class="btn btn-primary" onclick="showListView()">
-                        <i class="fas fa-list"></i> List 
+                    <button id="listViewBtn" class="btn btn-primary me" onclick="showListView()">
+                        <i class="fas fa-list"></i>  
                     </button>
-                    <button id="gridViewBtn" class="btn btn-secondary" onclick="showGridView()">
-                        <i class="fas fa-th"></i> Grid 
+                    <button id="gridViewBtn" class="btn btn-secondary me" onclick="showGridView()">
+                        <i class="fas fa-th"></i>  
                     </button>
                     </div>
                     <!-- List View -->

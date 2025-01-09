@@ -36,16 +36,15 @@ include 'header.php';
     </div>
 </div> -->
 <!-- Hero Section with Parallax Effect -->
-<div 
-    class="hero-section text-center py-5 mb-5 parallax-window" 
-    data-parallax="scroll" 
-    style="background-size: cover; background-position: center; margin-bottom: 10%; position: relative; top: -20px; overflow: hidden;"
->
+<div
+    class="hero-section text-center py-5 mb-5 parallax-window"
+    data-parallax="scroll"
+    style="background-size: cover; background-position: center; margin-bottom: 10%; position: relative; top: -20px; overflow: hidden;">
     <!-- Overlay for opacity -->
     <div class="hero-overlay"></div>
 
     <div class="container position-relative">
-        <h1 class="display-4 mb-4 animate__animated animate__fadeInDown">Welcome to Ultrakey Learning</h1>
+        <h4 class="display-4 mb-4 animate__animated animate__fadeInDown">Welcome to Ultrakey Learning</h4>
         <p class="lead mb-4 animate__animated animate__fadeInUp">Empower your future with our cutting-edge online courses</p>
         <?php if (!is_logged_in()): ?>
             <a href="register.php" class="btn btn-primary btn-lg me-2 animate__animated animate__fadeInLeft">Get Started</a>
@@ -59,7 +58,7 @@ include 'header.php';
         <div class="welcome-back mb-5 animate__animated animate__fadeIn">
             <h2>Welcome back, <?php echo htmlspecialchars($_SESSION['username']); ?>!</h2>
             <p>Ready to continue your learning journey? Check out your dashboard or explore new courses below.</p>
-            <a href="index.php" class="btn btn-primary">Go to Dashboard</a>
+            <!-- <a href="index.php" class="btn btn-primary">Go to Dashboard</a> -->
         </div>
     <?php endif; ?>
 
@@ -158,27 +157,28 @@ include 'header.php';
                     <div class="col-md-4 mb-4">
                         <div class="card h-100 animate__animated animate__fadeIn" style="height: 150px; overflow: hidden;">
                             <img
-                                src="assets/images/<?php echo htmlspecialchars($course['title'], ENT_QUOTES, 'UTF-8'); ?>.jpg" style="height: 180px; width: 100%; object-fit: cover;">
+                                src="assets/images/<?php echo htmlspecialchars($course['title'], ENT_QUOTES, 'UTF-8'); ?>.jpg" style="height: 180px; width: 100%; object-fit: contain;">
                             <div class="card-body" style="padding: 40px;">
                                 <h5 class="card-title" style="font-size: 14px;"><?php echo htmlspecialchars($course['title']); ?></h5>
                                 <p class="card-text" style="font-size: 12px;"><?php echo htmlspecialchars(substr($course['description'], 0, 60)) . '...'; ?></p>
                                 <p class="card-text" style="font-size: 10px;"><small class="text-muted">Tutor: <?php echo htmlspecialchars($course['tutor_name']); ?></small></p>
                             </div>
-                            <div class="card-footer bg-transparent border-0" style="padding: 5px;">
+                            <div class="card-footer bg-transparent border-0" style="padding: 35px; display: flex; justify-content: center; align-items: center; margin-top: -10px;">
                                 <?php if (is_logged_in()): ?>
-                                    <a href="course.php?id=<?php echo $course['id']; ?>" class="btn btn-primary btn-sm">View Course</a>
+                                    <a href="course.php?id=<?php echo $course['id']; ?>" class="btn btn-primary btn-sm" style="margin-right: 10px;">View Course</a>
                                     <a href="courses.php" class="btn btn-success btn-sm">Enroll</a>
                                 <?php else: ?>
                                     <a href="login.php" class="btn btn-secondary btn-sm">Login to Enroll</a>
                                 <?php endif; ?>
                             </div>
+
                         </div>
                     </div>
                 <?php endwhile; ?>
             </div>
 
             <div class="text-center">
-                <a href="courses.php" class="btn btn-outline-primary">View All Courses</a>
+                <a href="courses.php" class="btn btn-primary">View All Courses</a>
             </div>
         <?php else: ?>
             <p class="text-center">No courses are available at the moment. Please check back later.</p>
@@ -249,7 +249,7 @@ include 'header.php';
                     <div class="card-body">
                         <img src="assets/images/student1.jpg" alt="John Doe" class="rounded-circle mb-3" width="80">
                         <p class="card-text">"Ultrakey Learning has transformed my career. The courses are top-notch and the instructors are amazing!"</p>
-                        <p class="card-text"><small class="text-muted">- Sandhya, Web Developer</small></p>
+                        <p class="card-text"><strong style="font-weight: bold;">- Sandhya, Web Developer</strong></p>
                     </div>
                 </div>
             </div>
@@ -258,7 +258,7 @@ include 'header.php';
                     <div class="card-body">
                         <img src="assets/images/student2.jpg" alt="Jane Smith" class="rounded-circle mb-3" width="80">
                         <p class="card-text">"I've learned more in 3 months with Ultrakey Learning than I did in a year at university. Highly recommended!"</p>
-                        <p class="card-text"><small class="text-muted">- Neha, Android Developer</small></p>
+                        <p class="card-text"><strong style="font-weight: bold;">- Neha, Android Developer</strong></p>
                     </div>
                 </div>
             </div>
@@ -267,12 +267,13 @@ include 'header.php';
                     <div class="card-body">
                         <img src="assets/images/student3.jpg" alt="Mike Johnson" class="rounded-circle mb-3" width="80">
                         <p class="card-text">"The flexibility of online learning combined with the quality of content makes Ultrakey Learning unbeatable."</p>
-                        <p class="card-text"><small class="text-muted">- Arun, Business Analyst</small></p>
+                        <p class="card-text"><strong style="font-weight: bold;">- Arun, Business Analyst</strong></p>
                     </div>
                 </div>
             </div>
         </div>
     </section>
+
 
     <section class="cta text-center py-5 mb-5">
         <h2 class="mb-3">Ready to Start Your Learning Journey?</h2>
@@ -285,7 +286,7 @@ include 'header.php';
             <h2 class="text-center mb-5">Experience the Power of Ultrakey Learning</h2>
             <div class="row align-items-center mb-5">
                 <div class="col-md-6">
-                    <img src="assets/images/interactive-lessons.jpg" alt="Interactive Lessons" class="img-fluid rounded shadow-lg" style="max-width: 100%; height: 300px;">
+                    <img src="assets/images/interactive-lessons.jpg" alt="Interactive Lessons" class="img-fluid rounded shadow-lg responsive-img"  style="max-width: 100%; height: 400px; margin-left: 15%">
                 </div>
                 <div class="col-md-6">
                     <h3>Interactive Lessons</h3>
@@ -299,18 +300,18 @@ include 'header.php';
                 </div>
                 <div class="col-md-6 order-md-1">
                     <h3>Comprehensive Progress Tracking</h3>
-                    <p>Stay on top of your learning journey with our detailed progress tracking system. Monitor your course completion, quiz scores, and skill development in real-time. Set personal goals and watch as you achieve them step by step.</p>
+                    <p style="text-align: justify ; margin-right:15%">Stay on top of your learning journey with our detailed progress tracking system. Monitor your course completion, quiz scores, and skill development in real-time. Set personal goals and watch as you achieve them step by step.</p>
                     <a href="#" class="btn btn-outline-primary">Explore Features</a>
                 </div>
             </div>
             <div class="row align-items-center mb-5">
                 <div class="col-md-6">
-                    <img src="assets/images/community-forums.jpg" alt="Community Forums" class="img-fluid rounded shadow-lg">
+                    <img src="assets/images/community-forums.jpg" alt="Community Forums" class="img-fluid rounded shadow-lg" >
                 </div>
-                <div class="col-md-6">
-                    <h3>Vibrant Learning Community</h3>
-                    <p>Join our thriving community of learners and educators. Participate in discussions, share knowledge, and get support from peers and instructors.</p>
-                    <a href="#" class="btn btn-outline-primary">Join the Community</a>
+                <div class="col-md-6" >
+                    <h3 style="margin-left:30px ;"class="a" >Vibrant Learning Community</h3>
+                    <p  style="margin-left: 28px" >Join our thriving community of learners and educators. Participate in discussions, share knowledge, and get support from peers and instructors.</p>
+                    <a href="#" class="btn btn-outline-primary" style="margin-left: 34px;">Join the Community</a>
                 </div>
             </div>
         </div>
@@ -344,42 +345,69 @@ include 'header.php';
     });
 </script>
 <style>
-  #explore {
-    background-color:rgb(233, 245, 247); /* Light Cyan */
-    padding: 20px;
-    border-radius: 10px;
-    width: 100%;
-}
+    #explore {
+        background-color: rgb(233, 245, 247);
+        /* Light Cyan */
+        padding: 20px;
+        border-radius: 10px;
+        width: 100%;
+    }
 
     .hero-section {
-    background-image: url('assets/images/hero-bg.jpg');
-    background-size: cover;
-    background-position: center;
-    position: relative;
-}
-.stats-counter {
-    background: linear-gradient(135deg,rgb(166, 208, 250),rgb(124, 244, 224)); /* Blue and Green Gradient */
-    color: black; /* Ensures text remains readable */
-    padding: 50px 0;
-    border-radius: 10px; /* Optional: Adds rounded corners for a modern touch */
+        background-image: url('assets/images/hero-bg.jpg');
+        background-size: cover;
+        background-position: center;
+        position: relative;
+    }
+    .testimonials {
+    box-shadow: 0px 3px 2px grey;
 }
 
+    .stats-counter {
+        background: linear-gradient(135deg, rgb(166, 208, 250), rgb(124, 244, 224));
+        /* Blue and Green Gradient */
+        color: black;
+        /* Ensures text remains readable */
+        padding: 50px 0;
+        border-radius: 10px;
+        /* Optional: Adds rounded corners for a modern touch */
+    }
 
-.hero-overlay {
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background-color: rgba(100, 113, 122, 0.5); /* Adjust opacity here */
-    z-index: 1;
+
+    .hero-overlay {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background-color: rgba(100, 113, 122, 0.5);
+        /* Adjust opacity here */
+        z-index: 1;
+    }
+
+    .container {
+        position: relative;
+        z-index: 2;
+
+        /* Ensure content appears above the overlay */
+    }
+    .img-fluid {
+    max-width: 100%;
+    height: auto; /* Maintain aspect ratio */
+    display: block; /* Removes extra space below the image */
+    margin: 0 auto; /* Center the image */
+}
+/* General styles */
+.a {
+    margin-right: 23%; /* Apply the margin-right for larger screens */
 }
 
-.container {
-    position: relative;
-    z-index: 2; 
-
-    /* Ensure content appears above the overlay */
+/* Adjustments for Mobile View */
+@media (max-width: 768px) {
+    .a {
+        margin-right: 5%; /* Reduce the margin-right on smaller screens */
+    }
 }
+
 </style>
 <?php include 'footer.php'; ?>

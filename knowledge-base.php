@@ -31,20 +31,13 @@ $articles = [
     <link rel="stylesheet" href="styles.css">
 </head>
 <style>
-    body {
+body {
     font-family: 'Arial', sans-serif;
     margin: 0;
     padding: 0;
     background-color: #f4f4f9;
     color: #333;
 }
-
-/* .header {
-    background-color: #007BFF;
-    color: white;
-    padding: 20px 0;
-    text-align: center;
-} */
 
 .header h1 {
     margin: 0;
@@ -65,7 +58,7 @@ $articles = [
 
 .articles-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
     gap: 20px;
 }
 
@@ -75,6 +68,10 @@ $articles = [
     overflow: hidden;
     box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
     transition: transform 0.3s ease, box-shadow 0.3s ease;
+    width: 100%;
+    height: 400px; /* Reduced height */
+    display: flex;
+    flex-direction: column;
 }
 
 .article-card:hover {
@@ -84,33 +81,40 @@ $articles = [
 
 .article-card img {
     width: 100%;
-    height: 200px;
-    /* object-fit: cover; */
+    height: 150px; /* Reduced image height */
+    object-fit: contain; /* Ensures the image fits well */
 }
 
 .article-content {
-    padding: 20px;
+    padding: 15px;
+    display: flex;
+    flex-direction: column;
+    flex-grow: 1;
+    justify-content: space-between;
 }
 
 .article-content h3 {
-    font-size: 1.5rem;
+    font-size: 1.2rem; /* Adjusted size */
     margin: 0 0 10px;
 }
 
 .article-content p {
-    font-size: 1rem;
+    font-size: 0.9rem; /* Adjusted size */
     color: #555;
+    margin-bottom: auto;
 }
 
 .read-more {
     display: inline-block;
-    margin-top: 15px;
-    padding: 10px 20px;
+    margin-top: 10px;
+    padding: 8px 16px;
     color: white;
     background-color: #007BFF;
     text-decoration: none;
     border-radius: 4px;
+    font-size: 0.9rem;
     transition: background-color 0.3s ease;
+    align-self: flex-start;
 }
 
 .read-more:hover {
@@ -125,7 +129,22 @@ $articles = [
     margin-top: 20px;
 }
 
+/* Responsive Design */
+@media screen and (max-width: 768px) {
+    .articles-grid {
+        grid-template-columns: 1fr; /* One column on smaller screens */
+    }
+
+    .article-card {
+        height: auto; /* Allow height to adjust dynamically */
+    }
+
+    .article-card img {
+        height: 180px; /* Slightly larger image for smaller screens */
+    }
+}
 </style>
+
 <body>
    
 <?php include 'header.php'; ?>

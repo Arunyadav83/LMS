@@ -165,13 +165,19 @@ if (isset($_POST['update_course'])) {
 }
 
 // Fetch all courses with their topics
-$query = "SELECT c.id, c.title, c.description, 
-          GROUP_CONCAT(ct.topic_name SEPARATOR ', ') as topics
-          FROM courses c 
-          LEFT JOIN course_topics ct ON c.id = ct.course_id
-          GROUP BY c.id";
+// Fetch all courses
+$query = "SELECT id, title, description, course_prize, topics FROM courses";
+
+
 $result = mysqli_query($conn, $query);
 $courses = mysqli_fetch_all($result, MYSQLI_ASSOC);
+if ($result->num_rows > 0) {
+    while ($row = $result->fetch_assoc()) {
+        $courses[] = $row;
+    }
+} else {
+    echo "No courses found.";
+}
 ?>
 
 <!DOCTYPE html>
@@ -191,6 +197,86 @@ $courses = mysqli_fetch_all($result, MYSQLI_ASSOC);
         margin-bottom: 20px;
         /* Adjust this value as needed */
     }
+
+    #enrollmentGrid {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 16px;
+        /* Adjust spacing between cards */
+    }
+
+    #enrollmentGrid .col-md-4 {
+        flex: 1 1 calc(33.333% - 16px);
+        /* Three cards per row with space between */
+        max-width: calc(33.333% - 16px);
+    }
+
+    #enrollmentGrid .card {
+        position: relative;
+        /* Make the card a positioned element */
+        height: 100%;
+        /* Ensures cards stretch to the same height */
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+        /* Ensures proper spacing within the card */
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        border: none;
+        /* Optional: Removes default border for cleaner design */
+        border-radius: 8px;
+        /* Optional: Adds rounded corners */
+    }
+
+    #enrollmentGrid .dropdown {
+        position: absolute;
+        top: 10px;
+        /* Adjust spacing from the top */
+        right: 10px;
+        /* Adjust spacing from the right */
+        z-index: 1;
+        /* Ensure dropdown menu appears above other elements */
+    }
+
+    .dropdown-menu {
+        z-index: 2;
+        /* Ensure the dropdown appears above other elements */
+    }
+
+    #enrollmentGrid .card-body {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+    }
+
+    .card-title {
+        margin-bottom: 10px;
+        font-size: 1.25rem;
+    }
+
+    .card-text {
+        flex-grow: 1;
+        /* Ensures equal spacing between title and topics */
+        font-size: 0.9rem;
+    }
+
+    .button {
+    padding-inline: 30px;
+    font-weight: bolder;
+    text-decoration: none;
+    color: #0433c3; /* Initial blue text color */
+    background-color: white; /* Initially white background */
+    padding-block: 10px;
+    border-radius: 30px; /* Rounded corners */
+    transition: all 0.3s ease; /* Smooth transition for hover effect */
+}
+
+.button:hover {
+    color: white; /* Text color turns white */
+    background-color: #0433c3; /* Background turns blue */
+    border-radius: 30px; /* Keep rounded corners */
+}
+
+
 </style>
 
 <body>
@@ -222,17 +308,17 @@ $courses = mysqli_fetch_all($result, MYSQLI_ASSOC);
             <!-- Main Content -->
             <main class="col-md-9 ms-sm-auto col-lg-10 px-md-4">
                 <div class="container mt-4">
-                    <h1 class="mb-4">Courses List</h1>
+                    <h3 class="mb-4">Courses List</h3>
                     <!-- Add this just before the table in the main content section -->
                     <div class="mb-3">
-                        <a href="add_course.php" class="btn btn-success">Add New Course</a>
+                        <a href="add_course.php" class="button">Add New Course</a>
                     </div>
 
                     <div style="margin-left: 800px;">
-                        <button id="listViewBtn" class="btn btn-primary" onclick="showListView()">
+                        <button id="listViewBtn" class="btn btn-primary me" onclick="showListView()">
                             <i class="fas fa-list"></i>
                         </button>
-                        <button id="gridViewBtn" class="btn btn-secondary" onclick="showGridView()">
+                        <button id="gridViewBtn" class="btn btn-secondary me2" onclick="showGridView()">
                             <i class="fas fa-th"></i>
                         </button>
                     </div>
@@ -256,10 +342,18 @@ $courses = mysqli_fetch_all($result, MYSQLI_ASSOC);
                                         <td><?php echo htmlspecialchars($course['id']); ?></td>
                                         <td><?php echo htmlspecialchars($course['title']); ?></td>
                                         <td><?php echo htmlspecialchars($course['description']); ?></td>
-                                        <td><?php echo htmlspecialchars($course['topics']); ?></td>
+                                        <td>
+                                            <?php
+                                            // Display topics as badges
+                                            $topics = explode(',', $course['topics']); // Split topics into an array
+                                            foreach ($topics as $topic) {
+                                                echo '<span ">' . htmlspecialchars($topic) . '</span>';
+                                            }
+                                            ?>
+                                        </td>
                                         <td>
                                             <div class="dropdown">
-                                                <button class="btn btn-secondary" type="button" id="dropdownMenuButton" data-bs-toggle="dropdown" aria-expanded="false">
+                                                <button class="btn btn-primary" type="button" id="dropdownMenuButton" data-bs-toggle="dropdown" aria-expanded="false">
                                                     <i class="fas fa-ellipsis-v"></i>
                                                 </button>
                                                 <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="dropdownMenuButton">
@@ -269,7 +363,7 @@ $courses = mysqli_fetch_all($result, MYSQLI_ASSOC);
                                                             data-title="<?php echo htmlspecialchars($course['title']); ?>"
                                                             data-description="<?php echo htmlspecialchars($course['description']); ?>"
                                                             data-topics="<?php echo htmlspecialchars($course['topics']); ?>"
-                                                            data-prize="<?php echo isset($course['course_prize']) ? htmlspecialchars($course['course_prize']) : ''; ?>">Edit</button>
+                                                            data-prize="<?php echo htmlspecialchars($course['course_prize']); ?>">Edit</button>
                                                     </li>
                                                     <li>
                                                         <form action="" method="post" class="d-inline" onsubmit="return confirm('Are you sure you want to delete this course?');">
@@ -280,51 +374,63 @@ $courses = mysqli_fetch_all($result, MYSQLI_ASSOC);
                                                 </ul>
                                             </div>
                                         </td>
-
                                     </tr>
                                 <?php endforeach; ?>
                             </tbody>
                         </table>
                     </div>
 
+
                     <!-- Grid View -->
                     <div id="gridView" class="view">
                         <h2>Grid View</h2>
                         <div class="row g-4" id="enrollmentGrid">
                             <?php foreach ($courses as $course): ?>
-                                <div class="col-md-4 mb-4">
+                                <div class="col-12 col-sm-6 col-md-4 mb-4">
                                     <div class="card">
-                                        <div class="card-body">
-                                            <div class="dropdown float-end">
-                                                <a class="btn btn-secondary" type="button" id="dropdownMenuButton" data-bs-toggle="dropdown" aria-expanded="false">
-                                                    <i class="fas fa-ellipsis-v"></i>
-                                                </a>
-                                                <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="dropdownMenuButton">
-                                                    <li>
-                                                        <button class="dropdown-item edit-btn" data-bs-toggle="modal" data-bs-target="#editModal"
-                                                            data-id="<?php echo $course['id']; ?>"
-                                                            data-title="<?php echo htmlspecialchars($course['title']); ?>"
-                                                            data-description="<?php echo htmlspecialchars($course['description']); ?>"
-                                                            data-topics="<?php echo htmlspecialchars($course['topics']); ?>"
-                                                            data-prize="<?php isset($course['course_prize']) ? htmlspecialchars($course['course_prize']) : ''; ?>">Edit</button>
-                                                    </li>
-                                                    <li>
-                                                        <form action="" method="post" class="d-inline" onsubmit="return confirm('Are you sure you want to delete this course?');">
-                                                            <input type="hidden" name="course_id" value="<?php echo $course['id']; ?>">
-                                                            <button type="submit" name="delete_course" class="dropdown-item">Delete</button>
-                                                        </form>
-                                                    </li>
-                                                </ul>
+                                        <div class="card-body d-flex">
+                                            <!-- Image on the left -->
+                                            <img
+                                                src="../assets/images/<?php echo htmlspecialchars($course['title']); ?>.jpg"
+                                                alt="<?php echo htmlspecialchars($course['title']); ?>"
+                                                class="rounded"
+                                                style="width: 180px; height: 100px; object-fit: contain; margin-bottom: 10px;" />
+
+                                            <!-- Card content -->
+                                            <div>
+                                                <div class="dropdown float-end">
+                                                    <a class="btn btn-secondary" type="button" id="dropdownMenuButton" data-bs-toggle="dropdown" aria-expanded="false">
+                                                        <i class="fas fa-ellipsis-v"></i>
+                                                    </a>
+                                                    <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="dropdownMenuButton">
+                                                        <li>
+                                                            <button class="dropdown-item edit-btn" data-bs-toggle="modal" data-bs-target="#editModal"
+                                                                data-id="<?php echo $course['id']; ?>"
+                                                                data-title="<?php echo htmlspecialchars($course['title']); ?>"
+                                                                data-description="<?php echo htmlspecialchars($course['description']); ?>"
+                                                                data-topics="<?php echo htmlspecialchars($course['topics']); ?>"
+                                                                data-prize="<?php echo isset($course['course_prize']) ? htmlspecialchars($course['course_prize']) : ''; ?>">Edit</button>
+                                                        </li>
+                                                        <li>
+                                                            <form action="" method="post" class="d-inline" onsubmit="return confirm('Are you sure you want to delete this course?');">
+                                                                <input type="hidden" name="course_id" value="<?php echo $course['id']; ?>">
+                                                                <button type="submit" name="delete_course" class="dropdown-item">Delete</button>
+                                                            </form>
+                                                        </li>
+                                                    </ul>
+                                                </div>
+                                                <h5 class="card-title"><?php echo htmlspecialchars($course['title']); ?></h5>
+                                                <p class="card-text"><?php echo htmlspecialchars($course['description']); ?></p>
+                                                <p class="card-text"><strong>Topics Covered:</strong> <?php echo htmlspecialchars($course['topics']); ?></p>
                                             </div>
-                                            <h5 class="card-title"><?php echo htmlspecialchars($course['title']); ?></h5>
-                                            <p class="card-text"><?php echo htmlspecialchars($course['description']); ?></p>
-                                            <p class="card-text"><strong>Topics Covered:</strong> <?php echo htmlspecialchars($course['topics']); ?></p>
                                         </div>
                                     </div>
                                 </div>
                             <?php endforeach; ?>
                         </div>
                     </div>
+
+
                 </div>
             </main>
         </div>

@@ -8,12 +8,12 @@ if (isset($_GET['logout']) && $_GET['logout'] == 1) {
     session_unset();
     session_destroy();
 
-    // Redirect to index.php
+    // Redirect to index.php after logout
     header("Location: index.php");
     exit();
 }
 
-// At the beginning of your PHP script, add this function:
+// Ensure the directory exists (useful if you're working with file uploads or logs)
 function ensure_directory_exists($path)
 {
     if (!file_exists($path)) {
@@ -21,10 +21,13 @@ function ensure_directory_exists($path)
     }
 }
 
-// Check if the user is logging out
+// Check if the user is logging out (optional second check, should be handled by first condition)
 if (isset($_GET['logout'])) {
+    session_unset();
     session_destroy();
-    header("Location: " . $_SERVER['PHP_SELF']);
+    
+    // Redirect to index.php after logging out
+    header("Location: index.php");
     exit();
 }
 if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['login'])) {
@@ -83,13 +86,15 @@ if (!isset($_SESSION['user_id']) || !isset($_SESSION['role']) || $_SESSION['role
         <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
         <style>
             .mb-4 {
-                color: hotpink;
-                font-size: 35px
+                color: #0433c3;
+                font-size: 35px;
+              
             }
 
             .form-label {
                 color: blue
             }
+            
         </style>
     </head>
 
@@ -284,6 +289,27 @@ $classes = mysqli_fetch_all($result, MYSQLI_ASSOC);
         width: 700px;
         /* Set your desired width */
     }
+  .btn-primary{
+    margin-right: 36%;
+  }
+  h2 {
+        position: relative; /* Ensure proper stacking of elements */
+        z-index: 1;
+    }
+
+    #cardsContainer {
+        margin-top: 50px; /* Adds spacing between the heading and cards */
+    }
+
+    .btn-info {
+        z-index: 2; /* Ensure buttons appear above other elements */
+    }
+
+    .card {
+        border: 1px solid #ccc;
+        border-radius: 5px;
+        box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    }
 </style>
 
 <body>
@@ -384,15 +410,21 @@ $classes = mysqli_fetch_all($result, MYSQLI_ASSOC);
             </div>
         </div>
 
+  <h2 class="mt-4">Your Classes</h2>
 
-        <!-- Your Classes List -->
-        <h2 class="mt-5">Your Classes</h2>
+<!-- Include Font Awesome for Icons -->
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
 
-        <!-- Toggle View Buttons -->
-        <div class="mb-4">
-            <button id="listViewBtn" class="btn btn-info">List View</button>
-            <button id="gridViewBtn" class="btn btn-info">Grid View</button>
-        </div>
+<div class="mb-4" style="margin-left: 890px;">
+    <button id="listViewBtn" class="btn btn-info me-2">
+        <i class="fas fa-list"></i> <!-- List View Icon -->
+    </button>
+    <button id="gridViewBtn" class="btn btn-info">
+        <i class="fas fa-th"></i> <!-- Grid View Icon -->
+    </button>
+</div>
+
+
 
         <!-- Include SweetAlert2 -->
         <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>

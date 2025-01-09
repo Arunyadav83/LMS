@@ -15,6 +15,13 @@ $current_page = 'courses';
 $query = "SELECT id, full_name FROM tutors";
 $result = mysqli_query($conn, $query);
 $tutors = mysqli_fetch_all($result, MYSQLI_ASSOC);
+function truncateText($text, $maxLength = 100)
+{
+    if (strlen($text) > $maxLength) {
+        return substr($text, 0, $maxLength) . '...';
+    }
+    return $text;
+}
 
 // Set default value for tutor_id
 $tutor_id = isset($_POST['tutor_id']) ? (int)$_POST['tutor_id'] : null;
@@ -50,14 +57,14 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         $title = mysqli_real_escape_string($conn, $_POST['title']);
         $description = mysqli_real_escape_string($conn, $_POST['description']);
         $tutor_id = (int)$_POST['tutor_id']; // Ensure tutor_id is an integer
-    
+
         // Verify if tutor exists in the tutors table
         $query = "SELECT id FROM tutors WHERE id = ?";
         $stmt = mysqli_prepare($conn, $query);
         mysqli_stmt_bind_param($stmt, 'i', $tutor_id);
         mysqli_stmt_execute($stmt);
         $result = mysqli_stmt_get_result($stmt);
-    
+
         if (mysqli_num_rows($result) > 0) {
             // Tutor exists in the tutors table, proceed to update course
             $query = "UPDATE courses 
@@ -67,7 +74,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                       WHERE id = ?";
             $update_stmt = mysqli_prepare($conn, $query);
             mysqli_stmt_bind_param($update_stmt, 'ssii', $title, $description, $tutor_id, $id);
-    
+
             if (mysqli_stmt_execute($update_stmt)) {
                 // Successfully updated the course
                 echo '<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>';
@@ -111,9 +118,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                 });
             </script>";
         }
-    }
-}       
-    elseif (isset($_POST['delete_course'])) {
+    } elseif (isset($_POST['delete_course'])) {
         $id = (int)$_POST['id'];
 
         // Delete the enrollments associated with the course first
@@ -167,7 +172,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             </script>";
         }
     }
-
+}
 
 // Fetch all courses with tutor details
 $query = "SELECT c.*, t.full_name as tutor_name 
@@ -193,6 +198,10 @@ $course_titles = mysqli_fetch_all($result, MYSQLI_ASSOC);
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css" rel="stylesheet">
+
+
 
 
     <style>
@@ -215,12 +224,65 @@ $course_titles = mysqli_fetch_all($result, MYSQLI_ASSOC);
             font-size: 1.1rem;
         }
 
-        .grid-view .card {
-            height: 100%;
+        .card {
+            border-radius: 12px;
+            transition: transform 0.2s, box-shadow 0.2s;
+            overflow: hidden;
+        }
+        main{
+            background-color:rgb(244, 244, 255);
         }
 
-        .view-toggle {
-            margin-bottom: 1rem;
+        .card:hover {
+            transform: scale(1.02);
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
+        }
+
+        .card-body {
+            padding: 1.2rem;
+            box-shadow: 0px 2px lightblue 0.8px;
+            background-color:rgb(255, 255, 255);;
+
+        }
+
+        .edit-btn i,
+        .delete-btn i {
+            font-size: 1.2rem;
+            color: black;
+            transition: color 0.3s ease;
+        }
+
+        .edit-btn i:hover {
+            color: lightblue;
+            /* Hover effect for edit button */
+        }
+
+        .delete-btn i:hover {
+            color: red;
+            /* Hover effect for delete button */
+        }
+
+        .card-title {
+            font-size: 1.0rem;
+            /* Larger font size for the title */
+            font-weight: bold;
+            margin: 0;
+            /* Remove bottom margin for proper alignment */
+        }
+
+        .card-text {
+            font-size: 1.1rem;
+            /* Adjust font size for description and tutor */
+        }
+
+        .d-flex {
+            display: flex;
+            align-items: center;
+        }
+
+        .gap-2>* {
+            margin-left: 8px;
+            /* Spacing between buttons */
         }
     </style>
 </head>
@@ -285,13 +347,12 @@ $course_titles = mysqli_fetch_all($result, MYSQLI_ASSOC);
                     </form> -->
 
                     <!-- Courses List -->
-                    <h2>Courses List</h2>
+                    <h2>Courses</h2>
                     <div class="view-toggle text-end mb-3">
                         <button class="btn btn-outline-primary" id="grid-view-btn"><i class="fas fa-th"></i></button>
                         <button class="btn btn-primary" id="list-view-btn"><i class="fas fa-list"></i> </button>
                     </div>
 
-                    <!-- List View -->
                     <div id="list-view">
                         <table class="table table-striped courses-list">
                             <thead>
@@ -308,21 +369,24 @@ $course_titles = mysqli_fetch_all($result, MYSQLI_ASSOC);
                                     <tr>
                                         <td><?php echo htmlspecialchars($course['id']); ?></td>
                                         <td><?php echo htmlspecialchars($course['title']); ?></td>
-                                        <td><?php echo htmlspecialchars($course['description']); ?></td>
+                                        <td><?php echo htmlspecialchars(truncateText($course['description'], 50)); ?></td>
                                         <td><?php echo htmlspecialchars($course['tutor_name']); ?></td>
                                         <td>
                                             <div class="d-flex">
-                                                <!-- Edit Button -->
-                                                <button type="button" class="btn btn-sm btn-primary me-2" data-bs-toggle="modal" data-bs-target="#editCourse<?php echo $course['id']; ?>">Edit</button>
+                                                <!-- Edit Button with Icon -->
+                                                <button type="button" class="btn btn-sm btn-primary me-2" data-bs-toggle="modal" data-bs-target="#editCourse<?php echo $course['id']; ?>">
+                                                    <i class="bi bi-pencil"></i> <!-- Pencil icon -->
+                                                </button>
 
-                                                <!-- Delete Button -->
-                                                <form method="POST" style="display:inline;">
+                                                <!-- Delete Button with Icon -->
+                                                <form action="" method="POST" onsubmit="return confirm('Are you sure you want to delete this course?');">
                                                     <input type="hidden" name="id" value="<?php echo $course['id']; ?>">
-                                                    <button type="submit" name="delete_course" class="btn btn-sm btn-danger">Delete</button>
+                                                    <button type="submit" name="delete_course" class="btn btn-danger btn-sm">
+                                                        <i class="bi bi-trash"></i> <!-- Trash icon -->
+                                                    </button>
                                                 </form>
                                             </div>
                                         </td>
-
                                     </tr>
                                 <?php endforeach; ?>
                             </tbody>
@@ -332,24 +396,37 @@ $course_titles = mysqli_fetch_all($result, MYSQLI_ASSOC);
                     <!-- Grid View -->
                     <div id="grid-view" class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4" style="display: none;">
                         <?php foreach ($courses as $course): ?>
-                            <div class="col">
-                                <div class="card h-100">
+                            <div class="col" id="course-card-<?php echo $course['id']; ?>">
+                                <div class="card h-100 shadow-sm">
                                     <div class="card-body">
-                                        <h5 class="card-title"><?php echo htmlspecialchars($course['title']); ?></h5>
-                                        <p class="card-text"><?php echo htmlspecialchars($course['description']); ?></p>
-                                        <p class="card-text"><small class="text-muted">Tutor: <?php echo htmlspecialchars($course['tutor_name']); ?></small></p>
-                                    </div>
-                                    <div class="card-footer">
-                                        <button type="button" class="btn btn-sm btn-primary" data-bs-toggle="modal" data-bs-target="#editCourse<?php echo $course['id']; ?>">Edit</button>
-                                        <form method="POST" style="display:inline;">
-                                            <input type="hidden" name="id" value="<?php echo $course['id']; ?>">
-                                            <button type="submit" name="delete_course" class="btn btn-sm btn-danger">Delete</button>
-                                        </form>
+                                        <!-- Title with Buttons on Same Line -->
+                                        <div class="d-flex justify-content-between align-items-center mb-3">
+                                            <h5 class="card-title" style="color: black; margin: 0;">Title: <?php echo htmlspecialchars($course['title']); ?></h5>
+                                            <div class="d-flex gap-2">
+                                                <!-- Edit Button -->
+                                                <button type="button" class="btn btn-sm edit-btn" data-bs-toggle="modal" data-bs-target="#editCourse<?php echo $course['id']; ?>">
+                                                    <i class="bi bi-pencil"></i>
+                                                </button>
+                                                <!-- Delete Button -->
+                                                <button type="button" class="btn btn-sm delete-btn" onclick="confirmDelete(event, <?php echo $course['id']; ?>)">
+                                                    <i class="bi bi-trash"></i>
+                                                </button>
+                                            </div>
+                                        </div>
+
+                                        <!-- Description and Tutor -->
+                                        <p class="card-text text-muted">Description: <?php echo htmlspecialchars(truncateText($course['description'], 50)); ?></p>
+                                        <p class="card-text" style="color: black;">Tutor: <?php echo htmlspecialchars($course['tutor_name']); ?></p>
                                     </div>
                                 </div>
                             </div>
                         <?php endforeach; ?>
                     </div>
+
+
+
+
+
 
                     <!-- Edit Course Modals -->
                     <?php foreach ($courses as $course): ?>
@@ -426,6 +503,31 @@ $course_titles = mysqli_fetch_all($result, MYSQLI_ASSOC);
                 gridViewBtn.classList.add('btn-outline-primary');
                 gridViewBtn.classList.remove('btn-primary');
             });
+        });
+
+        function confirmDelete(event) {
+            event.preventDefault();
+            Swal.fire({
+                title: 'Are you sure?',
+                text: "You won't be able to revert this!",
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#3085d6',
+                cancelButtonColor: '#d33',
+                confirmButtonText: 'Yes, delete it!'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    event.target.closest('form').submit();
+                }
+            });
+            return false;
+        }
+
+        // Ensure SweetAlert is properly initialized
+        document.addEventListener('DOMContentLoaded', function() {
+            if (typeof Swal === 'undefined') {
+                console.error('SweetAlert2 is not loaded!');
+            }
         });
     </script>
 </body>

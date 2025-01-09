@@ -14,6 +14,11 @@ $class_id = (int)$_GET['class_id'];
 // Fetch quiz questions for this class
 $questions_query = "SELECT * FROM quiz_questions WHERE class_id = ?";
 $questions_stmt = mysqli_prepare($conn, $questions_query);
+
+if (!$questions_stmt) {
+    die("Failed to prepare statement for questions: " . mysqli_error($conn));
+}
+
 mysqli_stmt_bind_param($questions_stmt, "i", $class_id);
 mysqli_stmt_execute($questions_stmt);
 $questions_result = mysqli_stmt_get_result($questions_stmt);
@@ -32,6 +37,11 @@ $questions_result = mysqli_stmt_get_result($questions_stmt);
                 // Fetch answers for this question
                 $answers_query = "SELECT * FROM quiz_answers WHERE question_id = ?";
                 $answers_stmt = mysqli_prepare($conn, $answers_query);
+
+                if (!$answers_stmt) {
+                    die("Failed to prepare statement for answers: " . mysqli_error($conn));
+                }
+
                 mysqli_stmt_bind_param($answers_stmt, "i", $question['id']);
                 mysqli_stmt_execute($answers_stmt);
                 $answers_result = mysqli_stmt_get_result($answers_stmt);

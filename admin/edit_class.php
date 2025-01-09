@@ -155,7 +155,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
 </head>
 <body>
-    <div class="container mt-4">
+    <div class="container mt-4 fluid">
         <h1>Edit Class</h1>
         <form action="" method="post" enctype="multipart/form-data">
             <div class="mb-3">

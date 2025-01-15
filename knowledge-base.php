@@ -69,7 +69,7 @@ body {
     box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
     transition: transform 0.3s ease, box-shadow 0.3s ease;
     width: 100%;
-    height: 400px; /* Reduced height */
+    height: 450px; /* Reduced height */
     display: flex;
     flex-direction: column;
 }
@@ -81,7 +81,7 @@ body {
 
 .article-card img {
     width: 100%;
-    height: 150px; /* Reduced image height */
+    height: 1000px; /* Reduced image height */
     object-fit: contain; /* Ensures the image fits well */
 }
 
@@ -118,7 +118,7 @@ body {
 }
 
 .read-more:hover {
-    background-color: #0056b3;
+    background-color:rgb(241, 243, 245);
 }
 
 .footer {

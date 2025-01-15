@@ -37,10 +37,10 @@ $course_id = $class['course_id'];
 
 <div class="container mt-4">
     <h1>Quiz Results - <?php echo htmlspecialchars($class['class_name']); ?></h1>
-    
+
     <?php if (isset($_SESSION['success'])): ?>
         <div class="alert alert-success">
-            <?php 
+            <?php
             echo $_SESSION['success'];
             unset($_SESSION['success']);
             ?>
@@ -50,20 +50,28 @@ $course_id = $class['course_id'];
     <?php if (isset($_SESSION['quiz_data'])): ?>
         <h2>Question Explanations</h2>
         <?php
+        // Fetch the quiz data from the session
         $quiz_data = $_SESSION['quiz_data'];
-        unset($_SESSION['quiz_data']);
-        
+
         foreach ($quiz_data as $question_id => $question_data):
+            // Initialize the required variables
+            $question_text = $question_data['question_text'];
+            $user_selected_answer_id = $question_data['selected_answer_id'];
+            $correct_answer_id = isset($question_data['correct_answer_id']) ? $question_data['correct_answer_id'] : null; // Check if correct_answer_id exists
+            $answers = $question_data['answers'];
         ?>
             <div class="card mb-3">
                 <div class="card-body">
-                    <h5 class="card-title">Question: <?php echo htmlspecialchars($question_data['question_text']); ?></h5>
-                    <?php foreach ($question_data['answers'] as $answer): ?>
+                    <h5 class="card-title">Question: <?php echo htmlspecialchars($question_text); ?></h5>
+                    <?php foreach ($answers as $answer): ?>
                         <div class="mb-2 <?php echo $answer['is_correct'] ? 'text-success' : 'text-danger'; ?>">
                             <strong>Option: <?php echo htmlspecialchars($answer['answer_text']); ?></strong>
-                            <?php if ($answer['id'] == $question_data['selected_answer_id']): ?>
-                                (Your selection)
+                            <?php if ($answer['id'] == $user_selected_answer_id): ?>
+                                <span class="<?php echo $answer['is_correct'] ? 'badge bg-success' : 'badge bg-danger'; ?>">
+                                    (Your selection)
+                                </span>
                             <?php endif; ?>
+
                             <br>
                             Explanation: <?php echo htmlspecialchars($answer['feedback']); ?>
                         </div>
@@ -71,6 +79,8 @@ $course_id = $class['course_id'];
                 </div>
             </div>
         <?php endforeach; ?>
+
+        <?php unset($_SESSION['quiz_data']); ?>
     <?php endif; ?>
 
     <div class="mt-4">

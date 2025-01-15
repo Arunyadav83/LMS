@@ -1,6 +1,10 @@
 <?php
 require_once 'config.php';
 require_once 'functions.php';
+require 'vendor/autoload.php'; // Include PHPMailer
+
+use PHPMailer\PHPMailer\PHPMailer;
+use PHPMailer\PHPMailer\Exception;
 
 $error = '';
 $success = '';
@@ -33,6 +37,41 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             $insert_query = "INSERT INTO users (username, email, password, role) VALUES ('$username', '$email', '$hashed_password', 'student')";
             if (mysqli_query($conn, $insert_query)) {
                 $success = "Registration successful. You can now log in.";
+
+                // Send confirmation email
+                $mail = new PHPMailer(true);
+                try {
+                    // SMTP configuration
+                    $mail->isSMTP();
+                    $mail->Host = 'smtp.hostinger.com'; // Replace with your SMTP server
+                    $mail->SMTPAuth = true;
+                    $mail->Username = 'arun.bhairi@ultrakeyit.com'; // Replace with your email
+                    $mail->Password = 'Arun@1234'; // Replace with your email password
+                    $mail->SMTPSecure = PHPMailer::ENCRYPTION_STARTTLS;
+                    $mail->Port = 587;
+
+                    // Email settings
+                    $mail->setFrom('arun.bhairi@ultrakeyit.com', 'Ultrakey Learning'); // Replace with your email and name
+                    $mail->addAddress($email, $username);
+
+                    $mail->isHTML(true);
+                    $mail->Subject = 'Welcome to Our Website!';
+                    $mail->Body = "
+                        <h2>Thank you for registering with us!</h2>
+                        <p>Hi <b>$username</b>,</p>
+                        <p>We are thrilled to have you on board. Below are your login details:</p>
+                        <ul>
+                            <li><b>Email:</b> $email</li>
+                            <li><b>Password:</b> $password</li>
+                        </ul>
+                        <p>Please keep this information secure.</p>
+                        <p>Best regards,<br>Your Website Team</p>
+                    ";
+
+                    $mail->send();
+                } catch (Exception $e) {
+                    $error = "Registration successful, but email could not be sent. Error: {$mail->ErrorInfo}";
+                }
             } else {
                 $error = "Registration failed. Please try again.";
             }
@@ -45,11 +84,13 @@ include 'header.php';
 <style>
     body {
         background-color: rgb(151, 192, 232);
+        height: 800px;
     }
 
     .form-container {
         max-width: 500px;
-        margin: 80px auto 0;
+        /* height: 800px; */
+        margin: 100px auto 30px;
         /* Increased top margin to 80px */
         background: #ffffff;
         padding: 20px;
@@ -64,8 +105,13 @@ include 'header.php';
         margin-bottom: 20px;
     }
 
-    .form-heading img {
-        width: 50px;
+    h2 {
+        margin-top: 4%;
+        margin-left: 3%;
+    }
+
+    img {
+        width: 100px;
         height: 50px;
 
     }

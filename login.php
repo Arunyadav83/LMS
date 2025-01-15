@@ -70,10 +70,9 @@ $result = mysqli_query($conn, $query);
             timer: 2000, // Set a timer of 2 seconds before redirect
             timerProgressBar: true, // Optionally show a progress bar
         }).then((result) => {
-           
-                window.location.href = 'index.php'; // Redirect to the homepage after timer
-            }
-        );
+
+            window.location.href = 'index.php'; // Redirect to the homepage after timer
+        });
     </script>
 <?php elseif ($error): ?>
     <script>
@@ -88,123 +87,146 @@ $result = mysqli_query($conn, $query);
 <!-- Bootstrap 5 -->
 <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
 <style>
-    /* Centering the form */
+    /* Overall container styling */
     .login-container {
-    max-width: 400px;
-    margin: 130px auto 50px auto; /* Increased top margin */
-    padding: 30px;
-    border: 1px solid #ddd;
-    border-radius: 8px;
-    background-color: #f9f9f9;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-}
+        display: flex;
+        align-items: center;
+        margin: 30px;
+        justify-content: center;
+        height: 80vh;
+        padding: 20px;
+        background-color: #f9f9f9;
+        border: 1px solid #ddd;
+        border-radius: 8px;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        max-width: 800px;
+        margin: 0 auto;
+    }
 
+    /* User login image */
+    .user-login-image {
+        width: 200px;
+        /* Adjust width as needed */
+        height: auto;
+        border-radius: 10px;
+        margin-right: 30px;
+        /* Space between image and form */
+        box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.2);
+    }
 
-    .login-container h2 {
-        text-align: center;
-        margin-bottom: 20px;
+    /* Form container */
+    .form-container {
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: flex-start;
+        max-width: 400px;
+    }
+
+    /* Logo and heading styling */
+    .logo-image {
+        width: 50px;
+        height: auto;
+        margin-bottom: 10px;
+    }
+
+    .form-container h2 {
+        display: flex;
+        align-items: center;
         font-size: 24px;
+        margin-bottom: 20px;
         color: #333;
     }
 
-    .form-control {
-        width: 100%;
-        max-width: 350px;
+    .form-container h2 img {
+        margin-right: 10px;
     }
 
-    /* Styling the buttons */
+    /* Form styling */
+    .form-control {
+        width: 100%;
+        padding: 10px;
+        margin: 10px 0;
+        border: 1px solid #ccc;
+        border-radius: 4px;
+        font-size: 16px;
+    }
+
+    /* Button styling */
+    .btn-container {
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+        width: 100%;
+    }
+
     .btn-primary {
         width: 100%;
         padding: 10px;
         font-size: 16px;
+        background-color: #007bff;
+        color: white;
+        border: none;
         border-radius: 5px;
+        cursor: pointer;
+    }
+
+    .btn-primary:hover {
+        background-color: #0056b3;
     }
 
     .btn-link {
-        color: #007bff;
         font-size: 14px;
+        color: #007bff;
         text-decoration: none;
+        text-align: center;
     }
 
     .btn-link:hover {
         text-decoration: underline;
     }
 
-    /* Add some space between the buttons */
-    .mb-3 {
-        margin-bottom: 20px;
-    }
-
-    /* Add margin for the register link */
+    /* Register link styling */
     .register-link {
         text-align: center;
-        margin-top: 20px;
+        margin-top: 15px;
         font-size: 14px;
     }
-
-    img {
-        width: 100px;
-        height: 6%;
-        margin-right: 14%;
-
-    }
-    /* Styling the buttons */
-.btn-primary, .btn-link {
-    padding: 10px;
-    font-size: 16px;
-    border-radius: 5px;
-    width: 48%; /* Adjust the width to fit the buttons side by side */
-}
-
-.btn-primary {
-    background-color: #007bff;
-    color: white;
-}
-
-.btn-link {
-    color: #007bff;
-    font-size: 14px;
-    text-decoration: none;
-}
-
-.btn-link:hover {
-    text-decoration: underline;
-}
-
-/* Add some space between the buttons */
-.btn-container {
-    display: flex;
-    justify-content: space-between;
-    gap: 10px; /* Optional gap between buttons */
-}
-
-/* Add space between form inputs */
-.mb-3 {
-    margin-bottom: 20px;
-}
-
 </style>
 
+
 <div class="login-container">
-    <h2>
-        <img src="assets/images/logo2.png" alt="Logo"> Student Login
-    </h2>
-    <form action="login.php" method="post">
-        <div class="mb-3">
-            <label for="username" class="form-label">Username</label>
-            <input type="text" class="form-control" id="username" name="username" required>
-        </div>
-        <div class="mb-3">
-            <label for="password" class="form-label">Password</label>
-            <input type="password" class="form-control" id="password" name="password" required>
-        </div>
-        <div class="btn-container">
-            <button type="submit" class="btn btn-primary">Login</button>
-            <button type="button" class="btn btn-link" onclick="window.location.href='forgot_password.php';">Forgot Password</button>
-        </div>
-                <p class="register-link">Don't have an account? <a href="register.php">Register here</a></p>
-    </form>
+    <!-- Left side image -->
+    <img src="assets/images/userlogin.png" alt="User Login" class="user-login-image">
+
+    <!-- Right side login form -->
+    <div class="form-container">
+        <h2>
+            <img src="assets/images/logo2.png" alt="Logo" class="logo-image">
+            Student Login
+        </h2>
+        <form action="login.php" method="post">
+            <div class="mb-3">
+                <label for="username" class="form-label">Username</label>
+                <input type="text" class="form-control" id="username" name="username" required>
+            </div>
+            <div class="mb-3">
+                <label for="password" class="form-label">Password</label>
+                <input type="password" class="form-control" id="password" name="password" required>
+            </div>
+            <div class="btn-container">
+                <button type="submit" class="btn btn-primary">Login</button>
+                <button type="button" class="btn btn-link" onclick="window.location.href='forgot_password.php';">Forgot Password</button>
+            </div>
+            <p class="register-link">
+                Don't have an account? <a href="register.php">Register here</a>
+            </p>
+        </form>
+    </div>
 </div>
+
+
+
 
 <!-- Bootstrap 5 JavaScript -->
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>

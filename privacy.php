@@ -57,6 +57,7 @@ session_start();
         @media (max-width: 768px) {
             .hero-image {
                 max-height: 250px;
+                margin-top: 55px;
                 object-fit: contain;
             }
         }
@@ -180,9 +181,9 @@ session_start();
 
     <?php include 'header.php'; ?>
 
-    <img src="assets/images/privacypolicy.jpg" alt="Privacy Policy" class="hero-image">
+    <img src="assets/images/privacypolicy.jpg " alt="Privacy Policy" class="hero-image">
 
-    <div class="content container" style="margin-bottom: 5%;">
+    <div class="content container-fluid" style="margin-bottom: 5%;">
         <h2 style="color: #6ab1e7;">Embarking on a Secure Learning Adventure</h2>
         <p>
             Welcome to UltraKey Learning, where your privacy is our north star. As you navigate through our

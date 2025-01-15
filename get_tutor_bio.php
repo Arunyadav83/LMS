@@ -76,13 +76,13 @@ if (isset($_GET['id'])) {
                     .tutor-info h1,
                     .tutor-info h2 {
                         margin: 0;
-                        color: lightseagreen;
+                        color: #0433c3;
                     }
 
                     .tutor-info h2 {
                         margin-top: 10px;
                         font-size: 1.2rem;
-                        color: lightgrey;
+                        color: lightblue;
                     }
 
                     .tutor-info p {

@@ -12,42 +12,71 @@ if (!is_admin_logged_in()) {
 $current_page = 'index';
 
 // Fetch user counts from the database
-$query = "SELECT COUNT(*) AS total_users, 
-                 SUM(CASE WHEN role = 'instructor' THEN 1 ELSE 0 END) AS total_instructors, 
-                 SUM(CASE WHEN role = 'student' THEN 1 ELSE 0 END) AS total_students 
-                 
+$query = "SELECT 
+            COUNT(*) AS total_users, 
+            SUM(CASE WHEN role = 'student' THEN 1 ELSE 0 END) AS total_students 
           FROM users"; // Assuming 'users' is your table name
-$result = mysqli_query($conn, $query);
-$row = mysqli_fetch_assoc($result);
 
-$total_users = $row['total_users'];
-$total_instructors = $row['total_instructors'];
-$total_students = $row['total_students'];
+$result = mysqli_query($conn, $query);
+
+if ($result) {
+    $row = mysqli_fetch_assoc($result);
+
+    $total_users = $row['total_users'];
+    $total_students = $row['total_students'];
+} else {
+    echo "Error: " . mysqli_error($conn);
+    $total_users = 0;
+    $total_students = 0;
+}
+
+// Fetch total instructors count from the tutors table
+$tutors_count_query = "SELECT COUNT(*) AS total_instructors FROM tutors"; // Assuming 'tutors' is your table name
+$tutors_count_result = mysqli_query($conn, $tutors_count_query);
+
+if ($tutors_count_result) {
+    $row_tutors = mysqli_fetch_assoc($tutors_count_result);
+    $total_instructors = $row_tutors['total_instructors'];
+} else {
+    echo "Error: " . mysqli_error($conn);
+    $total_instructors = 0;
+}
 
 // Fetch total courses count
 $query_courses = "SELECT COUNT(*) AS total_courses FROM courses"; // Assuming 'courses' is your table name
 $result_courses = mysqli_query($conn, $query_courses);
-$row_courses = mysqli_fetch_assoc($result_courses);
-$total_courses = $row_courses['total_courses'];
 
-// Fetch recent activities
+if ($result_courses) {
+    $row_courses = mysqli_fetch_assoc($result_courses);
+    $total_courses = $row_courses['total_courses'];
+} else {
+    echo "Error: " . mysqli_error($conn);
+    $total_courses = 0;
+}
+
+// Fetch recent activities (latest course)
 $query_recent = "SELECT title, created_at FROM courses ORDER BY created_at DESC LIMIT 1"; // Fetch the latest course
 $result_recent = mysqli_query($conn, $query_recent);
-$recent_courses = mysqli_fetch_all($result_recent, MYSQLI_ASSOC);
+
+if ($result_recent) {
+    $recent_courses = mysqli_fetch_all($result_recent, MYSQLI_ASSOC);
+} else {
+    echo "Error: " . mysqli_error($conn);
+    $recent_courses = [];
+}
 
 // Fetch unread messages count
 $query_unread = "SELECT COUNT(*) AS unread_count FROM messages WHERE status = 'unread'"; // Adjust the table and column names as necessary
 $result_unread = mysqli_query($conn, $query_unread);
 
-// Check if the query was successful
 if ($result_unread) {
     $row_unread = mysqli_fetch_assoc($result_unread);
     $unread_count = $row_unread['unread_count'];
 } else {
-    // Output the error message
     echo "Error: " . mysqli_error($conn);
     $unread_count = 0; // Set to 0 or handle as needed
 }
+
 
 
 // Query to fetch total revenue from the payments table
@@ -76,42 +105,54 @@ if ($result) {
     $most_enrolled_courses = []; // Handle as needed
 }
 $query = "
-    SELECT 
-        enrollments.user_id,
-        courses.title AS course_title,
-        enrollments.enrolled_at
-    FROM 
-        enrollments
-    INNER JOIN courses ON enrollments.course_id = courses.id
-    ORDER BY enrollments.enrolled_at DESC
-    LIMIT 3
+  SELECT 
+    enrollments.user_id,
+    users.username, 
+    courses.title AS course_title,
+    enrollments.enrolled_at
+FROM 
+    enrollments
+INNER JOIN users ON enrollments.user_id = users.id
+INNER JOIN courses ON enrollments.course_id = courses.id
+ORDER BY enrollments.enrolled_at DESC
+LIMIT 3;
+
 ";
-$recent_enrollments =mysqli_query($conn, $query);
+$recent_enrollments = mysqli_query($conn, $query);
 function time_ago($datetime, $full = false)
 {
-    $now = new DateTime();
-    $ago = new DateTime($datetime);
+    // Set the time zone to match your data
+    $timezone = new DateTimeZone('Asia/Kolkata'); // Adjust to your time zone
+
+    $now = new DateTime('now', $timezone);
+    $ago = new DateTime($datetime, $timezone);
     $diff = $now->diff($ago);
 
-    // Ensure that the difference is calculated correctly
+    // If the time is in the future, return "just now"
     if ($diff->invert) {
-        return 'just now'; // If the time is in the future
+        return 'just now';
     }
 
-    // Check if the time difference is less than 1 minute
+    // Handle cases for less than 1 minute
     if ($diff->h == 0 && $diff->i == 0 && $diff->s < 60) {
-        return 'just now'; // Show "just now" for activities within the last minute
+        return 'just now';
     }
 
-    // Check if the time difference is less than 30 minutes
-    if ($diff->h == 0 && $diff->i < 30) {
-        return $diff->i . ' minute' . ($diff->i > 1 ? 's' : '') . ' ago'; // Show minutes for activities within the last 30 minutes
+    // Handle cases for less than 1 hour
+    if ($diff->h == 0 && $diff->i > 0) {
+        return $diff->i . ' minute' . ($diff->i > 1 ? 's' : '') . ' ago';
     }
 
-    // Manually calculate weeks based on days
+    // Handle cases for hours
+    if ($diff->h > 0 && $diff->d == 0) {
+        return $diff->h . ' hour' . ($diff->h > 1 ? 's' : '') . ' ago';
+    }
+
+    // Calculate weeks manually based on days
     $weeks = floor($diff->d / 7);
-    $diff->d -= $weeks * 7; // Update days after calculating weeks
+    $diff->d -= $weeks * 7;
 
+    // Build the time difference string
     $string = [];
     $units = [
         'y' => 'year',
@@ -289,6 +330,7 @@ function time_ago($datetime, $full = false)
 
         .navbar {
             background-color: #16308b;
+
         }
 
         .text-right {
@@ -325,7 +367,10 @@ function time_ago($datetime, $full = false)
 
 <body>
     <!-- Navigation Bar -->
-    <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark ">
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
         <div class="container-fluid">
             <a class="navbar-brand" href="index.php">LMS Admin</a>
             <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
@@ -373,7 +418,7 @@ function time_ago($datetime, $full = false)
                                         ₹<?php echo number_format($total_revenue, 0); ?> <!-- Display total revenue -->
                                     </h3>
                                     <!-- Additional description text -->
-                                    <small  style="font-size: 0.9rem; color: white;">As of Today</small>
+                                    <small style="font-size: 0.9rem; color: white;">As of Today</small>
 
                                 </div>
                             </div>
@@ -433,32 +478,55 @@ function time_ago($datetime, $full = false)
 
                     <!-- Recent Activity Section -->
                     <div class="card dashboard-card">
-    <div class="card-header bg-white">
-        <h5 class="card-title mb-0" style="color: #0433c3;">Recent Activities</h5>
-    </div>
-    <div class="card-body">
-        <div class="d-flex align-items-center flex-wrap gap-4">
-            <!-- Heading on the left -->
-            <div class="text-left">
-                <h6 class="mb-1">Recent Enrollments:</h6>
-            </div>
+                        <div class="card-header bg-white">
+                            <h5 class="card-title mb-0" style="color: #0433c3;">Recent Activities</h5>
+                        </div>
+                        <div class="card-body">
+                            <!-- Recent Enrollments Section -->
+                            <div class="d-flex align-items-center flex-wrap gap-4 mb-4">
+                                <!-- Heading for Recent Enrollments -->
+                                <div class="text-left w-100">
+                                    <h6 class="mb-3">Recent Enrollments:</h6>
+                                </div>
 
-            <!-- Loop through enrollments -->
-            <?php foreach ($recent_enrollments as $enrollment): ?>
-                <div class="d-flex flex-row gap-2 justify-items-between align-items-center text-center activity-item">
-                    <p class="text-muted mb-1">
-                        <?php echo htmlspecialchars($enrollment['user_id']); ?> 
-                        enrolled in 
-                        "<?php echo htmlspecialchars($enrollment['course_title']); ?>"
-                    </p>
-                    <small class="text-muted">
-                        <?php echo time_ago($enrollment['enrolled_at']); ?>
-                    </small>
-                </div>
-            <?php endforeach; ?>
-        </div>
-    </div>
-</div>
+                                <!-- Loop through enrollments -->
+                                <!-- Loop through enrollments -->
+                                <?php foreach ($recent_enrollments as $enrollment): ?>
+                                    <div class="d-flex flex-row gap-2 justify-items-between align-items-center text-center activity-item">
+                                        <p class="text-muted mb-1">
+                                            <!-- User ID: <?php echo htmlspecialchars($enrollment['user_id']); ?> -->
+                                            <strong><?php echo htmlspecialchars($enrollment['username']); ?></strong>
+                                            enrolled in
+                                            "<?php echo htmlspecialchars($enrollment['course_title']); ?>"
+                                        </p>
+                                        <small class="text-muted">
+                                            <?php echo time_ago($enrollment['enrolled_at']); ?>
+                                        </small>
+                                    </div>
+                                <?php endforeach; ?>
+
+                            </div>
+
+                            <!-- New Courses Added Section -->
+                            <div class="d-flex flex-wrap gap-4">
+                                <!-- Heading for New Courses -->
+                                <div class="text-left w-100">
+                                    <h6 class="mb-3">New Courses Added:</h6>
+                                </div>
+
+                                <!-- Loop through courses -->
+                                <?php foreach ($recent_courses as $course): ?>
+                                    <div class="d-flex align-items-center gap-3 activity-item">
+                                        <p class="mb-0 text-dark fw-bold"><?php echo htmlspecialchars($course['title']); ?></p>
+                                        <small class="text-muted"><?php echo time_ago($course['created_at']); ?></small>
+                                        <span class="badge bg-primary rounded-pill">New</span>
+                                    </div>
+                                <?php endforeach; ?>
+                            </div>
+
+                        </div>
+                    </div>
+
 
                     <div class="card dashboard-card">
                         <div class="card-header bg-white">

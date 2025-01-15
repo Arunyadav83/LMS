@@ -89,7 +89,14 @@ $tutor_filter = isset($_GET['tutor']) ? $_GET['tutor'] : '';
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
 </head>
+<style>
+    .navbar{
+        background-color:#1a237e !important;
+            margin: auto;
+            padding: 0px 5px;
+    }
 
+</style>
 <body>
     <!-- Navigation Bar -->
     <nav class="navbar navbar-expand-lg navbar-dark bg-dark">

@@ -47,11 +47,11 @@
                     <i class="fas fa-video"></i> Videos
                 </a>
             </li>
-            <li class="nav-item">
+            <!-- <li class="nav-item">
                 <a class="nav-link <?php echo ($current_page == 'certificate') ? 'active' : ''; ?>" href="certificate.php">
                     <i class="fas fa-certificate"></i> Certificate
                 </a>
-            </li>
+            </li> -->
             <li class="nav-item">
                 <a class="nav-link <?php echo ($current_page == 'quiz_result') ? 'active' : ''; ?>" href="quiz_result.php">
                     <i class="fas fa-poll"></i> Quiz Result
@@ -108,15 +108,47 @@
         margin-bottom: 10px;
     }
 
-    /* Responsive Sidebar */
-    @media (max-width: 768px) {
+ /* Responsive Sidebar */
+    /* @media (max-width: 768px) {
         .sidebar {
             min-height: auto;
             padding: 20px;
+            transform: translateX(-100%);
         }
 
+        .sidebar-toggle {
+        position: fixed;
+        top: 10px;
+        left: 10px;
+        z-index: 1100;
+        background: #16308b;
+        color: #fff;
+        border: none;
+        padding: 10px 15px;
+        border-radius: 5px;
+        cursor: pointer;
+    } */
+    
+    .sidebar.show {
+        transform: translateX(0);
+    }
         .nav-link {
             font-size: 1rem;
         }
-    }
+    
 </style>
+<script>
+    // JavaScript to toggle the sidebar on smaller screens
+document.addEventListener("DOMContentLoaded", function () {
+    const sidebar = document.querySelector('.sidebar');
+    const toggleButton = document.createElement('button');
+    toggleButton.className = 'sidebar-toggle';
+    toggleButton.innerText = '☰';
+    document.body.appendChild(toggleButton);
+
+    toggleButton.addEventListener('click', function () {
+        sidebar.classList.toggle('show');
+    });
+});
+
+</script>

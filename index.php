@@ -44,7 +44,7 @@ include 'header.php';
     <div class="hero-overlay"></div>
 
     <div class="container position-relative">
-        <h4 class="display-4 mb-4 animate__animated animate__fadeInDown">Welcome to Ultrakey Learning</h4>
+        <h4 class="display-4 mb-4 animate__animated animate__fadeInDown" style="margin-top: 97px;">Welcome to Ultrakey Learning</h4>
         <p class="lead mb-4 animate__animated animate__fadeInUp">Empower your future with our cutting-edge online courses</p>
         <?php if (!is_logged_in()): ?>
             <a href="register.php" class="btn btn-primary btn-lg me-2 animate__animated animate__fadeInLeft">Get Started</a>
@@ -158,12 +158,12 @@ include 'header.php';
                         <div class="card h-100 animate__animated animate__fadeIn" style="height: 150px; overflow: hidden;">
                             <img
                                 src="assets/images/<?php echo htmlspecialchars($course['title'], ENT_QUOTES, 'UTF-8'); ?>.jpg" style="height: 180px; width: 100%; object-fit: contain;">
-                            <div class="card-body" style="padding: 40px;">
+                            <div class="card-body" style="padding: 28px;">
                                 <h5 class="card-title" style="font-size: 14px;"><?php echo htmlspecialchars($course['title']); ?></h5>
                                 <p class="card-text" style="font-size: 12px;"><?php echo htmlspecialchars(substr($course['description'], 0, 60)) . '...'; ?></p>
                                 <p class="card-text" style="font-size: 10px;"><small class="text-muted">Tutor: <?php echo htmlspecialchars($course['tutor_name']); ?></small></p>
                             </div>
-                            <div class="card-footer bg-transparent border-0" style="padding: 35px; display: flex; justify-content: center; align-items: center; margin-top: -10px;">
+                            <div class="card-footer bg-transparent border-0" style="padding: 20px; display: flex; justify-content: center; align-items: center; margin-top: -10px;">
                                 <?php if (is_logged_in()): ?>
                                     <a href="course.php?id=<?php echo $course['id']; ?>" class="btn btn-primary btn-sm" style="margin-right: 10px;">View Course</a>
                                     <a href="courses.php" class="btn btn-success btn-sm">Enroll</a>
@@ -346,7 +346,7 @@ include 'header.php';
 </script>
 <style>
     #explore {
-        background-color: rgb(233, 245, 247);
+        background-color: rgb(180, 218, 228);
         /* Light Cyan */
         padding: 20px;
         border-radius: 10px;

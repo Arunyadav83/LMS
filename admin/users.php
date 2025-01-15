@@ -165,7 +165,7 @@ function renderTutorsGrid($tutors)
                                 <div class="d-flex justify-content-between align-items-start">
                                     <div>
                                         <h5 class="card-title">' . htmlspecialchars($tutor['full_name'] ?? 'N/A') . '</h5>
-                                        <p class="card-text">
+                                        <p class="card-text" style="margin-inline:6%">
                                             <strong>Username:</strong> ' . htmlspecialchars($tutor['username']) . '<br>
                                             <strong>Email:</strong> ' . htmlspecialchars($tutor['email']) . '<br>
                                             <strong>Specialization:</strong> ' . htmlspecialchars($tutor['specialization'] ?? 'N/A') . '<br>
@@ -384,108 +384,259 @@ $view = isset($_GET['view']) ? $_GET['view'] : 'grid';
 
 </head>
 <style>
-    .row {
-        margin-left: 0px;
-        /* gap: 20px; */
-
+    body {
+        font-family: Arial, sans-serif;
+        background-color: #f8f9fa;
+        margin: 0;
+        padding: 0px;
     }
+
+    /* .row {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 20px;
+        justify-content: center;
+    } */
+
+    /* Default styling for larger screens */
+   /* Default styling for larger screens */
+.responsive-buttons {
+    margin-left: 840px;
+    margin-top: -7%;
+    text-align: right; /* Align to the right for larger screens */
+}
+
+/* Button spacing and styling */
+.responsive-buttons a {
+    margin: 5px; /* Add spacing between buttons */
+    padding: 10px 20px; /* Increase clickable area */
+    font-size: 14px; /* Adjust text size */
+}
+
+/* For screens between 468px and 768px */
+@media (max-width: 768px) and (min-width: 468px) {
+    .responsive-buttons {
+        margin-left: auto; /* Center the buttons horizontally */
+        margin-right: auto;
+        margin-top: 10px;
+        text-align: center; /* Align center for medium screens */
+    }
+
+    .responsive-buttons a {
+        margin: 5px; /* Spacing between buttons */
+        font-size: 16px; /* Slightly larger text */
+        padding: 12px 25px; /* Adjust padding for better appearance */
+    }
+}
+
+/* For screens below 468px */
+@media (max-width: 467px) {
+    .responsive-buttons {
+        margin-left: auto;
+        margin-right: auto;
+        margin-top: 15px;
+        text-align: center; /* Center buttons */
+    }
+
+    .responsive-buttons a {
+        display: block; /* Stack buttons vertically */
+        margin: 10px auto; /* Add vertical spacing */
+        width: 90%; /* Full width with some margin */
+        font-size: 16px; /* Increase text size for readability */
+        padding: 15px; /* Larger padding for smaller screens */
+    }
+}
+
 
     .card {
-        height: 200px;
-        margin: 20px;
+        background-color: #ffffff;
+        border: 1px solid #ddd;
+        border-radius: 8px;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        overflow: hidden;
+        margin: 6%;
+        transition: transform 0.2s, box-shadow 0.2s;
     }
 
-    .btn-navy {
-        background-color: navy;
+    .card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+    }
+
+    .card-body {
+        padding: 20px;
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+
+    }
+
+    .card-title {
+        font-size: 18px;
+        font-weight: bold;
+        color: #333;
+        margin: 0;
+    }
+
+    .card-text {
+        font-size: 14px;
+        color: #666;
+        margin: 0;
+    }
+
+    .btn {
+        font-size: 14px;
+        padding: 6px 12px;
+        border-radius: 5px;
+        transition: background-color 0.2s, color 0.2s;
+        background-color: #0433c3;
         color: white;
-        border-radius: 0.6px;
-        border: none;
     }
 
-    .btn-navy:hover {
-        background-color: white;
-        color: black;
+    .btn-info {
+        background-color: #17a2b8;
+        color: #fff;
+        text-decoration: none;
     }
 
-    .table {
+    .btn-info:hover {
+        background-color: #138496;
+        color: #fff;
+    }
 
-        background-color: transparent;
-        margin-top: 4%;
+    /* .dropdown {
+        position: relative;
+    } */
+    /* 
+    .dropdown .dropdown-menu {
+        position: absolute;
+        top: 100%;
+        right: 0;
+        background-color: #fff;
+        border: 1px solid #ddd;
+        border-radius: 8px;
+        padding: 10px 0;
+        width: 200px;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        display: none;
+    } */
+    /*                 
+
+    /* .dropdown-item {
+        padding: 10px 20px;
+        font-size: 14px;
+        color: #333;
+        text-decoration: none;
+        display: block;
+    } */
+
+    /* .dropdown-item:hover {
+        background-color: #f1f1f1;
+    } */
+
+    .modal-content {
+        border-radius: 10px;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    }
+
+    .form-label {
+        font-size: 14px;
+        font-weight: bold;
+        color: #333;
+    }
+
+    .form-control {
+        font-size: 14px;
+        padding: 10px;
+        border-radius: 5px;
+        border: 1px solid #ddd;
+    }
+
+    .btn-primary {
+        background-color: #007bff;
+        color: #fff;
+    }
+
+    .btn-primary:hover {
+        background-color: #0056b3;
+    }
+
+
+    .navbar-brand {
+        font-size: 20px;
+        /* margin-inline-start: 20px; */
+        color: white;
+
 
     }
 
-    #addTutorOffCanvas {
-        width: 700px;
+    .nav-link {
+        color: white;
+        padding-inline: 20px;
+        text-decoration: underline;
+
     }
 
-    @media (max-width: 768px) {
-        .card-title {
-            font-size: 1rem;
-        }
-
-        .card-text {
-
-            font-size: 0.9rem;
-
-            
-                /* font-size: 0.9rem; */
-                line-height: 1.5;
-                /* Adjust the spacing between lines */
-                margin-bottom: 10px;
-                /* Add space between paragraphs or elements inside the card */
-            
-
-        }
-
-        .table th,
-        .table td {
-            font-size: 0.85rem;
-        }
+    .nav-link:hover {
+        color: white;
+        /* text-decoration: underline; */
     }
 
-    @media (max-width: 576px) {
-        .card-title {
-            font-size: 0.9rem;
-        }
+    .navbar {
+        background-color: #16308b;
+        margin: auto;
+        padding: 3px;
+        /* Adjust top-bottom and left-right padding to reduce height */
+        line-height: 1.2;
+        /* Reduce line height for inner elements */
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        /* Optional: Adds a subtle shadow for depth */
+    }
 
-        .card-text {
-            font-size: 0.8rem;
-        }
 
-        .dropdown-menu {
-            font-size: 0.85rem;
-        }
+    .button {
+        padding-inline: 10px;
+        text-decoration: none;
+        color: #0433c3;
+        padding-block: 10px;
 
-        .table th,
-        .table td {
-            font-size: 0.75rem;
-        }
+    }
 
-        .navbar-brand {
-            font-size: 1rem;
-        }
+    .button:hover {
+        background-color: #0433c3;
+        color: white;
+        border-radius: 30px !important;
+    }
 </style>
 
 <body>
     <!-- Navigation Bar -->
-    <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+    <nav class="navbar navbar-expand-lg custom-navbar" style="background-color: #1a237e;padding: 0px 3px; !important">
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
         <div class="container-fluid">
-            <a class="navbar-brand" href="#">LMS Admin</a>
+            <a class="navbar-brand text-light fw-bold" href="index.php">LMS Admin</a>
             <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
                 <span class="navbar-toggler-icon"></span>
             </button>
-            <div class="collapse navbar-collapse" id="navbarNav">
-                <ul class="navbar-nav ms-auto">
+            <div class="collapse navbar-collapse justify-content-end" id="navbarNav">
+                <ul class="navbar-nav align-items-center">
                     <li class="nav-item">
-                        <a class="nav-link" href="#"><i class="fas fa-user"></i> Profile</a>
+                        <a class="nav-link text-light d-flex align-items-center" href="#">
+                            <i class="fas fa-user me-2"></i> Profile
+                        </a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="logout.php"><i class="fas fa-sign-out-alt"></i> Logout</a>
+                        <a class="nav-link text-light d-flex align-items-center" href="logout.php">
+                            <i class="fas fa-sign-out-alt me-2"></i> Logout
+                        </a>
                     </li>
                 </ul>
             </div>
         </div>
     </nav>
+
 
     <div class="container-fluid">
         <div class="row">
@@ -495,11 +646,11 @@ $view = isset($_GET['view']) ? $_GET['view'] : 'grid';
             <!-- Main Content -->
             <main class="col-md-9 ms-sm-auto col-lg-10 px-md-4">
                 <div class="container mt-4">
-                    <h1 class="mb-4">Tutors</h1>
+                    <h1 class="mb-4" style="color:#16308b ;">Tutors</h1>
 
                     <!-- Add Tutor Button -->
                     <div class="mb-3">
-                        <button type="button" class="btn btn-navy" data-bs-toggle="offcanvas" data-bs-target="#addTutorOffCanvas" aria-controls="addTutorOffCanvas">
+                        <button type="button" class="btn btn-navy" data-bs-toggle="offcanvas" data-bs-target="#addTutorOffCanvas" aria-controls="addTutorOffCanvas" style="margin-bottom: 3%;">
                             Add Tutor
                         </button>
                     </div>
@@ -551,14 +702,15 @@ $view = isset($_GET['view']) ? $_GET['view'] : 'grid';
 
 
                     <!-- Add View Toggle Buttons -->
-                    <div class="mb-3" style="margin-left: 840px; margin-top: -7%;">
+                    <div class="mb-3 responsive-buttons">
                         <a href="?view=grid" class="btn btn-primary">
-                            <i class="fa fa-th-large"></i>
+                            <i class="fa fa-th-large"></i> Grid
                         </a>
                         <a href="?view=list" class="btn btn-secondary">
-                            <i class="fa fa-list"></i>
+                            <i class="fa fa-list"></i> List
                         </a>
                     </div>
+
 
 
 

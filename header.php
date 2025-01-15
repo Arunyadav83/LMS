@@ -3,10 +3,12 @@ require_once 'config.php';
 require_once 'functions.php';
 if (session_status() === PHP_SESSION_NONE) {
     session_start();
+    // echo "Session started successfully!";
 }
 ?>
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -19,21 +21,27 @@ if (session_status() === PHP_SESSION_NONE) {
     <link rel="stylesheet" href="styles.css">
     <style>
         .container {
-            margin-top: 20px;
+            margin-top: 20px !important;
             position: relative;
         }
+
         .navbar {
             padding: 0.4px 10px !important;
         }
+
         .dropdown-item:hover {
-            background-color: #f8f9fa; /* Light background on hover */
-            color:#007bff; /* Change text color on hover */
+            background-color: #f8f9fa;
+            /* Light background on hover */
+            color: #007bff;
+            /* Change text color on hover */
         }
+
         /* .nav-link.dropdown-toggle:hover {
           padding: 0.5rem 1rem !important;
         } */
     </style>
 </head>
+
 <body>
     <nav class="navbar navbar-expand-lg navbar-light bg-light fixed-top">
         <div class="container">
@@ -61,7 +69,9 @@ if (session_status() === PHP_SESSION_NONE) {
                             </a>
                             <ul class="dropdown-menu" aria-labelledby="navbarDropdown">
                                 <li><a class="dropdown-item" href="user_profile.php"><i class="fas fa-id-card"></i> Profile</a></li>
-                                <li><hr class="dropdown-divider"></li>
+                                <li>
+                                    <hr class="dropdown-divider">
+                                </li>
                                 <li><a class="dropdown-item" href="logout.php"><i class="fas fa-sign-out-alt"></i> Logout</a></li>
                             </ul>
                         </li>
@@ -84,4 +94,5 @@ if (session_status() === PHP_SESSION_NONE) {
     <!-- Bootstrap JS -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
 </body>
+
 </html>

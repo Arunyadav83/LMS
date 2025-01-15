@@ -3,6 +3,7 @@ session_start();
 
 require_once '../config.php';
 require_once '../functions.php';
+
 if (isset($_GET['logout']) && $_GET['logout'] == 1) {
     // Destroy the session
     session_unset();
@@ -25,11 +26,12 @@ function ensure_directory_exists($path)
 if (isset($_GET['logout'])) {
     session_unset();
     session_destroy();
-    
+
     // Redirect to index.php after logging out
     header("Location: index.php");
     exit();
 }
+
 if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['login'])) {
     $email = mysqli_real_escape_string($conn, $_POST['email']);
     $password = $_POST['password'];
@@ -69,9 +71,6 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['login'])) {
     }
 }
 
-
-
-
 // Check if the user is logged in and is a tutor
 if (!isset($_SESSION['user_id']) || !isset($_SESSION['role']) || $_SESSION['role'] !== 'instructor') {
     // If not logged in, show login form
@@ -88,39 +87,37 @@ if (!isset($_SESSION['user_id']) || !isset($_SESSION['role']) || $_SESSION['role
             .mb-4 {
                 color: #0433c3;
                 font-size: 35px;
-              
+                margin: 20px;
             }
 
             .form-label {
                 color: blue
             }
-            
         </style>
     </head>
 
     <body>
-        <div class="container mt-5">
-            <div class="row justify-content-center">
-                <div class="col-md-6">
-                    <h2 class="mb-4">Tutor Login</h2>
-                    <?php if (isset($error)): ?>
-                        <div class="alert alert-danger"><?php echo $error; ?></div>
-                    <?php endif; ?>
-                    <form method="post" action="">
-                        <div class="mb-3">
-                            <label for="email" class="form-label">Email address</label>
-                            <input type="email" class="form-control" id="email" name="email" required>
-                        </div>
-                        <div class="mb-3">
-                            <label for="password" class="form-label">Password</label>
-                            <input type="password" class="form-control" id="password" name="password" required>
-                        </div>
-                        <button type="submit" name="login" class="btn btn-primary">Login</button>
-                    </form>
+    <div class="container mt-5">
+    <div class="row justify-content-center">
+        <div class="col-md-6" style="max-width: 700px; height: 60vh; background-color: #f8f9fa; border-radius: 2%; text-align: center;">
+            <h2 class="mb-4">Tutor Login</h2>
+            <?php if (isset($error)): ?>
+                <div class="alert alert-danger"><?php echo $error; ?></div>
+            <?php endif; ?>
+            <form method="post" action="" style="width: 300px; margin-top: 30px; margin-left: 28%;"> <!-- Adjusted margin -->
+                <div class="mb-3">
+                    <label for="email" class="form-label">Email address</label>
+                    <input type="email" class="form-control" id="email" name="email" required>
                 </div>
-            </div>
+                <div class="mb-3">
+                    <label for="password" class="form-label">Password</label>
+                    <input type="password" class="form-control" id="password" name="password" required>
+                </div>
+                <button type="submit" name="login" class="btn btn-primary w-60">Login</button>
+            </form>
         </div>
-        <!-- <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script> -->
+    </div>
+</div>
 
         <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
     </body>
@@ -130,11 +127,10 @@ if (!isset($_SESSION['user_id']) || !isset($_SESSION['role']) || $_SESSION['role
     exit();
 }
 
-
 $tutor_id = $_SESSION['user_id'];
 $tutor_name = $_SESSION['full_name'];
 
-// Handle form submissions
+// Handle form submissions for adding classes
 if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     if (isset($_POST['add_class'])) {
         $course_id = (int)$_POST['course_id'];
@@ -148,7 +144,6 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             ensure_directory_exists($upload_dir);
             $video_path = $upload_dir . time() . '_' . $_FILES['class_video']['name'];
             if (move_uploaded_file($_FILES['class_video']['tmp_name'], $video_path)) {
-                // File uploaded successfully
                 $video_path = str_replace('../', '', $video_path); // Remove the '../' from the beginning for database storage
             } else {
                 $error = "Failed to upload video. Error: " . $_FILES['class_video']['error'];
@@ -160,6 +155,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         $online_link = mysqli_real_escape_string($conn, $_POST['online_link'] ?? '');
         $schedule_time = mysqli_real_escape_string($conn, $_POST['schedule_time'] ?? '');
 
+        // Insert class data into the database
         $query = "INSERT INTO classes (course_id, tutor_id, class_name, description, video_path, is_online, online_link, schedule_time) 
                   VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
         $stmt = mysqli_prepare($conn, $query);
@@ -170,22 +166,17 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         // Handle quiz questions
         if (isset($_POST['questions'])) {
             foreach ($_POST['questions'] as $index => $question) {
-                // Sanitize and escape input to prevent SQL injection
-                $question_text = mysqli_real_escape_string($conn, $question);
-                $correct_answer = mysqli_real_escape_string($conn, $_POST['correct_answers'][$index]);
-
-                // Assuming you have a video_id to associate with the question
+                $question_text = trim($question);
+                $correct_answer = trim($_POST['correct_answers'][$index] ?? '');
                 $video_id = isset($_POST['video_id'][$index]) ? mysqli_real_escape_string($conn, $_POST['video_id'][$index]) : null;
 
-                // Check if the required fields are filled
+                // Validate required fields
                 if (empty($question_text) || empty($correct_answer)) {
                     echo "Error: Question or correct answer is empty!";
-                    continue; // Skip the current question if it's empty
+                    continue;
                 }
 
-                // Prepare the INSERT statement for the quiz question
-                $query = "INSERT INTO quiz_questions (class_id, question_text, correct_answer, video_id) 
-                  VALUES (?, ?, ?, ?)";
+                $query = "INSERT INTO quiz_questions (class_id, question_text, correct_answer, video_id) VALUES (?, ?, ?, ?)";
                 $stmt = mysqli_prepare($conn, $query);
 
                 if (!$stmt) {
@@ -193,29 +184,22 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                     continue;
                 }
 
-                // Bind parameters and execute the statement
                 mysqli_stmt_bind_param($stmt, "isss", $class_id, $question_text, $correct_answer, $video_id);
 
-                // Execute the query and check if successful
                 if (mysqli_stmt_execute($stmt)) {
-                    // Get the last inserted question_id
                     $question_id = mysqli_insert_id($conn);
 
-                    // Insert answer options and feedback
                     if (isset($_POST['answers'][$index]) && isset($_POST['feedback'][$index])) {
                         foreach ($_POST['answers'][$index] as $answer_index => $answer) {
                             $answer_text = mysqli_real_escape_string($conn, $answer);
                             $feedback_text = mysqli_real_escape_string($conn, $_POST['feedback'][$index][$answer_index]);
 
-                            // Check if the answer or feedback is empty
                             if (empty($answer_text) || empty($feedback_text)) {
                                 echo "Error: Answer or feedback is empty!";
-                                continue; // Skip the current answer if it's empty
+                                continue;
                             }
 
-                            // Prepare the INSERT statement for quiz answers
-                            $query = "INSERT INTO quiz_answers (question_id, answer_text, feedback) 
-                              VALUES (?, ?, ?)";
+                            $query = "INSERT INTO quiz_answers (question_id, answer_text, feedback) VALUES (?, ?, ?)";
                             $stmt = mysqli_prepare($conn, $query);
 
                             if (!$stmt) {
@@ -223,10 +207,8 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                                 continue;
                             }
 
-                            // Bind parameters and execute the query
                             mysqli_stmt_bind_param($stmt, "iss", $question_id, $answer_text, $feedback_text);
 
-                            // Execute the query and check if successful
                             if (!mysqli_stmt_execute($stmt)) {
                                 echo "Error executing query for quiz answer: " . mysqli_error($conn);
                             }
@@ -243,25 +225,26 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 }
 
 // Fetch courses assigned to the logged-in tutor
-$query = "SELECT * FROM courses WHERE tutor_id = ?";  // Fetch courses for the specific tutor
+$query = "SELECT * FROM courses WHERE tutor_id = ?";
 $stmt = mysqli_prepare($conn, $query);
-mysqli_stmt_bind_param($stmt, "i", $tutor_id);  // Bind the tutor_id parameter
+mysqli_stmt_bind_param($stmt, "i", $tutor_id);
 mysqli_stmt_execute($stmt);
 $result = mysqli_stmt_get_result($stmt);
-$courses = mysqli_fetch_all($result, MYSQLI_ASSOC);  // Fetch all courses as an associative array
+$courses = mysqli_fetch_all($result, MYSQLI_ASSOC);
 
 // Fetch classes created by the tutor
 $query = "SELECT c.*, co.title as course_title 
           FROM classes c 
           JOIN courses co ON c.course_id = co.id 
           WHERE c.tutor_id = ?
-          ORDER BY c.created_at DESC";  // Add this line to sort by creation date, newest first
+          ORDER BY c.created_at DESC";
 $stmt = mysqli_prepare($conn, $query);
 mysqli_stmt_bind_param($stmt, "i", $tutor_id);
 mysqli_stmt_execute($stmt);
 $result = mysqli_stmt_get_result($stmt);
 $classes = mysqli_fetch_all($result, MYSQLI_ASSOC);
 ?>
+
 
 <!DOCTYPE html>
 <html lang="en">
@@ -289,20 +272,41 @@ $classes = mysqli_fetch_all($result, MYSQLI_ASSOC);
         width: 700px;
         /* Set your desired width */
     }
-  .btn-primary{
-    margin-right: 36%;
-  }
-  h2 {
-        position: relative; /* Ensure proper stacking of elements */
+
+    .btn-primary {
+        margin-right: 36%;
+    }
+
+    h2 {
+        position: relative;
+        /* Ensure proper stacking of elements */
         z-index: 1;
     }
 
     #cardsContainer {
-        margin-top: 50px; /* Adds spacing between the heading and cards */
+        margin-top: 50px;
+        /* Adds spacing between the heading and cards */
     }
 
     .btn-info {
-        z-index: 2; /* Ensure buttons appear above other elements */
+        z-index: 2;
+        /* Ensure buttons appear above other elements */
+    }
+
+    form {
+        background-color: #f8f9fa;
+        /* Light background for contrast */
+        padding: 20px;
+        border-radius: 8px;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        /* margin-left: 13%; */
+        /* margin-right: 4%; */
+    }
+
+    input.form-control {
+        height: 40px;
+        /* Adjust input height */
+        margin-right: 4%;
     }
 
     .card {
@@ -310,7 +314,30 @@ $classes = mysqli_fetch_all($result, MYSQLI_ASSOC);
         border-radius: 5px;
         box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
     }
+
+    .col-md-6 {
+        max-width: 740px;
+        height: 80vh;
+        border-radius: 3%;
+        box-shadow: 2px 3px 10px grey;
+        background-color: rgb(130, 142, 181);
+    }
 </style>
+<script>
+    document.getElementById('addQuestion').addEventListener('click', function() {
+        const quizContainer = document.getElementById('quizQuestions');
+        const questionHTML = `
+        <div class="mb-3">
+            <label for="question" class="form-label">Question</label>
+            <input type="text" class="form-control" name="questions[]" required>
+        </div>
+        <div class="mb-3">
+            <label for="correct_answer" class="form-label">Correct Answer</label>
+            <input type="text" class="form-control" name="correct_answers[]" required>
+        </div>`;
+        quizContainer.insertAdjacentHTML('beforeend', questionHTML);
+    });
+</script>
 
 <body>
     <!-- Navigation Bar -->
@@ -410,19 +437,19 @@ $classes = mysqli_fetch_all($result, MYSQLI_ASSOC);
             </div>
         </div>
 
-  <h2 class="mt-4">Your Classes</h2>
+        <h2 class="mt-4">Your Classes</h2>
 
-<!-- Include Font Awesome for Icons -->
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+        <!-- Include Font Awesome for Icons -->
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
 
-<div class="mb-4" style="margin-left: 890px;">
-    <button id="listViewBtn" class="btn btn-info me-2">
-        <i class="fas fa-list"></i> <!-- List View Icon -->
-    </button>
-    <button id="gridViewBtn" class="btn btn-info">
-        <i class="fas fa-th"></i> <!-- Grid View Icon -->
-    </button>
-</div>
+        <div class="mb-4" style="margin-left: 890px;">
+            <button id="listViewBtn" class="btn btn-info me-2">
+                <i class="fas fa-list"></i> <!-- List View Icon -->
+            </button>
+            <button id="gridViewBtn" class="btn btn-info">
+                <i class="fas fa-th"></i> <!-- Grid View Icon -->
+            </button>
+        </div>
 
 
 
@@ -582,42 +609,37 @@ $classes = mysqli_fetch_all($result, MYSQLI_ASSOC);
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
     <script>
         document.addEventListener('DOMContentLoaded', function() {
-            const isOnlineCheckbox = document.getElementById('is_online');
-            const onlineClassDetails = document.getElementById('onlineClassDetails');
+            const quizForm = document.getElementById('quizForm'); // Ensure your form has this ID
             const addQuestionBtn = document.getElementById('addQuestion');
             const quizQuestionsContainer = document.getElementById('quizQuestions');
             let questionCount = 0;
 
-            isOnlineCheckbox.addEventListener('change', function() {
-                onlineClassDetails.style.display = this.checked ? 'block' : 'none';
-            });
-
             function createQuestionTemplate(index) {
                 return `
-                    <div class="card mb-3">
-                        <div class="card-body">
-                            <h5 class="card-title">Question ${index + 1}</h5>
-                            <div class="mb-3">
-                                <label for="question${index}" class="form-label">Question</label>
-                                <input type="text" class="form-control" id="question${index}" name="questions[]" required>
-                            </div>
-                            <div class="mb-3">
-                                <label class="form-label">Answers</label>
-                                ${[0, 1, 2, 3].map(answerIndex => `
-                                    <div class="mb-3">
-                                        <div class="input-group mb-2">
-                                            <div class="input-group-text">
-                                                <input type="radio" name="correct_answers[${index}]" value="${answerIndex}" required>
-                                            </div>
-                                            <input type="text" class="form-control" name="answers[${index}][]" placeholder="Answer option" required>
-                                        </div>
-                                        <input type="text" class="form-control" name="feedback[${index}][]" placeholder="Feedback for this answer" required>
-                                    </div>
-                                `).join('')}
-                            </div>
-                        </div>
+            <div class="card mb-3" data-question-index="${index}">
+                <div class="card-body">
+                    <h5 class="card-title">Question ${index + 1}</h5>
+                    <div class="mb-3">
+                        <label for="question${index}" class="form-label">Question</label>
+                        <input type="text" class="form-control" id="question${index}" name="questions[]" required>
                     </div>
-                `;
+                    <div class="mb-3">
+                        <label class="form-label">Answers</label>
+                        ${[0, 1, 2, 3].map(answerIndex => `
+                            <div class="mb-3">
+                                <div class="input-group mb-2">
+                                    <div class="input-group-text">
+                                        <input type="radio" name="correct_answers[${index}]" value="${answerIndex}" required>
+                                    </div>
+                                    <input type="text" class="form-control" name="answers[${index}][]" placeholder="Answer option" required>
+                                </div>
+                                <input type="text" class="form-control" name="feedback[${index}][]" placeholder="Feedback for this answer" required>
+                            </div>
+                        `).join('')}
+                    </div>
+                </div>
+            </div>
+            `;
             }
 
             // Add initial question
@@ -629,8 +651,57 @@ $classes = mysqli_fetch_all($result, MYSQLI_ASSOC);
                 quizQuestionsContainer.insertAdjacentHTML('beforeend', createQuestionTemplate(questionCount));
                 questionCount++;
             });
+
+            // Validate form on submit
+            quizForm.addEventListener('submit', function(e) {
+                e.preventDefault(); // Prevent default form submission
+
+                const formData = new FormData(quizForm);
+                const payload = [];
+
+                // Loop through questions to construct payload
+                for (let i = 0; i < questionCount; i++) {
+                    const questionText = formData.getAll(`questions[]`)[i];
+                    const answers = formData.getAll(`answers[${i}][]`);
+                    const feedbacks = formData.getAll(`feedback[${i}][]`);
+                    const correctAnswerIndex = formData.get(`correct_answers[${i}]`);
+
+                    if (!questionText || !correctAnswerIndex) {
+                        alert(`Error: Question ${i + 1} or its correct answer is not properly filled.`);
+                        return;
+                    }
+
+                    answers.forEach((answer, idx) => {
+                        payload.push({
+                            question_id: i + 1,
+                            answer_text: answer,
+                            is_correct: idx == correctAnswerIndex ? 1 : 0, // Mark correct answer as 1
+                            feedback: feedbacks[idx],
+                        });
+                    });
+                }
+
+                // Submit data via fetch
+                fetch('/submit-quiz', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify(payload),
+                    })
+                    .then(response => response.json())
+                    .then(data => {
+                        console.log('Quiz submitted successfully:', data);
+                        alert('Quiz submitted successfully!');
+                    })
+                    .catch(error => {
+                        console.error('Error submitting quiz:', error);
+                        alert('An error occurred while submitting the quiz.');
+                    });
+            });
         });
     </script>
+
 </body>
 
 </html>

@@ -198,6 +198,7 @@ if ($result->num_rows > 0) {
         /* Adjust this value as needed */
     }
 
+    /* General grid styling */
     #enrollmentGrid {
         display: flex;
         flex-wrap: wrap;
@@ -205,11 +206,47 @@ if ($result->num_rows > 0) {
         /* Adjust spacing between cards */
     }
 
+    /* Default: Three cards per row */
     #enrollmentGrid .col-md-4 {
         flex: 1 1 calc(33.333% - 16px);
-        /* Three cards per row with space between */
         max-width: calc(33.333% - 16px);
     }
+
+    /* Responsive styling for smaller screens (468px and below) */
+    @media (max-width: 468px) {
+        #enrollmentGrid .col-md-4 {
+            flex: 1 1 100%;
+            /* One card per row */
+            max-width: 120%;
+        }
+
+        main {
+            width: 90%;
+            /* Adjust this value as needed */
+            margin: 0 auto;
+            /* Center the main element */
+        }
+
+        body{
+            width: 100%;
+        }
+
+
+        #enrollmentGrid .card {
+            margin-bottom: 16px;
+            /* Add space between cards */
+        }
+    }
+
+    /* Responsive styling for medium screens (789px and below) */
+    @media (max-width: 789px) {
+        #enrollmentGrid .col-md-4 {
+            flex: 1 1 50%;
+            /* Two cards per row */
+            max-width: 150%;
+        }
+    }
+
 
     #enrollmentGrid .card {
         position: relative;
@@ -217,8 +254,9 @@ if ($result->num_rows > 0) {
         height: 100%;
         /* Ensures cards stretch to the same height */
         display: flex;
+        background-color: rgb(222, 222, 242);
         flex-direction: column;
-        justify-content: space-between;
+        justify-content: space-evenly;
         /* Ensures proper spacing within the card */
         box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
         border: none;
@@ -226,6 +264,7 @@ if ($result->num_rows > 0) {
         border-radius: 8px;
         /* Optional: Adds rounded corners */
     }
+
 
     #enrollmentGrid .dropdown {
         position: absolute;
@@ -235,6 +274,14 @@ if ($result->num_rows > 0) {
         /* Adjust spacing from the right */
         z-index: 1;
         /* Ensure dropdown menu appears above other elements */
+    }
+
+    h3 {
+        color: #16308b
+    }
+
+    main {
+        background-color: rgb(244, 244, 255);
     }
 
     .dropdown-menu {
@@ -259,41 +306,129 @@ if ($result->num_rows > 0) {
         font-size: 0.9rem;
     }
 
+    .navbar {
+        background-color: #1a237e;
+        margin: 0;
+        padding: 0px 5px;
+        /* Adjust padding for comfortable spacing */
+        line-height: 1.2;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        /* Adds a subtle shadow */
+        /* position: fixed; */
+        /* Makes the navbar fixed */
+        top: 0;
+        /* Sticks to the top of the viewport */
+        left: 0;
+        width: 100%;
+        /* Ensures the navbar spans the full width */
+        z-index: 1000;
+        /* Keeps the navbar above other elements */
+    }
+
+    .navbar-brand {
+        font-size: 23px;
+        color: white;
+    }
+
+    .nav-link {
+        color: white;
+        padding-inline: 20px;
+        text-decoration: underline;
+    }
+
+    .nav-link:hover {
+        color: white;
+    }
+
     .button {
-    padding-inline: 30px;
-    font-weight: bolder;
-    text-decoration: none;
-    color: #0433c3; /* Initial blue text color */
-    background-color: white; /* Initially white background */
-    padding-block: 10px;
-    border-radius: 30px; /* Rounded corners */
-    transition: all 0.3s ease; /* Smooth transition for hover effect */
-}
+        padding-inline: 30px;
+        font-weight: bolder;
+        text-decoration: none;
+        color: #0433c3;
+        /* background-color: white; */
+        padding-block: 10px;
+        border-radius: 30px;
+        transition: all 0.3s ease;
+    }
 
-.button:hover {
-    color: white; /* Text color turns white */
-    background-color: #0433c3; /* Background turns blue */
-    border-radius: 30px; /* Keep rounded corners */
-}
+    .button:hover {
+        color: white;
+        background-color: #0433c3;
+        border-radius: 30px;
+    }
 
+    .description-preview {
+        display: inline;
+    }
 
+    .full-description {
+        display: inline;
+        white-space: normal;
+    }
+
+    .read-more-link {
+        color: #007bff;
+        text-decoration: none;
+        cursor: pointer;
+    }
+
+    .read-more-link:hover {
+        text-decoration: underline;
+    }
+
+    /* Scrollable container for buttons */
+    #buttonContainer {
+        overflow-x: auto;
+        /* Allow horizontal scrolling */
+        display: flex;
+        justify-content: center;
+        /* Center the buttons */
+        margin-bottom: 20px;
+        /* Add space below the buttons */
+    }
+
+    #buttonContainer button {
+        margin: 0 10px;
+        /* Add space between buttons */
+        min-width: 100px;
+        /* Ensure buttons are wide enough to tap on small screens */
+    }
+
+    /* Adjust button styling */
+    @media (max-width: 468px) {
+        #buttonContainer {
+            overflow-x: auto;
+        }
+
+        #buttonContainer button {
+            margin: 0 5px;
+            /* Reduce spacing on smaller screens */
+        }
+    }
 </style>
 
 <body>
     <!-- Navigation Bar -->
-    <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+    <nav class="navbar navbar-expand-lg custom-navbar">
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
         <div class="container-fluid">
-            <a class="navbar-brand" href="#">LMS Admin</a>
+            <a class="navbar-brand text-light fw-bold" href="index.php">LMS Admin</a>
             <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
                 <span class="navbar-toggler-icon"></span>
             </button>
-            <div class="collapse navbar-collapse" id="navbarNav">
-                <ul class="navbar-nav ms-auto">
+            <div class="collapse navbar-collapse justify-content-end" id="navbarNav">
+                <ul class="navbar-nav align-items-center">
                     <li class="nav-item">
-                        <a class="nav-link" href="#"><i class="fas fa-user"></i> Profile</a>
+                        <a class="nav-link text-light d-flex align-items-center" href="#">
+                            <i class="fas fa-user me-2"></i> Profile
+                        </a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="logout.php"><i class="fas fa-sign-out-alt"></i> Logout</a>
+                        <a class="nav-link text-light d-flex align-items-center" href="logout.php">
+                            <i class="fas fa-sign-out-alt me-2"></i> Logout
+                        </a>
                     </li>
                 </ul>
             </div>
@@ -314,26 +449,29 @@ if ($result->num_rows > 0) {
                         <a href="add_course.php" class="button">Add New Course</a>
                     </div>
 
-                    <div style="margin-left: 800px;">
-                        <button id="listViewBtn" class="btn btn-primary me" onclick="showListView()">
-                            <i class="fas fa-list"></i>
-                        </button>
-                        <button id="gridViewBtn" class="btn btn-secondary me2" onclick="showGridView()">
-                            <i class="fas fa-th"></i>
-                        </button>
+                    <div style="overflow-x: auto; width: 100%; display: flex; justify-content: center; margin-bottom: 20px;">
+                        <div style="min-width: 250px; display: inline-block;">
+                            <button id="listViewBtn" class="btn btn-primary me" onclick="showListView()">
+                                <i class="fas fa-list"></i>
+                            </button>
+                            <button id="gridViewBtn" class="btn btn-secondary me2" onclick="showGridView()">
+                                <i class="fas fa-th"></i>
+                            </button>
+                        </div>
                     </div>
 
+
                     <!-- List View -->
-                    <div id="listView" class="view">
-                        <h2>List View</h2>
-                        <table class="table table-striped">
-                            <thead>
+                    <div id="listView" class="view container mt-5">
+                        <h2 class="mb-4">List View</h2>
+                        <table class="table table-striped table-bordered align-middle">
+                            <thead class="table-dark">
                                 <tr>
-                                    <th>ID</th>
-                                    <th>Title</th>
-                                    <th>Description</th>
-                                    <th>Topics</th>
-                                    <th>Actions</th>
+                                    <th scope="col">ID</th>
+                                    <th scope="col">Title</th>
+                                    <th scope="col">Description</th>
+                                    <th scope="col">Topics</th>
+                                    <th scope="col" class="text-center">Actions</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -344,16 +482,14 @@ if ($result->num_rows > 0) {
                                         <td><?php echo htmlspecialchars($course['description']); ?></td>
                                         <td>
                                             <?php
-                                            // Display topics as badges
-                                            $topics = explode(',', $course['topics']); // Split topics into an array
-                                            foreach ($topics as $topic) {
-                                                echo '<span ">' . htmlspecialchars($topic) . '</span>';
-                                            }
-                                            ?>
+                                            $topics = explode(',', $course['topics']);
+                                            foreach ($topics as $topic): ?>
+                                                <span class="badge bg-primary me-1"><?php echo htmlspecialchars(trim($topic)); ?></span>
+                                            <?php endforeach; ?>
                                         </td>
-                                        <td>
+                                        <td class="text-center">
                                             <div class="dropdown">
-                                                <button class="btn btn-primary" type="button" id="dropdownMenuButton" data-bs-toggle="dropdown" aria-expanded="false">
+                                                <button class="btn btn-light btn-sm" type="button" id="dropdownMenuButton" data-bs-toggle="dropdown" aria-expanded="false">
                                                     <i class="fas fa-ellipsis-v"></i>
                                                 </button>
                                                 <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="dropdownMenuButton">
@@ -394,7 +530,7 @@ if ($result->num_rows > 0) {
                                                 src="../assets/images/<?php echo htmlspecialchars($course['title']); ?>.jpg"
                                                 alt="<?php echo htmlspecialchars($course['title']); ?>"
                                                 class="rounded"
-                                                style="width: 180px; height: 100px; object-fit: contain; margin-bottom: 10px;" />
+                                                style="width: 100px; height: 100px; object-fit: contain; margin-bottom: 10px;" />
 
                                             <!-- Card content -->
                                             <div>
@@ -407,9 +543,11 @@ if ($result->num_rows > 0) {
                                                             <button class="dropdown-item edit-btn" data-bs-toggle="modal" data-bs-target="#editModal"
                                                                 data-id="<?php echo $course['id']; ?>"
                                                                 data-title="<?php echo htmlspecialchars($course['title']); ?>"
-                                                                data-description="<?php echo htmlspecialchars($course['description']); ?>"
+                                                                data-description="<?php echo htmlspecialchars(substr($course['description'], 0, 100)); ?>..."
                                                                 data-topics="<?php echo htmlspecialchars($course['topics']); ?>"
-                                                                data-prize="<?php echo isset($course['course_prize']) ? htmlspecialchars($course['course_prize']) : ''; ?>">Edit</button>
+                                                                data-prize="<?php echo isset($course['course_prize']) ? htmlspecialchars($course['course_prize']) : ''; ?>">
+                                                                Edit
+                                                            </button>
                                                         </li>
                                                         <li>
                                                             <form action="" method="post" class="d-inline" onsubmit="return confirm('Are you sure you want to delete this course?');">
@@ -420,9 +558,18 @@ if ($result->num_rows > 0) {
                                                     </ul>
                                                 </div>
                                                 <h5 class="card-title"><?php echo htmlspecialchars($course['title']); ?></h5>
-                                                <p class="card-text"><?php echo htmlspecialchars($course['description']); ?></p>
+                                                <p class="card-text">
+                                                    <span class="description-preview" id="desc-<?php echo $course['id']; ?>">
+                                                        <?php echo htmlspecialchars(substr($course['description'], 0, 100)); ?>...
+                                                    </span>
+                                                    <span class="full-description d-none" id="full-desc-<?php echo $course['id']; ?>">
+                                                        <?php echo htmlspecialchars($course['description']); ?>
+                                                    </span>
+                                                    <!-- <a href="javascript:void(0);" class="read-more-link" onclick="toggleDescription('<?php echo $course['id']; ?>')">Read More</a> -->
+                                                </p>
                                                 <p class="card-text"><strong>Topics Covered:</strong> <?php echo htmlspecialchars($course['topics']); ?></p>
                                             </div>
+
                                         </div>
                                     </div>
                                 </div>
@@ -531,6 +678,23 @@ if ($result->num_rows > 0) {
             document.getElementById('listViewBtn').classList.add('btn-secondary');
             document.getElementById('listViewBtn').classList.remove('btn-primary');
         }
+
+        function toggleDescription(courseId) {
+            const preview = document.getElementById(`desc-${courseId}`);
+            const fullDesc = document.getElementById(`full-desc-${courseId}`);
+            const link = preview.nextElementSibling;
+
+            if (preview.classList.contains('d-none')) {
+                preview.classList.remove('d-none');
+                fullDesc.classList.add('d-none');
+                link.textContent = 'Read More';
+            } else {
+                preview.classList.add('d-none');
+                fullDesc.classList.remove('d-none');
+                link.textContent = 'Show Less';
+            }
+        }
+
 
         // Populate the edit modal with course data
         const editModal = document.getElementById('editModal');

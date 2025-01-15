@@ -100,6 +100,7 @@
 </head>
 <body>
     
+   <div class="container-fluid">
     <h1>Terms and Conditions</h1>
     <h2>Privacy Policy</h2>
     <p>
@@ -137,6 +138,7 @@
         fully reserves the right not to allow further usage of the Application or provide any Services/products thereunder to you.
     </p>
     </p>
+    </div>
     
 </body>
 </html>

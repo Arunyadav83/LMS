@@ -16,6 +16,7 @@
         .help-center {
             text-align: center;
             padding: 60px 20px;
+            margin-top: 78PX;
             background: linear-gradient(to right,rgb(68, 90, 107),rgb(151, 234, 239));
             color: white;
         }

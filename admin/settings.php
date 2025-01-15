@@ -1,6 +1,14 @@
 <?php
 require_once '../config.php';
-require_once '../functions.php';
+require_once '../functions.php'; // Ensure this path is correct
+
+// Function to sanitize input (if it's not already defined in functions.php)
+function sanitize_input($data) {
+    $data = trim($data); // Remove extra spaces
+    $data = stripslashes($data); // Remove backslashes
+    $data = htmlspecialchars($data); // Convert special characters to HTML entities
+    return $data;
+}
 
 // Initialize variables for form values
 $site_name = $site_email = $max_file_size = $allowed_file_types = $smtp_host = $smtp_port = $smtp_username = $smtp_password = '';
@@ -17,15 +25,48 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     $smtp_username = sanitize_input($_POST['smtp_username']);
     $smtp_password = sanitize_input($_POST['smtp_password']);
 
-    // TODO: Add code to save settings to database or configuration file
-    
-    $success_message = "Settings updated successfully!";
+    // Check if settings already exist in the database
+    $query = "SELECT COUNT(*) as count FROM settings WHERE id=1";
+    $result = mysqli_query($conn, $query);
+    $row = mysqli_fetch_assoc($result);
+
+    if ($row['count'] > 0) {
+        // Update existing settings
+        $query = "UPDATE settings 
+                  SET site_name='$site_name', site_email='$site_email', max_file_size='$max_file_size', allowed_file_types='$allowed_file_types', smtp_host='$smtp_host', smtp_port='$smtp_port', smtp_username='$smtp_username', smtp_password='$smtp_password' 
+                  WHERE id=1";
+    } else {
+        // Insert new settings
+        $query = "INSERT INTO settings (site_name, site_email, max_file_size, allowed_file_types, smtp_host, smtp_port, smtp_username, smtp_password) 
+                  VALUES ('$site_name', '$site_email', '$max_file_size', '$allowed_file_types', '$smtp_host', '$smtp_port', '$smtp_username', '$smtp_password')";
+    }
+
+    // Execute query
+    if (mysqli_query($conn, $query)) {
+        $success_message = "Settings saved successfully!";
+    } else {
+        $error_message = "Error saving settings: " . mysqli_error($conn);
+    }
 }
 
-// TODO: Add code to retrieve current settings from database or configuration file
+// Retrieve current settings from the database
+$query = "SELECT * FROM settings WHERE id=1";
+$result = mysqli_query($conn, $query);
+if ($row = mysqli_fetch_assoc($result)) {
+    $site_name = $row['site_name'];
+    $site_email = $row['site_email'];
+    $max_file_size = $row['max_file_size'];
+    $allowed_file_types = $row['allowed_file_types'];
+    $smtp_host = $row['smtp_host'];
+    $smtp_port = $row['smtp_port'];
+    $smtp_username = $row['smtp_username'];
+    $smtp_password = $row['smtp_password'];
+}
 
 $current_page = 'settings';
 ?>
+
+
 
 <!DOCTYPE html>
 <html lang="en">
@@ -36,6 +77,14 @@ $current_page = 'settings';
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
 </head>
+<style>
+    h1 ,h3{
+        color: #16308b;
+    }
+    .mb-3{
+        color:rgba(123, 149, 243, 0.54);
+    }
+</style>
 <body>
     <div class="container-fluid">
         <div class="row">
@@ -49,6 +98,10 @@ $current_page = 'settings';
                 <?php if (isset($success_message)): ?>
                     <div class="alert alert-success" role="alert">
                         <?php echo $success_message; ?>
+                    </div>
+                <?php elseif (isset($error_message)): ?>
+                    <div class="alert alert-danger" role="alert">
+                        <?php echo $error_message; ?>
                     </div>
                 <?php endif; ?>
 

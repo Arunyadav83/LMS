@@ -2,6 +2,10 @@
 session_start();
 require_once 'config.php';
 require_once 'functions.php';
+require 'vendor/autoload.php'; // Include PHPMailer
+
+use PHPMailer\PHPMailer\PHPMailer;
+use PHPMailer\PHPMailer\Exception;
 
 $error = '';
 $success = '';
@@ -17,14 +21,60 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         // Hash the new password
         $hashedPassword = password_hash($newPassword, PASSWORD_BCRYPT);
 
-        // Assuming the user's email is stored in the session
         if (isset($_SESSION['email'])) {
             $userEmail = $_SESSION['email'];
 
+            // Fetch the user's name
+            $query = "SELECT name FROM users WHERE email = '$userEmail'";
+            $result = mysqli_query($conn, $query);
+
+            if ($result && mysqli_num_rows($result) > 0) {
+                $row = mysqli_fetch_assoc($result);
+                $userName = $row['name'];
+            } else {
+                $userName = "User"; // Fallback if the name is not found
+            }
+
             // Update the password in the database
             $query = "UPDATE users SET password = '$hashedPassword' WHERE email = '$userEmail'";
+
             if (mysqli_query($conn, $query)) {
-                $success = "Password reset successful!";
+                // Send email notification
+                $mail = new PHPMailer(true);
+                try {
+                    // Server settings
+                    $mail->isSMTP();
+                    $mail->Host = 'smtp.hostinger.com';
+                    $mail->SMTPAuth = true;
+                    $mail->Username = 'arun.bhairi@ultrakeyit.com'; // Your email
+                    $mail->Password = 'Arun@1234';                  // Your email password
+                    $mail->SMTPSecure = PHPMailer::ENCRYPTION_STARTTLS;
+                    $mail->Port = 587;
+
+                    // Recipients
+                    $mail->setFrom('arun.bhairi@ultrakeyit.com', 'UltrakeyIt');
+                    $mail->addAddress($userEmail); // User's email
+
+                    // Content
+                    $mail->isHTML(true);
+                    $mail->Subject = 'Your Password Has Been Updated';
+                    $mail->Body = "
+                        <p>Dear $userName,</p>
+                        <p>Your password has been successfully updated. Please find your updated credentials below:</p>
+                        <ul>
+                            <li><strong>Username:</strong> $userEmail</li>
+                            <li><strong>New Password:</strong> $newPassword</li>
+                        </ul>
+                        <p><strong>Note:</strong> Please keep your password secure and do not share it with anyone.</p>
+                        <p>If you did not request this change, please contact support immediately.</p>
+                        <p>Best regards,<br>Your Company Team</p>
+                    ";
+
+                    $mail->send();
+                    $success = "Password reset successful!";
+                } catch (Exception $e) {
+                    $error = "Password reset successful, but the email could not be sent. Mailer Error: {$mail->ErrorInfo}";
+                }
             } else {
                 $error = "Failed to reset password. Please try again.";
             }

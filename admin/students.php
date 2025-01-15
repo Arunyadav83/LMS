@@ -42,24 +42,78 @@ $students = mysqli_fetch_all($result, MYSQLI_ASSOC);
 </head>
 <style>
     .mb-4{
-        color:aqua
+        color: #16308b;
     }
+    .navbar-brand {
+            font-size: 20px;
+            /* margin-inline-start: 20px; */
+            color: white;
+
+
+        }
+
+        .nav-link {
+            color: white;
+            padding-inline: 20px;
+            text-decoration: underline;
+
+        }
+
+        .nav-link:hover {
+            color: white;
+            /* text-decoration: underline; */
+        }
+
+        .navbar {
+            background-color: #16308b;
+            margin: auto;
+            padding: 0px 5px;
+            /* Adjust top-bottom and left-right padding to reduce height */
+            line-height: 1.2;
+            /* Reduce line height for inner elements */
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            /* Optional: Adds a subtle shadow for depth */
+        }
+
+
+        .button {
+            padding-inline: 10px;
+            text-decoration: none;
+            color: #0433c3;
+            padding-block: 10px;
+
+        }
+        
+
+        .button:hover {
+            background-color: #0433c3;
+            color: white;
+            border-radius: 30px !important;
+        }
+        
 </style>
 <body>
     <!-- Navigation Bar -->
-    <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+    <nav class="navbar navbar-expand-lg custom-navbar">
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
         <div class="container-fluid">
-            <a class="navbar-brand" href="#">LMS Admin</a>
+            <a class="navbar-brand text-light fw-bold" href="#">LMS Admin</a>
             <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
                 <span class="navbar-toggler-icon"></span>
             </button>
-            <div class="collapse navbar-collapse" id="navbarNav">
-                <ul class="navbar-nav ms-auto">
+            <div class="collapse navbar-collapse justify-content-end" id="navbarNav">
+                <ul class="navbar-nav align-items-center">
                     <li class="nav-item">
-                        <a class="nav-link" href="#"><i class="fas fa-user"></i> Profile</a>
+                        <a class="nav-link text-light d-flex align-items-center" href="#">
+                            <i class="fas fa-user me-2"></i> Profile
+                        </a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="logout.php"><i class="fas fa-sign-out-alt"></i> Logout</a>
+                        <a class="nav-link text-light d-flex align-items-center" href="logout.php">
+                            <i class="fas fa-sign-out-alt me-2"></i> Logout
+                        </a>
                     </li>
                 </ul>
             </div>

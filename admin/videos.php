@@ -35,6 +35,11 @@ $current_page = 'videos';
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
 </head>
+<style>
+    .navbar{
+        background-color: #1a237e !important;
+    }
+</style>
 <body>
     <!-- Navigation Bar -->
     <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
@@ -53,41 +58,53 @@ $current_page = 'videos';
                 </div>
                 
                 <form action="" method="get" class="mb-4">
-                    <div class="row">
-                        <div class="col-md-6">
-                            <select name="course_id" class="form-select" onchange="this.form.submit()">
-                                <option value="">Select a course</option>
-                                <?php foreach ($courses as $course): ?>
-                                    <option value="<?php echo $course['id']; ?>" <?php echo ($selected_course_id == $course['id']) ? 'selected' : ''; ?>>
-                                        <?php echo htmlspecialchars($course['title']); ?>
-                                    </option>
-                                <?php endforeach; ?>
-                            </select>
-                        </div>
+    <div class="row">
+        <div class="col-md-6">
+            <select name="course_id" class="form-select" onchange="this.form.submit()">
+                <option value="">Select a course</option>
+                <?php foreach ($courses as $course): ?>
+                    <option value="<?php echo $course['id']; ?>" <?php echo ($selected_course_id == $course['id']) ? 'selected' : ''; ?>>
+                        <?php echo htmlspecialchars($course['title']); ?>
+                    </option>
+                <?php endforeach; ?>
+            </select>
+        </div>
+    </div>
+</form>
+
+<?php if ($selected_course_id): ?>
+    <div class="row">
+        <?php foreach ($videos_and_quizzes as $item): ?>
+            <div class="col-md-4 mb-4">
+                <div class="card">
+                    <div class="card-body">
+                        <h5 class="card-title"><?php echo htmlspecialchars($item['class_name']); ?></h5>
+
+                        <?php if (!empty($item['video_path'])): ?>
+                            <?php
+                            // Base path for videos
+                            $base_url = '../uploads/class_videos/';
+                            $video_url = $base_url . $item['video_path'];
+                            ?>
+
+                            <!-- Embed the video -->
+                            <video width="100%" controls>
+                                <source src="<?php echo htmlspecialchars($video_url); ?>" type="video/mp4">
+                                Your browser does not support the video tag.
+                            </video>
+                        <?php else: ?>
+                            <p>No video available</p>
+                        <?php endif; ?>
+
+                        <p>Quiz Questions: <?php echo $item['quiz_count']; ?></p>
                     </div>
-                </form>
-                
-                <?php if ($selected_course_id): ?>
-                    <div class="row">
-                        <?php foreach ($videos_and_quizzes as $item): ?>
-                            <div class="col-md-4 mb-4">
-                                <div class="card">
-                                    <div class="card-body">
-                                        <h5 class="card-title"><?php echo htmlspecialchars($item['class_name']); ?></h5>
-                                        <?php if (!empty($item['video_path'])): ?>
-                                            <p><a href="<?php echo $item['video_path']; ?>" target="_blank">View Video</a></p>
-                                        <?php else: ?>
-                                            <p>No video available</p>
-                                        <?php endif; ?>
-                                        <p>Quiz Questions: <?php echo $item['quiz_count']; ?></p>
-                                    </div>
-                                </div>
-                            </div>
-                        <?php endforeach; ?>
-                    </div>
-                <?php elseif (isset($_GET['course_id'])): ?>
-                    <p>No videos or quizzes found for this course.</p>
-                <?php endif; ?>
+                </div>
+            </div>
+        <?php endforeach; ?>
+    </div>
+<?php elseif (isset($_GET['course_id'])): ?>
+    <p>No videos or quizzes found for this course.</p>
+<?php endif; ?>
             </main>
         </div>
     </div>

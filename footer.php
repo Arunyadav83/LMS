@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Document</title>
     <style>
-        a{
+        a {
             text-decoration: none;
         }
         
@@ -16,14 +16,29 @@
             color: white;
             font-size: 14px;
             position: relative;
+            height: 360px;
         }
-
-       
 
         footer a:hover {
             text-decoration: underline;
         }
 
+        /* Media Query for Column View */
+        @media (max-width: 768px) {
+            footer {
+                height: 1070px; /* Increase height for smaller screens */
+            }
+
+            .col-md-4, .col-md-2 {
+                margin-bottom: 20px; /* Add spacing between columns */
+            }
+
+            .social-icons {
+                display: flex;
+                justify-content: center;
+                gap: 10px;
+            }
+        }
     </style>
 </head>
 <body>

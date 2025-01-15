@@ -1,153 +1,3 @@
-<?php
-include 'header.php';
-
-class About
-{
-    private $courses;
-    private $tutors;
-
-    public function __construct()
-    {
-        $this->courses = $this->fetchCoursesFromDatabase();
-        $this->tutors = $this->fetchTutorsFromDatabase();
-    }
-
-    private function fetchCoursesFromDatabase()
-    {
-        // Database connection parameters
-        $host = 'localhost';
-        $db = 'lms';
-        $user = 'root';
-        $pass = '';
-
-        try {
-            $pdo = new PDO("mysql:host=$host;dbname=$db", $user, $pass);
-            $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
-
-            $stmt = $pdo->prepare("SELECT id, title FROM courses");
-            $stmt->execute();
-
-            return $stmt->fetchAll(PDO::FETCH_ASSOC);
-        } catch (PDOException $e) {
-            echo "Connection failed: " . $e->getMessage();
-            return [];
-        }
-    }
-
-    private function fetchTutorsFromDatabase()
-    {
-        $host = 'localhost';
-        $db = 'lms';
-        $user = 'root';
-        $pass = '';
-
-        try {
-            $pdo = new PDO("mysql:host=$host;dbname=$db", $user, $pass);
-            $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
-
-            $stmt = $pdo->prepare("SELECT id, full_name, email, role, bio, specialization, resume_path, certificate_path, created_at FROM tutors");
-            $stmt->execute();
-
-            $tutors = $stmt->fetchAll(PDO::FETCH_ASSOC);
-
-            foreach ($tutors as &$tutor) {
-                $image_name = strtolower(str_replace(' ', '_', $tutor['full_name'])) . '.jpg';
-                $tutor['image'] = 'assets/images/' . $image_name;
-            }
-
-            return $tutors;
-        } catch (PDOException $e) {
-            echo "Connection failed: " . $e->getMessage();
-            return [];
-        }
-    }
-
-
-    public function displayAbout()
-    {
-        echo "<div class='container-fluid'>";
-        echo "<h2 class='section-title'>
-                <span class='subtitle'>World-Class Instructors</span><br>
-                Classes Taught By Real Creators
-              </h2>";
-        echo "<div class='tutors-section'>";
-
-        foreach ($this->tutors as $tutor) {
-            echo "<div class='tutor-card'>
-                    <div class='card'>
-                        <div class='card-body'>
-                            <div class='d-flex flex-column align-items-center'>
-                                <img src='" . htmlspecialchars($tutor['image']) . "' alt='" . htmlspecialchars($tutor['full_name']) . "' class='tutor-image mb-4'>
-                                <h3 class='tutor-name'>" . htmlspecialchars($tutor['full_name']) . "</h3>
-                                <p class='tutor-specialization'>" . htmlspecialchars($tutor['specialization']) . "</p>
-                                <button class='btn btn-primary bio-btn' onclick='showBio(" . $tutor['id'] . ")'>View Bio</button>
-                            </div>
-                        </div>
-                    </div>
-                </div>";
-        }
-
-        echo "</div>"; // Close tutors section
-
-        echo "<h2 class='section-title'>Courses Offered</h2>";
-        echo "<div class='course-slider'>";
-
-        foreach ($this->courses as $course) {
-            $image_name = strtolower(str_replace(' ', '_', $course['title'])) . '.jpg';
-            echo "<div class='course-item'>
-                    <img src='assets/images/{$image_name}' alt='" . htmlspecialchars($course['title']) . "' class='course-image' >
-                </div>";
-        }
-
-        echo "</div>"; // Close courses slider
-        echo "</div>"; // Close container-fluid
-    }
-
-    public function displayWelcomeMessage()
-    {
-        echo "<div class='container-fluid'>";
-        echo "<div class='welcome-section'>";
-        echo "<h1>About Us</h1>";
-
-        echo "<p>Welcome to Ultrakey, your trusted partner in academic success and personal growth!<br>
-        Ultrakey Learning is your one-stop destination for quality online courses in a variety of fields. Whether you're looking to upskill, learn a new language, or explore programming, we have the courses you need to succeed.</p>";
-
-        echo '<h2 style="text-align: center; margin-top:4%">Why Choose Us?</h2>';
-
-        echo "<div class='why-choose-us-cards'>";
-
-        echo "<div class='why-card'>
-                <img src='assets/images/expert_educators.png' alt='Expert Educators'>
-                <h3>Expert Educators</h3>
-                <p>Innovative teaching methodologies to ensure student success.</p>
-              </div>";
-
-        echo "<div class='why-card'>
-                <img src='assets/images/motivators.png' alt='Motivators'>
-                <h3>Motivating Environment</h3>
-                <p>Encouraging growth and consistent progress.</p>
-              </div>";
-
-        echo "<div class='why-card'>
-                <img src='assets/images/outstanding_students.png' alt='Outstanding Students'>
-                <h3>Outstanding Students</h3>
-                <p>A dynamic learning ecosystem for thriving students.</p>
-              </div>";
-
-        echo "</div>"; // Close why-choose-us-cards
-        echo "</div>";
-        echo  "</div>";
-        // Close welcome-section
-    }
-}
-
-$about = new About();
-$about->displayWelcomeMessage();
-$about->displayAbout();
-
-include 'footer.php';
-?>
-
 <!DOCTYPE html>
 <html lang="en">
 
@@ -157,18 +7,18 @@ include 'footer.php';
     <title>About Us - Ultrakey</title>
     <link rel="stylesheet" type="text/css" href="https://cdnjs.cloudflare.com/ajax/libs/slick-carousel/1.8.1/slick.min.css" />
     <link rel="stylesheet" type="text/css" href="https://cdnjs.cloudflare.com/ajax/libs/slick-carousel/1.8.1/slick-theme.min.css" />
-    <script>
+    <!-- <script>
         document.onreadystatechange = function() {
             if (document.readyState == "interactive") {
                 document.body.classList.add('page-loaded');
             }
         };
-    </script>
+    </script> -->
     <style>
-        .page-loaded {
+        /* .page-loaded {
             opacity: 1;
             transition: opacity 0.5s ease-in-out;
-        }
+        } */
 
         body {
             font-family: 'Poppins', sans-serif;
@@ -181,11 +31,11 @@ include 'footer.php';
         }
 
         /* Make the content visible after it's loaded */
-        body.loaded {
+        /* body.loaded {
             opacity: 1;
             visibility: visible;
             transition: opacity 0.5s ease-in-out;
-        }
+        } */
 
         h1,
         h2 {
@@ -225,6 +75,7 @@ include 'footer.php';
             position: relative;
             color: white;
             text-align: center;
+            margin-top: 0px;
             padding: 50px 20px;
             background: linear-gradient(rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.5)),
                 url('assets/images/about_us_background.jpg') no-repeat center center;
@@ -284,6 +135,7 @@ include 'footer.php';
             grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
             gap: 20px;
             /* Space between grid items */
+            animation: scroll-carousel 10s linear infinite;
             margin-top: 30px;
             padding: 10px;
         }
@@ -611,3 +463,157 @@ include 'footer.php';
 </body>
 
 </html>
+
+
+
+<?php
+include 'header.php';
+
+class About
+{
+    private $courses;
+    private $tutors;
+
+    public function __construct()
+    {
+        $this->courses = $this->fetchCoursesFromDatabase();
+        $this->tutors = $this->fetchTutorsFromDatabase();
+    }
+
+    private function fetchCoursesFromDatabase()
+    {
+        // Database connection parameters
+        $host = 'localhost';
+        $db = 'lms';
+        $user = 'root';
+        $pass = '';
+
+        try {
+            $pdo = new PDO("mysql:host=$host;dbname=$db", $user, $pass);
+            $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+
+            $stmt = $pdo->prepare("SELECT id, title FROM courses");
+            $stmt->execute();
+
+            return $stmt->fetchAll(PDO::FETCH_ASSOC);
+        } catch (PDOException $e) {
+            echo "Connection failed: " . $e->getMessage();
+            return [];
+        }
+    }
+
+    private function fetchTutorsFromDatabase()
+    {
+        $host = 'localhost';
+        $db = 'lms';
+        $user = 'root';
+        $pass = '';
+
+        try {
+            $pdo = new PDO("mysql:host=$host;dbname=$db", $user, $pass);
+            $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+
+            $stmt = $pdo->prepare("SELECT id, full_name, email, role, bio, specialization, resume_path, certificate_path, created_at FROM tutors");
+            $stmt->execute();
+
+            $tutors = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+            foreach ($tutors as &$tutor) {
+                $image_name = strtolower(str_replace(' ', '_', $tutor['full_name'])) . '.jpg';
+                $tutor['image'] = 'assets/images/' . $image_name;
+            }
+
+            return $tutors;
+        } catch (PDOException $e) {
+            echo "Connection failed: " . $e->getMessage();
+            return [];
+        }
+    }
+
+
+    public function displayAbout()
+    {
+        echo "<div class='container-fluid'>";
+        echo "<h2 class='section-title'>
+                <span class='subtitle'>World-Class Instructors</span><br>
+                Classes Taught By Real Creators
+              </h2>";
+              echo "<div class='tutors-section container-fluid'>";
+
+
+        foreach ($this->tutors as $tutor) {
+            echo "<div class='tutor-card'>
+                    <div class='card'>
+                        <div class='card-body'>
+                            <div class='d-flex flex-column align-items-center'>
+                                <img src='" . htmlspecialchars($tutor['image']) . "' alt='" . htmlspecialchars($tutor['full_name']) . "' class='tutor-image mb-4'>
+                                <h3 class='tutor-name'>" . htmlspecialchars($tutor['full_name']) . "</h3>
+                                <p class='tutor-specialization'>" . htmlspecialchars($tutor['specialization']) . "</p>
+                                <button class='btn btn-primary bio-btn' onclick='showBio(" . $tutor['id'] . ")'>View Bio</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>";
+        }
+
+        echo "</div>"; // Close tutors section
+
+        echo "<h2 class='section-title'>Courses Offered</h2>";
+        echo "<div class='course-slider'>";
+
+        foreach ($this->courses as $course) {
+            $image_name = strtolower(str_replace(' ', '_', $course['title'])) . '.jpg';
+            echo "<div class='course-item'>
+                    <img src='assets/images/{$image_name}' alt='" . htmlspecialchars($course['title']) . "' class='course-image' >
+                </div>";
+        }
+
+        echo "</div>"; // Close courses slider
+        echo "</div>"; // Close container-fluid
+    }
+
+    public function displayWelcomeMessage()
+    {
+        echo "<div class='container-fluid'>";
+        echo "<div class='welcome-section'>";
+        echo "<h1>About Us</h1>";
+
+        echo "<p>Welcome to Ultrakey, your trusted partner in academic success and personal growth!<br>
+        Ultrakey Learning is your one-stop destination for quality online courses in a variety of fields. Whether you're looking to upskill, learn a new language, or explore programming, we have the courses you need to succeed.</p>";
+
+        echo '<h2 style="text-align: center; margin-top:4%">Why Choose Us?</h2>';
+
+        echo "<div class='why-choose-us-cards'>";
+
+        echo "<div class='why-card'>
+                <img src='assets/images/expert_educators.png' alt='Expert Educators'>
+                <h3>Expert Educators</h3>
+                <p>Innovative teaching methodologies to ensure student success.</p>
+              </div>";
+
+        echo "<div class='why-card'>
+                <img src='assets/images/motivators.png' alt='Motivators'>
+                <h3>Motivating Environment</h3>
+                <p>Encouraging growth and consistent progress.</p>
+              </div>";
+
+        echo "<div class='why-card'>
+                <img src='assets/images/outstanding_students.png' alt='Outstanding Students'>
+                <h3>Outstanding Students</h3>
+                <p>A dynamic learning ecosystem for thriving students.</p>
+              </div>";
+
+        echo "</div>"; // Close why-choose-us-cards
+        echo "</div>";
+        echo  "</div>";
+        // Close welcome-section
+    }
+}
+
+$about = new About();
+$about->displayWelcomeMessage();
+$about->displayAbout();
+
+include 'footer.php';
+?>
+

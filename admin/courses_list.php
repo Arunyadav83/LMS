@@ -227,7 +227,7 @@ if ($result->num_rows > 0) {
             /* Center the main element */
         }
 
-        body{
+        body {
             width: 100%;
         }
 
@@ -405,6 +405,7 @@ if ($result->num_rows > 0) {
             /* Reduce spacing on smaller screens */
         }
     }
+    
 </style>
 
 <body>
@@ -477,17 +478,17 @@ if ($result->num_rows > 0) {
                             <tbody>
                                 <?php foreach ($courses as $course): ?>
                                     <tr>
-                                        <td><?php echo htmlspecialchars($course['id']); ?></td>
-                                        <td><?php echo htmlspecialchars($course['title']); ?></td>
-                                        <td><?php echo htmlspecialchars($course['description']); ?></td>
-                                        <td>
+                                        <td data-label="ID"><?php echo htmlspecialchars($course['id']); ?></td>
+                                        <td data-label="Title"><?php echo htmlspecialchars($course['title']); ?></td>
+                                        <td data-label="Description"><?php echo htmlspecialchars($course['description']); ?></td>
+                                        <td data-label="Topics">
                                             <?php
                                             $topics = explode(',', $course['topics']);
                                             foreach ($topics as $topic): ?>
                                                 <span class="badge bg-primary me-1"><?php echo htmlspecialchars(trim($topic)); ?></span>
                                             <?php endforeach; ?>
                                         </td>
-                                        <td class="text-center">
+                                        <td data-label="Actions" class="text-center">
                                             <div class="dropdown">
                                                 <button class="btn btn-light btn-sm" type="button" id="dropdownMenuButton" data-bs-toggle="dropdown" aria-expanded="false">
                                                     <i class="fas fa-ellipsis-v"></i>
@@ -497,7 +498,7 @@ if ($result->num_rows > 0) {
                                                         <button class="dropdown-item edit-btn" data-bs-toggle="modal" data-bs-target="#editModal"
                                                             data-id="<?php echo $course['id']; ?>"
                                                             data-title="<?php echo htmlspecialchars($course['title']); ?>"
-                                                            data-description="<?php echo htmlspecialchars($course['description']); ?>"
+                                                             data-description="<?php echo htmlspecialchars(substr($course['description'], 0, 10)); ?>..."
                                                             data-topics="<?php echo htmlspecialchars($course['topics']); ?>"
                                                             data-prize="<?php echo htmlspecialchars($course['course_prize']); ?>">Edit</button>
                                                     </li>
@@ -513,6 +514,7 @@ if ($result->num_rows > 0) {
                                     </tr>
                                 <?php endforeach; ?>
                             </tbody>
+
                         </table>
                     </div>
 

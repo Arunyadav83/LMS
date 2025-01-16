@@ -39,6 +39,9 @@ $current_page = 'videos';
     .navbar{
         background-color: #1a237e !important;
     }
+    .h2{
+        color: #1a237e;
+    }
 </style>
 <body>
     <!-- Navigation Bar -->

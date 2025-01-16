@@ -95,6 +95,9 @@ $tutor_filter = isset($_GET['tutor']) ? $_GET['tutor'] : '';
             margin: auto;
             padding: 0px 5px;
     }
+    .mb-4{
+        color: #16308b;
+    }
 
 </style>
 <body>

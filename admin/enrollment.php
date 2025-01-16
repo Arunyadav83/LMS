@@ -86,7 +86,7 @@ foreach ($enrollments as $enrollment) {
     }
 
     .navbar {
-        background-color: #16308b;
+        background-color:#1a237e;
         margin: auto;
         padding: 0px 5px;
         /* Adjust top-bottom and left-right padding to reduce height */

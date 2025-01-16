@@ -65,7 +65,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                             <li><b>Password:</b> $password</li>
                         </ul>
                         <p>Please keep this information secure.</p>
-                        <p>Best regards,<br>Your Website Team</p>
+                        <p>Best regards,<br>Ultrakey Learning</p>
                     ";
 
                     $mail->send();
@@ -119,8 +119,7 @@ include 'header.php';
 
 <div class="form-container">
     <div class="form-heading">
-        <img src="assets/images/logo2.png" alt="Logo">
-        <h2>Student Registration</h2>
+        <h2 style="margin-left:60px">Student Registration</h2>
     </div>
 
     <?php if ($error): ?>

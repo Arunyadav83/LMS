@@ -46,33 +46,27 @@ $students = mysqli_fetch_all($result, MYSQLI_ASSOC);
     }
     .navbar-brand {
             font-size: 20px;
-            /* margin-inline-start: 20px; */
             color: white;
-
-
         }
 
         .nav-link {
             color: white;
             padding-inline: 20px;
             text-decoration: underline;
-
         }
 
         .nav-link:hover {
-            color: white;
-            /* text-decoration: underline; */
+            color: white;/* text-decoration: underline; */
         }
 
         .navbar {
-            background-color: #16308b;
+            background-color:#1a237e;
             margin: auto;
             padding: 0px 5px;
             /* Adjust top-bottom and left-right padding to reduce height */
             line-height: 1.2;
             /* Reduce line height for inner elements */
-            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-            /* Optional: Adds a subtle shadow for depth */
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); /* Optional: Adds a subtle shadow for depth */
         }
 
 
@@ -81,8 +75,7 @@ $students = mysqli_fetch_all($result, MYSQLI_ASSOC);
             text-decoration: none;
             color: #0433c3;
             padding-block: 10px;
-
-        }
+         }
         
 
         .button:hover {

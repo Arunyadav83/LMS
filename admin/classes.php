@@ -97,27 +97,27 @@ if (!isset($_SESSION['user_id']) || !isset($_SESSION['role']) || $_SESSION['role
     </head>
 
     <body>
-    <div class="container mt-5">
-    <div class="row justify-content-center">
-        <div class="col-md-6" style="max-width: 700px; height: 60vh; background-color: #f8f9fa; border-radius: 2%; text-align: center;">
-            <h2 class="mb-4">Tutor Login</h2>
-            <?php if (isset($error)): ?>
-                <div class="alert alert-danger"><?php echo $error; ?></div>
-            <?php endif; ?>
-            <form method="post" action="" style="width: 300px; margin-top: 30px; margin-left: 28%;"> <!-- Adjusted margin -->
-                <div class="mb-3">
-                    <label for="email" class="form-label">Email address</label>
-                    <input type="email" class="form-control" id="email" name="email" required>
+        <div class="container mt-5">
+            <div class="row justify-content-center">
+                <div class="col-md-6" style="max-width: 700px; height: 60vh; background-color: #f8f9fa; border-radius: 2%; text-align: center;">
+                    <h2 class="mb-4">Tutor Login</h2>
+                    <?php if (isset($error)): ?>
+                        <div class="alert alert-danger"><?php echo $error; ?></div>
+                    <?php endif; ?>
+                    <form method="post" action="" style="width: 300px; margin-top: 30px; margin-left: 28%;"> <!-- Adjusted margin -->
+                        <div class="mb-3">
+                            <label for="email" class="form-label">Email address</label>
+                            <input type="email" class="form-control" id="email" name="email" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="password" class="form-label">Password</label>
+                            <input type="password" class="form-control" id="password" name="password" required>
+                        </div>
+                        <button type="submit" name="login" class="btn btn-primary w-60">Login</button>
+                    </form>
                 </div>
-                <div class="mb-3">
-                    <label for="password" class="form-label">Password</label>
-                    <input type="password" class="form-control" id="password" name="password" required>
-                </div>
-                <button type="submit" name="login" class="btn btn-primary w-60">Login</button>
-            </form>
+            </div>
         </div>
-    </div>
-</div>
 
         <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
     </body>
@@ -126,7 +126,6 @@ if (!isset($_SESSION['user_id']) || !isset($_SESSION['role']) || $_SESSION['role
 <?php
     exit();
 }
-
 $tutor_id = $_SESSION['user_id'];
 $tutor_name = $_SESSION['full_name'];
 
@@ -188,27 +187,30 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 
                 if (mysqli_stmt_execute($stmt)) {
                     $question_id = mysqli_insert_id($conn);
-
+                    
                     if (isset($_POST['answers'][$index]) && isset($_POST['feedback'][$index])) {
                         foreach ($_POST['answers'][$index] as $answer_index => $answer) {
                             $answer_text = mysqli_real_escape_string($conn, $answer);
                             $feedback_text = mysqli_real_escape_string($conn, $_POST['feedback'][$index][$answer_index]);
-
+                            
                             if (empty($answer_text) || empty($feedback_text)) {
                                 echo "Error: Answer or feedback is empty!";
                                 continue;
                             }
-
-                            $query = "INSERT INTO quiz_answers (question_id, answer_text, feedback) VALUES (?, ?, ?)";
+                            
+                            // Set 'is_correct' dynamically based on the selected correct answer
+                            $is_correct = ($_POST['correct_answers'][$index] == $answer_index) ? 1 : 0;
+                            
+                            $query = "INSERT INTO quiz_answers (question_id, answer_text, feedback, is_correct) VALUES (?, ?, ?, ?)";
                             $stmt = mysqli_prepare($conn, $query);
-
+                            
                             if (!$stmt) {
                                 echo "Error preparing statement for quiz answer: " . mysqli_error($conn);
                                 continue;
                             }
-
-                            mysqli_stmt_bind_param($stmt, "iss", $question_id, $answer_text, $feedback_text);
-
+                            
+                            mysqli_stmt_bind_param($stmt, "issi", $question_id, $answer_text, $feedback_text, $is_correct);
+                            
                             if (!mysqli_stmt_execute($stmt)) {
                                 echo "Error executing query for quiz answer: " . mysqli_error($conn);
                             }
@@ -217,12 +219,11 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                 } else {
                     echo "Error inserting quiz question: " . mysqli_error($conn);
                 }
-            }
-        } else {
-            echo "No quiz questions submitted.";
-        }
-    }
-}
+            }  // <-- Close the foreach loop
+        }  // <-- Close the if for checking 'questions'
+    }  // <-- Close the if for 'add_class'
+}  // <-- Close the if for checking POST request
+
 
 // Fetch courses assigned to the logged-in tutor
 $query = "SELECT * FROM courses WHERE tutor_id = ?";
@@ -322,6 +323,53 @@ $classes = mysqli_fetch_all($result, MYSQLI_ASSOC);
         box-shadow: 2px 3px 10px grey;
         background-color: rgb(130, 142, 181);
     }
+
+    .custom-table th {
+        background-color: #343a40;
+        color: white;
+        text-align: center;
+    }
+
+    .custom-table td {
+        vertical-align: middle;
+        text-align: center;
+    }
+
+    .btn-custom {
+        border-radius: 20px;
+        font-size: 14px;
+    }
+
+    body {
+        background-color: rgb(213, 221, 245);
+    }
+
+    .table-container {
+        padding: 20px;
+        background-color: #f8f9fa;
+        border-radius: 8px;
+        box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    }
+
+    .add-button {
+        position: relative;
+        left: 994px;
+        bottom: 65px;
+        padding-inline: 30px;
+        font-weight: bolder;
+        text-decoration: none;
+        color: #0433c3;
+        /* background-color: white; */
+        padding-block: 10px;
+        border-radius: 30px;
+        transition: all 0.3s ease;
+    }
+
+    .add-button:hover {
+        color: white;
+        background-color: #0433c3;
+        border-radius: 30px;
+    }
 </style>
 <script>
     document.getElementById('addQuestion').addEventListener('click', function() {
@@ -378,9 +426,9 @@ $classes = mysqli_fetch_all($result, MYSQLI_ASSOC);
             unset($_SESSION['error_message']);
         }
         ?>
-        <h1 class="mb-4">Classes - Tutor: <?php echo htmlspecialchars($tutor_name); ?></h1>
+        <h1 class="mb-4" style="color: #1a237e;">Classes - Tutor: <?php echo htmlspecialchars($tutor_name); ?></h1>
         <!-- Button to Open the Offcanvas -->
-        <button class="btn btn-primary" type="button" data-bs-toggle="offcanvas" data-bs-target="#addClassOffcanvas" aria-controls="addClassOffcanvas">
+        <button class="add-button" type="button" data-bs-toggle="offcanvas" data-bs-target="#addClassOffcanvas" aria-controls="addClassOffcanvas">
             Add New Class
         </button>
 
@@ -429,7 +477,7 @@ $classes = mysqli_fetch_all($result, MYSQLI_ASSOC);
                     </div>
                     <h3>Quiz Questions</h3>
                     <div id="quizQuestions">
-                        <!-- Initial question will be added here -->
+
                     </div>
                     <button type="button" class="btn btn-secondary mb-3" id="addQuestion">Add Question</button>
                     <button type="submit" name="add_class" class="btn btn-primary">Add Class</button>
@@ -442,7 +490,7 @@ $classes = mysqli_fetch_all($result, MYSQLI_ASSOC);
         <!-- Include Font Awesome for Icons -->
         <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
 
-        <div class="mb-4" style="margin-left: 890px;">
+        <div class="mb-4" style="margin-left: 1100px;">
             <button id="listViewBtn" class="btn btn-info me-2">
                 <i class="fas fa-list"></i> <!-- List View Icon -->
             </button>
@@ -458,11 +506,13 @@ $classes = mysqli_fetch_all($result, MYSQLI_ASSOC);
 
 
         <!-- List View -->
-        <div id="listView" class="d-block">
+        <div id="listView" class="table-container">
             <?php if (empty($classes)): ?>
-                <p>You haven't created any classes yet.</p>
+                <div class="alert alert-warning text-center">
+                    <p>You haven't created any classes yet.</p>
+                </div>
             <?php else: ?>
-                <table class="table table-striped">
+                <table class="table table-striped table-hover custom-table">
                     <thead>
                         <tr>
                             <th>Course</th>
@@ -478,26 +528,30 @@ $classes = mysqli_fetch_all($result, MYSQLI_ASSOC);
                             <tr>
                                 <td><?php echo htmlspecialchars($class['course_title']); ?></td>
                                 <td><?php echo htmlspecialchars($class['class_name']); ?></td>
-                                <td><?php echo htmlspecialchars($class['description']); ?></td>
+                                <td>
+                                    <span class="text-truncate d-inline-block" style="max-width: 150px;" title="<?php echo htmlspecialchars($class['description']); ?>">
+                                        <?php echo htmlspecialchars($class['description']); ?>
+                                    </span>
+                                </td>
                                 <td>
                                     <?php if (!empty($class['video_path'])): ?>
-                                        <a href="<?php echo $class['video_path']; ?>" target="_blank">View Video</a>
+                                        <a href="<?php echo $class['video_path']; ?>" target="_blank" class="btn btn-sm btn-success btn-custom">View Video</a>
                                     <?php else: ?>
-                                        N/A
+                                        <span class="badge bg-secondary">N/A</span>
                                     <?php endif; ?>
                                 </td>
                                 <td>
                                     <?php if ($class['is_online']): ?>
-                                        Yes - <?php echo htmlspecialchars($class['schedule_time']); ?>
+                                        <span class="badge bg-primary">Yes</span><br>
+                                        <small><?php echo htmlspecialchars($class['schedule_time']); ?></small>
                                     <?php else: ?>
-                                        No
+                                        <span class="badge bg-danger">No</span>
                                     <?php endif; ?>
                                 </td>
-                                <td class="d-flex justify-content-start">
-                                    <a href="edit_class.php?id=<?php echo $class['id']; ?>" class="btn btn-sm btn-primary me-2">Edit</a>
-                                    <a href="view_quiz.php?class_id=<?php echo $class['id']; ?>" class="btn btn-sm btn-info me-2">View Quiz</a>
-                                    <a href="javascript:void(0);" class="btn btn-sm btn-danger" onclick="confirmDelete(<?php echo $class['id']; ?>)">Delete</a>
-
+                                <td class="d-flex justify-content-center">
+                                    <a href="edit_class.php?id=<?php echo $class['id']; ?>" class="btn btn-sm btn-primary btn-custom me-2">Edit</a>
+                                    <a href="view_quiz.php?class_id=<?php echo $class['id']; ?>" class="btn btn-sm btn-info btn-custom me-2">View Quiz</a>
+                                    <button class="btn btn-sm btn-danger btn-custom" onclick="confirmDelete(<?php echo $class['id']; ?>)">Delete</button>
                                 </td>
                             </tr>
                         <?php endforeach; ?>
@@ -505,6 +559,7 @@ $classes = mysqli_fetch_all($result, MYSQLI_ASSOC);
                 </table>
             <?php endif; ?>
         </div>
+
         <script>
             function confirmDelete(classId) {
                 Swal.fire({
@@ -608,98 +663,93 @@ $classes = mysqli_fetch_all($result, MYSQLI_ASSOC);
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
     <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            const quizForm = document.getElementById('quizForm'); // Ensure your form has this ID
-            const addQuestionBtn = document.getElementById('addQuestion');
-            const quizQuestionsContainer = document.getElementById('quizQuestions');
-            let questionCount = 0;
+      document.addEventListener('DOMContentLoaded', function () {
+    const quizForm = document.getElementById('quizForm'); // Ensure your form has this ID
+    const addQuestionBtn = document.getElementById('addQuestion');
+    const quizQuestionsContainer = document.getElementById('quizQuestions');
+    let questionCount = 0;
 
-            function createQuestionTemplate(index) {
-                return `
-            <div class="card mb-3" data-question-index="${index}">
-                <div class="card-body">
-                    <h5 class="card-title">Question ${index + 1}</h5>
-                    <div class="mb-3">
-                        <label for="question${index}" class="form-label">Question</label>
-                        <input type="text" class="form-control" id="question${index}" name="questions[]" required>
-                    </div>
-                    <div class="mb-3">
-                        <label class="form-label">Answers</label>
-                        ${[0, 1, 2, 3].map(answerIndex => `
-                            <div class="mb-3">
-                                <div class="input-group mb-2">
-                                    <div class="input-group-text">
-                                        <input type="radio" name="correct_answers[${index}]" value="${answerIndex}" required>
-                                    </div>
-                                    <input type="text" class="form-control" name="answers[${index}][]" placeholder="Answer option" required>
+    function createQuestionTemplate(index) {
+        return `
+        <div class="card mb-3" data-question-index="${index}">
+            <div class="card-body">
+                <h5 class="card-title">Question ${index + 1}</h5>
+                <div class="mb-3">
+                    <label for="question${index}" class="form-label">Question</label>
+                    <input type="text" class="form-control" id="question${index}" name="questions[${index}]" required>
+                </div>
+                <div class="mb-3">
+                    <label class="form-label">Answers</label>
+                    ${[0, 1, 2, 3].map(answerIndex => `
+                        <div class="mb-3">
+                            <div class="input-group mb-2">
+                                <div class="input-group-text">
+                                    <input type="radio" name="correct_answers[${index}]" value="${answerIndex}" required>
                                 </div>
-                                <input type="text" class="form-control" name="feedback[${index}][]" placeholder="Feedback for this answer" required>
+                                <input type="text" class="form-control" name="answers[${index}][]" placeholder="Answer option" required>
                             </div>
-                        `).join('')}
-                    </div>
+                            <input type="text" class="form-control" name="feedback[${index}][]" placeholder="Feedback for this answer" required>
+                        </div>
+                    `).join('')}
                 </div>
             </div>
-            `;
+        </div>`;
+    }
+
+    // Add event listener for adding more questions
+    addQuestionBtn.addEventListener('click', function () {
+        quizQuestionsContainer.insertAdjacentHTML('beforeend', createQuestionTemplate(questionCount));
+        questionCount++;
+    });
+
+    // Validate form on submit
+    quizForm.addEventListener('submit', function (e) {
+        e.preventDefault(); // Prevent default form submission
+
+        const formData = new FormData(quizForm);
+        const payload = [];
+
+        // Loop through questions to construct payload
+        for (let i = 0; i < questionCount; i++) {
+            const questionText = formData.get(`questions[${i}]`);
+            const answers = formData.getAll(`answers[${i}][]`);
+            const feedbacks = formData.getAll(`feedback[${i}][]`);
+            const correctAnswerIndex = formData.get(`correct_answers[${i}]`);
+
+            if (!questionText || correctAnswerIndex === null) {
+                alert(`Error: Question ${i + 1} or its correct answer is not properly filled.`);
+                return;
             }
 
-            // Add initial question
-            quizQuestionsContainer.insertAdjacentHTML('beforeend', createQuestionTemplate(questionCount));
-            questionCount++;
-
-            // Add event listener for adding more questions
-            addQuestionBtn.addEventListener('click', function() {
-                quizQuestionsContainer.insertAdjacentHTML('beforeend', createQuestionTemplate(questionCount));
-                questionCount++;
+            answers.forEach((answer, idx) => {
+                payload.push({
+                    question_id: i + 1,
+                    answer_text: answer,
+                    is_correct: idx == correctAnswerIndex ? 1 : 0, // Mark correct answer as 1
+                    feedback: feedbacks[idx],
+                });
             });
+        }
 
-            // Validate form on submit
-            quizForm.addEventListener('submit', function(e) {
-                e.preventDefault(); // Prevent default form submission
-
-                const formData = new FormData(quizForm);
-                const payload = [];
-
-                // Loop through questions to construct payload
-                for (let i = 0; i < questionCount; i++) {
-                    const questionText = formData.getAll(`questions[]`)[i];
-                    const answers = formData.getAll(`answers[${i}][]`);
-                    const feedbacks = formData.getAll(`feedback[${i}][]`);
-                    const correctAnswerIndex = formData.get(`correct_answers[${i}]`);
-
-                    if (!questionText || !correctAnswerIndex) {
-                        alert(`Error: Question ${i + 1} or its correct answer is not properly filled.`);
-                        return;
-                    }
-
-                    answers.forEach((answer, idx) => {
-                        payload.push({
-                            question_id: i + 1,
-                            answer_text: answer,
-                            is_correct: idx == correctAnswerIndex ? 1 : 0, // Mark correct answer as 1
-                            feedback: feedbacks[idx],
-                        });
-                    });
-                }
-
-                // Submit data via fetch
-                fetch('/submit-quiz', {
-                        method: 'POST',
-                        headers: {
-                            'Content-Type': 'application/json'
-                        },
-                        body: JSON.stringify(payload),
-                    })
-                    .then(response => response.json())
-                    .then(data => {
-                        console.log('Quiz submitted successfully:', data);
-                        alert('Quiz submitted successfully!');
-                    })
-                    .catch(error => {
-                        console.error('Error submitting quiz:', error);
-                        alert('An error occurred while submitting the quiz.');
-                    });
+        // Submit data via fetch
+        fetch('/submit-quiz', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(payload),
+        })
+            .then((response) => response.json())
+            .then((data) => {
+                console.log('Quiz submitted successfully:', data);
+                alert('Quiz submitted successfully!');
+            })
+            .catch((error) => {
+                console.error('Error submitting quiz:', error);
+                alert('An error occurred while submitting the quiz.');
             });
-        });
+    });
+});
     </script>
 
 </body>

@@ -26,6 +26,7 @@
             color: white;
             padding: 20px 20px;
             text-align: center;
+            margin-top:41px;
         }
 
         .hero h1 {

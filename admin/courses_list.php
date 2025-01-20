@@ -404,7 +404,42 @@ if ($result->num_rows > 0) {
             margin: 0 5px;
             /* Reduce spacing on smaller screens */
         }
+        main{
+            max-width: 800px;
+        }
     }
+    @media (max-width: 768px) {
+
+    #listView h2 {
+        font-size: 1.5rem;
+        top: 0; /* Reset position */
+    }
+    .table td, .table th {
+        font-size: 0.875rem; /* Smaller font for better fit */
+        white-space: normal;
+        
+         /* Prevent text overflow */
+    }
+    main{
+            max-width: 800px;
+        }
+    .badge {
+        font-size: 0.75rem; /* Smaller badge size */
+    }
+    .dropdown-menu {
+        font-size: 0.875rem; /* Smaller dropdown text */
+    }
+    /* .a{
+        margin-left: 340px;
+        
+    } */
+     .table_list{
+        overflow-x: auto;
+        width: 100%;
+
+    }
+}
+
     
 </style>
 
@@ -450,8 +485,8 @@ if ($result->num_rows > 0) {
                         <a href="add_course.php" class="button">Add New Course</a>
                     </div>
 
-                    <div style="overflow-x: auto; width: 100%; display: flex; justify-content: center; margin-bottom: 20px;">
-                        <div style="min-width: 250px; display: inline-block;">
+                    <div style="overflow-x: auto; display: flex; justify-content: center; position:relative;bottom: 34px;margin-left: 165px;" >
+                        <div  class="a">
                             <button id="listViewBtn" class="btn btn-primary me" onclick="showListView()">
                                 <i class="fas fa-list"></i>
                             </button>
@@ -463,8 +498,9 @@ if ($result->num_rows > 0) {
 
 
                     <!-- List View -->
-                    <div id="listView" class="view container mt-5">
+                    <div id="listView" class="view container mt-5" >
                         <h2 class="mb-4">List View</h2>
+                        <div class="table_list">
                         <table class="table table-striped table-bordered align-middle">
                             <thead class="table-dark">
                                 <tr>
@@ -516,6 +552,7 @@ if ($result->num_rows > 0) {
                             </tbody>
 
                         </table>
+                        </div>
                     </div>
 
 

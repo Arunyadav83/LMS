@@ -99,17 +99,19 @@ $result = mysqli_query($conn, $query);
         border: 1px solid #ddd;
         border-radius: 8px;
         box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-        max-width: 800px;
-        margin: 0 auto;
+        max-width: 850px;
+        margin: 100px auto;
     }
 
     /* User login image */
     .user-login-image {
-        width: 200px;
+        width: 400px;
         /* Adjust width as needed */
         height: auto;
         border-radius: 10px;
-        margin-right: 30px;
+        margin-right: 80px;
+        margin-top: -34px;
+        /* margin-left: -4px; */
         /* Space between image and form */
         box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.2);
     }
@@ -121,13 +123,15 @@ $result = mysqli_query($conn, $query);
         justify-content: center;
         align-items: flex-start;
         max-width: 400px;
+        
     }
 
     /* Logo and heading styling */
     .logo-image {
-        width: 50px;
+        width: 160px;
         height: auto;
         margin-bottom: 10px;
+        margin-left: -57px;
     }
 
     .form-container h2 {
@@ -161,9 +165,11 @@ $result = mysqli_query($conn, $query);
     }
 
     .btn-primary {
-        width: 100%;
+        width: 50%;
         padding: 10px;
         font-size: 16px;
+        margin-left: 60px;
+        margin-right: -23px;
         background-color: #007bff;
         color: white;
         border: none;
@@ -179,6 +185,7 @@ $result = mysqli_query($conn, $query);
         font-size: 14px;
         color: #007bff;
         text-decoration: none;
+        margin-bottom: 23px;
         text-align: center;
     }
 

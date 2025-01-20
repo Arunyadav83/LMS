@@ -64,7 +64,7 @@
     /* Sidebar Styling */
     .sidebar {
         background: linear-gradient(135deg, rgb(186, 134, 241), rgb(98, 149, 236));
-        min-height: 100vh;
+        /* min-height: 100vh; */
         color: #fff;
         box-shadow: 2px 0 5px rgba(0, 0, 0, 0.1);
         padding: 10px 0;
@@ -142,9 +142,9 @@
 document.addEventListener("DOMContentLoaded", function () {
     const sidebar = document.querySelector('.sidebar');
     const toggleButton = document.createElement('button');
-    toggleButton.className = 'sidebar-toggle';
-    toggleButton.innerText = '☰';
-    document.body.appendChild(toggleButton);
+    // toggleButton.className = 'sidebar-toggle';
+    // toggleButton.innerText = '☰';
+    // document.body.appendChild(toggleButton);
 
     toggleButton.addEventListener('click', function () {
         sidebar.classList.toggle('show');

@@ -22,7 +22,7 @@ if (!$course_stmt) {
     die("Database query preparation failed: " . mysqli_error($conn));
 }
 
-// Check if binding parameters is successful
+// Check if binding parameters is successfull
 if (!mysqli_stmt_bind_param($course_stmt, "i", $course_id)) {
     die("Parameter binding failed: " . mysqli_error($conn));
 }
@@ -38,7 +38,7 @@ if (!$course) {
 }
 
 // Fetch classes (videos) for this course
-$classes_query = "SELECT id, class_name, description, video_path, is_online, online_link, schedule_time
+$classes_query = "SELECT id, class_name, description, video_path, is_online, online_link, schedule_time, course_id, is_unlocked
                   FROM classes
                   WHERE course_id = ?
                   ORDER BY created_at ASC";
@@ -129,7 +129,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['course_id']) && isset
         <?php
         $lesson_number = 1;
         while ($class = mysqli_fetch_assoc($classes_result)):
-            $is_unlocked = ($lesson_number === 1);
+            $is_unlocked = ($lesson_number === 1) || ($class['is_unlocked'] == 1);
         ?>
             <div class="col">
                 <div class="card shadow-sm">
@@ -234,11 +234,28 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['course_id']) && isset
                                 <p class="text-danger">No video available for this class.</p>
                             <?php endif; ?>
                         <?php else: ?>
-                            <p class="text-muted">This lesson is locked. Complete the previous lesson and quiz to unlock.</p>
-                            <form method="POST" action="unlock_class.php">
+                            <?php
+                            // Check if user has completed quiz for previous class
+                            $prev_class_id = $class['id'] - 1;
+                            $quiz_check_query = "SELECT percentage FROM quiz_results WHERE user_id = ? AND class_id = ? ORDER BY submitted_at DESC LIMIT 1";
+                            $quiz_check_stmt = mysqli_prepare($conn, $quiz_check_query);
+                            mysqli_stmt_bind_param($quiz_check_stmt, "ii", $_SESSION['user_id'], $prev_class_id);
+                            mysqli_stmt_execute($quiz_check_stmt);
+                            $quiz_result = mysqli_stmt_get_result($quiz_check_stmt);
+                            $quiz_score = mysqli_fetch_assoc($quiz_result);
+                            ?>
+                            
+                            <?php if ($quiz_score && $quiz_score['percentage'] >= 70): ?>
+  
+                            <form method="POST" action="unlock_next_class.php">
                                 <input type="hidden" name="class_id" value="<?php echo $class['id']; ?>">
-                                <button type="submit" class="btn btn-warning">Unlock</button>
+                                <input type="hidden" name="course_id" value="<?php echo $class['course_id']; ?>">
+                                <input type="hidden" name="user_id" value="<?php echo $_SESSION['user_id']; ?>">
+                                    <button type="submit" class="btn btn-warning">Unlock This Lesson</button>
                             </form>
+                            <?php else: ?>
+                                <p class="text-muted">This lesson is locked. Complete the previous lesson's quiz with at least 70% score to unlock.</p>
+                            <?php endif; ?>
                         <?php endif; ?>
                     </div>
                 </div>

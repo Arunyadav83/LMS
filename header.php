@@ -1,10 +1,17 @@
 <?php
-require_once 'config.php';
-require_once 'functions.php';
+ob_start();
+
+// Check if session is not already started
 if (session_status() === PHP_SESSION_NONE) {
     session_start();
-    // echo "Session started successfully!";
 }
+
+// Include required files
+require_once 'config.php';
+require_once 'functions.php';
+
+// Clear any existing output buffers and start fresh
+if (ob_get_length()) ob_clean();
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -27,6 +34,7 @@ if (session_status() === PHP_SESSION_NONE) {
 
         .navbar {
             padding: 0.4px 10px !important;
+            /* background-color: #007bff !important; */
         }
 
         .dropdown-item:hover {
@@ -39,6 +47,7 @@ if (session_status() === PHP_SESSION_NONE) {
         /* .nav-link.dropdown-toggle:hover {
           padding: 0.5rem 1rem !important;
         } */
+         
     </style>
 </head>
 

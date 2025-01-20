@@ -61,53 +61,53 @@ $current_page = 'videos';
                 </div>
                 
                 <form action="" method="get" class="mb-4">
-    <div class="row">
-        <div class="col-md-6">
-            <select name="course_id" class="form-select" onchange="this.form.submit()">
-                <option value="">Select a course</option>
-                <?php foreach ($courses as $course): ?>
-                    <option value="<?php echo $course['id']; ?>" <?php echo ($selected_course_id == $course['id']) ? 'selected' : ''; ?>>
-                        <?php echo htmlspecialchars($course['title']); ?>
-                    </option>
-                <?php endforeach; ?>
-            </select>
-        </div>
-    </div>
-</form>
-
-<?php if ($selected_course_id): ?>
-    <div class="row">
-        <?php foreach ($videos_and_quizzes as $item): ?>
-            <div class="col-md-4 mb-4">
-                <div class="card">
-                    <div class="card-body">
-                        <h5 class="card-title"><?php echo htmlspecialchars($item['class_name']); ?></h5>
-
-                        <?php if (!empty($item['video_path'])): ?>
-                            <?php
-                            // Base path for videos
-                            $base_url = '../uploads/class_videos/';
-                            $video_url = $base_url . $item['video_path'];
-                            ?>
-
-                            <!-- Embed the video -->
-                            <video width="100%" controls>
-                                <source src="<?php echo htmlspecialchars($video_url); ?>" type="video/mp4">
-                                Your browser does not support the video tag.
-                            </video>
-                        <?php else: ?>
-                            <p>No video available</p>
-                        <?php endif; ?>
-
-                        <p>Quiz Questions: <?php echo $item['quiz_count']; ?></p>
+                    <div class="row">
+                        <div class="col-md-6">
+                            <select name="course_id" class="form-select" onchange="this.form.submit()">
+                                <option value="">Select a course</option>
+                                <?php foreach ($courses as $course): ?>
+                                    <option value="<?php echo $course['id']; ?>" <?php echo ($selected_course_id == $course['id']) ? 'selected' : ''; ?>>
+                                        <?php echo htmlspecialchars($course['title']); ?>
+                                    </option>
+                                <?php endforeach; ?>
+                            </select>
+                        </div>
                     </div>
-                </div>
-            </div>
-        <?php endforeach; ?>
-    </div>
-<?php elseif (isset($_GET['course_id'])): ?>
-    <p>No videos or quizzes found for this course.</p>
-<?php endif; ?>
+                </form>
+
+                <?php if ($selected_course_id): ?>
+                    <div class="row">
+                        <?php foreach ($videos_and_quizzes as $item): ?>
+                            <div class="col-md-4 mb-4">
+                                <div class="card">
+                                    <div class="card-body">
+                                        <h5 class="card-title"><?php echo htmlspecialchars($item['class_name']); ?></h5>
+
+                                        <?php if (!empty($item['video_path'])): ?>
+                                            <?php
+                                            // Correct base path for videos in admin dashboard
+                                            $base_url = '/LMS/uploads/class_videos/'; // Use the full URL relative to the root of the website
+                                            $video_url = $base_url . $item['video_path'];
+                                            ?>
+
+                                            <!-- Embed the video -->
+                                            <video width="100%" controls>
+                                                <source src="<?php echo htmlspecialchars($video_url); ?>" type="video/mp4">
+                                                Your browser does not support the video tag.
+                                            </video>
+                                        <?php else: ?>
+                                            <p>No video available</p>
+                                        <?php endif; ?>
+
+                                        <p>Quiz Questions: <?php echo $item['quiz_count']; ?></p>
+                                    </div>
+                                </div>
+                            </div>
+                        <?php endforeach; ?>
+                    </div>
+                <?php elseif (isset($_GET['course_id'])): ?>
+                    <p>No videos or quizzes found for this course.</p>
+                <?php endif; ?>
             </main>
         </div>
     </div>

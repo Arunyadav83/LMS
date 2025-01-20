@@ -1,12 +1,15 @@
 <?php
-$host = "localhost";
-$username = "root";
-$password = "";
-$database = "lms";
+// config.php
+$host = 'localhost'; // Database host
+$dbname = 'lms'; // Your database name
+$username = 'root'; // Database username
+$password = ''; // Database password
 
-$conn = mysqli_connect($host, $username, $password, $database);
+// Create a MySQLi connection
+$conn = mysqli_connect($host, $username, $password, $dbname);
 
+// Check if the connection was successful
 if (!$conn) {
-    die("Connection failed: " . mysqli_connect_error());
+    die("Database connection failed: " . mysqli_connect_error());
 }
 ?>

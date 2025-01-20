@@ -3,11 +3,11 @@ session_start();
 require_once '../config.php';
 require_once '../functions.php';
 
-// Check if the user is logged in as an admin
 if (!is_admin_logged_in()) {
     header("Location: login.php");
     exit();
 }
+
 
 $current_page = 'index';
 
@@ -178,6 +178,51 @@ function time_ago($datetime, $full = false)
 
     return $string ? implode(', ', $string) . ' ago' : 'just now';
 }
+$query = "
+SELECT 
+    p.id,
+    CONCAT(u.username) AS username,  -- Adjusted to use first and last name
+    title AS course_name,
+    p.amount,
+    p.status,
+    p.created_at
+FROM payments p
+JOIN users u ON p.user_id = u.id  -- Join the users table using user_id
+JOIN courses c ON p.course_id = c.id  -- Join the courses table using course_id
+ORDER BY p.created_at DESC
+LIMIT 5
+";
+
+$stmt = mysqli_query($conn, $query);
+
+if ($stmt) {
+    $results = [];
+    while ($row = mysqli_fetch_assoc($stmt)) {
+        $results[] = $row;
+    }
+    // Use $results as an array of rows
+    // print_r($results); // Debugging output
+} else {
+    // Debug the error if query fails
+    echo "Error: " . mysqli_error($conn);
+}
+
+
+
+
+function get_recent_students()
+{
+    // Assuming you are using PDO to connect to your database
+    global $pdo;  // Your PDO connection object
+
+    $sql = "SELECT * FROM users WHERE role = 'student' ORDER BY created_at DESC LIMIT 5";  // Adjust LIMIT as needed
+    $stmt = $pdo->prepare($sql);
+    $stmt->execute();
+
+    return $stmt->fetchAll(PDO::FETCH_ASSOC);
+}
+
+
 
 ?>
 
@@ -190,6 +235,13 @@ function time_ago($datetime, $full = false)
     <title>Admin Dashboard - LMS</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <!-- Include jQuery -->
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <!-- Include Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <!-- Include FullCalendar JS -->
+    <script src="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.8/index.global.min.js"></script>
+
     <style>
         :root {
             --sidebar-width: 250px;
@@ -362,15 +414,160 @@ function time_ago($datetime, $full = false)
             color: white;
             border-radius: 30px !important;
         }
+
+        /* Calendar Container */
+        #calendar {
+            width: 100%;
+            max-width: 320px;
+            border: 1px solid #ddd;
+            border-radius: 10px;
+            background-color: #fff;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            padding: 15px;
+            font-family: 'Arial', sans-serif;
+        }
+
+        /* Header */
+        #calendar .calendar-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px 0;
+            border-bottom: 1px solid #ddd;
+        }
+
+        #calendar .calendar-header h3 {
+            margin: 0;
+            font-size: 1.2rem;
+            color: #333;
+        }
+
+        #calendar .calendar-header button {
+            background: #0433c3;
+            color: #fff;
+            border: none;
+            border-radius: 5px;
+            padding: 5px 10px;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: background 0.3s;
+        }
+
+        #calendar .calendar-header button:hover {
+            background: #021a66;
+        }
+
+        /* Days of the Week */
+        #calendar .calendar-days {
+            display: grid;
+            grid-template-columns: repeat(7, 1fr);
+            margin-top: 10px;
+            text-align: center;
+            font-weight: bold;
+            color: #555;
+        }
+
+        /* Days Grid */
+        #calendar .calendar-dates {
+            display: grid;
+            grid-template-columns: repeat(7, 1fr);
+            grid-gap: 5px;
+            margin-top: 10px;
+        }
+
+        #calendar .calendar-dates div {
+            text-align: center;
+            padding: 10px;
+            border-radius: 5px;
+            transition: background 0.3s;
+            cursor: pointer;
+            font-size: 0.9rem;
+        }
+
+        /* Hover Effect */
+        #calendar .calendar-dates div:hover {
+            background: #f1f1f1;
+        }
+
+        /* Today Highlight */
+        #calendar .calendar-dates .today {
+            background: #ff8c00;
+            color: #fff;
+            font-weight: bold;
+        }
+
+        /* Event Days */
+        #calendar .calendar-dates .event {
+            background: #0433c3;
+            color: #fff;
+            font-weight: bold;
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            #calendar {
+                max-width: 100%;
+            }
+
+            .fc-toolbar.fc-header-toolbar {
+                display: none;
+                /* Hides the toolbar with week/month/day options */
+            }
+
+            .table_list {
+                overflow-x: auto;
+                width: 100%
+            }
+
+        }
     </style>
+    <!-- <script>
+        $(document).ready(function() {
+            // Initialize FullCalendar
+            var calendarEl = document.getElementById('calendar');
+            var calendar = new FullCalendar.Calendar(calendarEl, {
+                initialView: 'dayGridMonth', // Month view
+                headerToolbar: {
+                    left: 'prev,next today',
+                    center: 'title',
+                    right: 'dayGridMonth,timeGridWeek,timeGridDay'
+                },
+                events: [ // Example events
+                    {
+                        title: 'Event 1',
+                        start: '2025-01-20'
+                    },
+                    {
+                        title: 'Event 2',
+                        start: '2025-01-22',
+                        end: '2025-01-25'
+                    }
+                ]
+            });
+            calendar.render();
+        });
+        document.addEventListener('DOMContentLoaded', function() {
+    var calendarEl = document.getElementById('calendar');
+
+    var calendar = new FullCalendar.Calendar(calendarEl, {
+        headerToolbar: {
+            left: '', // Leave empty to remove "week", "month", etc.
+            center: 'title',
+            right: ''
+        },
+        initialView: 'dayGridMonth' // Specify the default view
+    });
+
+    calendar.render();
+});
+
+    </script> -->
+
 </head>
 
 <body>
     <!-- Navigation Bar -->
     <nav class="navbar navbar-expand-lg navbar-dark bg-dark ">
-        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
-            <span class="navbar-toggler-icon"></span>
-        </button>
         <div class="container-fluid">
             <a class="navbar-brand" href="index.php">LMS Admin</a>
             <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
@@ -524,6 +721,8 @@ function time_ago($datetime, $full = false)
                                 <?php endforeach; ?>
                             </div>
 
+                            <!-- New Students Registered Section -->
+
                         </div>
                     </div>
 
@@ -565,6 +764,65 @@ function time_ago($datetime, $full = false)
                             </div>
                         </div>
                     </div>
+                    <div class="container mt-5">
+                        <h4 class="card-title mb-0" style="color: #0433c3; padding: 20px;">Transaction History</h4>
+                        <div class="table_list">
+                            <table class="table table-bordered table-hover">
+                                <thead class="thead-light"
+                                    <tr>
+                                    <th>Student</th>
+                                    <th>Amount</th>
+                                    <th>Date</th>
+                                    <th>Status</th>
+                                    <th>Action</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <?php if (!empty($results)): ?>
+                                        <?php foreach ($results as $row): ?>
+                                            <tr>
+                                                <td>
+                                                    <div class="d-flex align-items-center">
+                                                        <!-- Optionally, you can add an avatar image -->
+                                                        <!-- <img src="path/to/avatar.jpg" alt="Avatar" class="rounded-circle me-2" width="40" height="40"> -->
+                                                        <span><?= htmlspecialchars($row['username']) ?></span>
+                                                    </div>
+                                                </td>
+                                                <td>₹ <?= number_format($row['amount'], 2) ?></td>
+                                                <td><?= htmlspecialchars(date('d M Y', strtotime($row['created_at']))) ?></td>
+                                                <td>
+                                                    <span class="badge bg-<?= strtolower($row['status']) === 'unpaid' ? 'warning text-dark' : 'success' ?>">
+                                                        <?= ucfirst($row['status']) ?>
+                                                    </span>
+                                                </td>
+                                                <td>
+                                                    <?php if (strtolower($row['status']) === 'unpaid'): ?>
+                                                        <form method="POST" action="mark_paid.php" class="d-inline">
+                                                            <input type="hidden" name="payment_id" value="<?= $row['id'] ?>">
+                                                            <button type="submit" class="btn btn-primary btn-sm">Mark as Paid</button>
+                                                        </form>
+                                                    <?php else: ?>
+                                                        <button disabled class="btn btn-secondary btn-sm"> Paid</button>
+                                                    <?php endif; ?>
+                                                </td>
+                                            </tr>
+                                        <?php endforeach; ?>
+                                    <?php else: ?>
+                                        <tr>
+                                            <td colspan="5" class="text-center">No recent transactions found.</td>
+                                        </tr>
+                                    <?php endif; ?>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+
+                </div>
+
+
+
+                <div id="messagesContainer"></div>
+
 
             </main>
         </div>
@@ -572,86 +830,78 @@ function time_ago($datetime, $full = false)
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
     <script>
-        let messageCount = 0; // Initialize message count
+    let messageCount = 0; // Initialize message count
 
-        // Fetch new messages count
-        function fetchNewMessages() {
-            fetch('fetchmessages.php') // New endpoint to get unread message count
-                .then(response => response.json())
-                .then(data => {
+    // Fetch new messages count
+    function fetchNewMessages() {
+        fetch('fetchmessages.php')
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error(`HTTP error! Status: ${response.status}`);
+                }
+                return response.json();
+            })
+            .then(messages => {
+                const messagesContainer = document.getElementById('messagesContainer');
+                messagesContainer.innerHTML = '';
+
+                if (messages.length > 0) {
+                    messages.forEach(message => {
+                        const messageElement = document.createElement('div');
+                        messageElement.classList.add('message-item');
+                        messageElement.innerHTML = `
+                            <p>${message.content}</p>
+                            <small>${time_ago(message.created_at)}</small>
+                        `;
+                        messagesContainer.appendChild(messageElement);
+                    });
+                } else {
+                    messagesContainer.innerHTML = '<p>No new messages.</p>';
+                }
+            })
+            .catch(error => {
+        console.error('Error fetching messages:', error);
+        // // Optionally show an error message to the user
+        // document.getElementById('messagesContainer').innerHTML = '<p>Error loading messages.</p>';
+    });
+    }
+
+    // Function to reset message count and clear messages
+    function resetMessages() {
+        messageCount = 0; // Reset count
+        const messageCountElement = document.getElementById('messageCount');
+        messageCountElement.style.display = 'none'; // Hide the badge
+
+        const messagesContainer = document.getElementById('messagesContainer');
+        messagesContainer.innerHTML = ''; // Clear existing messages
+    }
+
+    // Call this function when the dashboard is loaded
+    document.addEventListener('DOMContentLoaded', function () {
+        fetchNewMessages()
+        resetMessages(); // Reset messages when the dashboard is loaded
+    });
+
+    // Reset message count and update status when the notification is clicked
+    document.getElementById('notificationLink').addEventListener('click', function () {
+        fetch('reset_message_status.php') // Call the PHP file to reset message status
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    messageCount = 0; // Reset count
                     const messageCountElement = document.getElementById('messageCount');
-                    if (data.unread_count > messageCount) {
-                        messageCount = data.unread_count; // Update message count
-                        messageCountElement.textContent = messageCount;
-                        messageCountElement.style.display = 'inline'; // Show the badge
-                    } else if (data.unread_count === 0) {
-                        messageCountElement.style.display = 'none'; // Hide if no messages
-                    }
-                })
-                .catch(error => console.error('Error fetching messages:', error));
-        }
+                    messageCountElement.style.display = 'none'; // Hide the badge
+                    fetchMessages(); // Fetch and display messages
+                }
+            })
+            .catch(error => console.error('Error resetting message status:', error));
+    });
+    // fetchNewMessages()
 
-        // Function to reset message count and clear messages
-        function resetMessages() {
-            messageCount = 0; // Reset count
-            const messageCountElement = document.getElementById('messageCount');
-            messageCountElement.style.display = 'none'; // Hide the badge
+    // Set interval to fetch new messages every 5 seconds
+    setInterval(fetchNewMessages, 5000);
+</script>
 
-            const messagesContainer = document.getElementById('messagesContainer');
-            messagesContainer.innerHTML = ''; // Clear existing messages
-        }
-
-        // Call this function when the dashboard is loaded
-        document.addEventListener('DOMContentLoaded', function() {
-            resetMessages(); // Reset messages when the dashboard is loaded
-        });
-
-        // Reset message count and update status when the notification is clicked
-        document.getElementById('notificationLink').addEventListener('click', function() {
-            fetch('reset_message_status.php') // Call the PHP file to reset message status
-                .then(response => response.json())
-                .then(data => {
-                    if (data.success) {
-                        messageCount = 0; // Reset count
-                        const messageCountElement = document.getElementById('messageCount');
-                        messageCountElement.style.display = 'none'; // Hide the badge
-                        fetchMessages(); // Fetch and display messages
-                    }
-                })
-                .catch(error => console.error('Error resetting message status:', error));
-        });
-
-        // Function to fetch and display messages
-        function fetchMessages() {
-            fetch('fetchmessages.php') // Adjust this to your actual endpoint
-                .then(response => response.json())
-                .then(messages => {
-                    const messagesContainer = document.getElementById('messagesContainer'); // Ensure you have a container for messages
-                    messagesContainer.innerHTML = ''; // Clear existing messages
-
-                    if (messages.length > 0) {
-                        messages.forEach(message => {
-                            const messageElement = document.createElement('div');
-                            messageElement.classList.add('message-item');
-                            messageElement.innerHTML = `
-                                <p>${message.content}</p> <!-- Adjust based on your message structure -->
-                                <small>${time_ago(message.created_at)}</small> <!-- Assuming you have a time_ago function -->
-                            `;
-                            messagesContainer.appendChild(messageElement);
-                        });
-                    } else {
-                        messagesContainer.innerHTML = '<p>No new messages.</p>';
-                    }
-                })
-                .catch(error => console.error('Error fetching messages:', error));
-        }
-
-        // Call the function to fetch new messages count
-        fetchNewMessages();
-
-        // Set interval to fetch new messages every 5 seconds
-        setInterval(fetchNewMessages, 5000);
-    </script>
 </body>
 
 </html>

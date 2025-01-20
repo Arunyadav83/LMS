@@ -21,8 +21,14 @@
     body {
         font-family: 'Roboto', sans-serif;
         line-height: 1.6;
-        background-color: #f9f9f9;
+        background-color: #f0f2f5;
         color: #333;
+        overflow-x: hidden;
+    }
+
+    /* Smooth Scroll */
+    html {
+        scroll-behavior: smooth;
     }
 
     /* Navbar */
@@ -67,17 +73,30 @@
 
     /* Hero Section */
     header {
-        background-image: url('assets/images/Landing.jpg');
+        background-image: linear-gradient(rgba(0, 0, 0, 0.7), rgba(0, 0, 0, 0.7)), url('assets/images/Landing.jpg');
         background-size: cover;
         background-position: center;
-        padding: 100px 0;
-        margin: 30px 0px ;
+        background-attachment: fixed;
+        min-height: 100vh;
+        display: flex;
+        align-items: center;
+        justify-content: center;
         text-align: center;
         color: white;
-        margin-bottom:3%; 
-        position: relative; 
-        top: -47px; 
-        overflow: hidden
+        position: relative;
+        margin: 0;
+        padding: 0;
+    }
+
+    .hero-content {
+        max-width: 800px;
+        padding: 20px;
+        animation: fadeIn 1s ease-in;
+    }
+
+    @keyframes fadeIn {
+        from { opacity: 0; transform: translateY(20px); }
+        to { opacity: 1; transform: translateY(0); }
     }
 
     .hero-content h1 {
@@ -121,34 +140,59 @@
 
     /* Courses Section */
     #courses {
-        padding: 50px 0;
-        background-color: #f4f4f4;
+        padding: 80px 0;
+        background-color: #ffffff;
         text-align: center;
     }
 
     #courses .container {
         max-width: 1200px;
         margin: 0 auto;
+        padding: 0 20px;
     }
 
     #courses h2 {
-        font-size: 32px;
-        margin-bottom: 20px;
+        font-size: 36px;
+        margin-bottom: 40px;
+        color: #1a237e;
+        position: relative;
+    }
+
+    #courses h2:after {
+        content: '';
+        display: block;
+        width: 60px;
+        height: 3px;
+        background: #304ffe;
+        margin: 15px auto;
     }
 
     .course-cards {
-        display: flex;
-        justify-content: space-around;
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+        gap: 30px;
         margin-top: 30px;
     }
 
     .card {
         background-color: white;
-        padding: 20px;
-        border-radius: 10px;
-        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-        width: 250px;
-        text-align: center;
+        padding: 25px;
+        border-radius: 15px;
+        box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+        transition: all 0.3s ease;
+        position: relative;
+        overflow: hidden;
+        border: 1px solid #e0e0e0;
+    }
+
+    .card:before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 4px;
+        background: linear-gradient(to right, #304ffe, #1a237e);
     }
 
     .card h3 {
@@ -206,26 +250,46 @@
         }
     /* Responsive Design */
     @media (max-width: 768px) {
-
-        .course-cards,
-        .department-cards {
-            flex-direction: column;
-            align-items: center;
+        .course-cards {
+            grid-template-columns: 1fr;
+            padding: 0 20px;
         }
 
-        .card,
-        .department-card {
+        .card {
+            width: 100%;
             margin-bottom: 20px;
-            width: 80%;
         }
 
         header .hero-content h1 {
-            font-size: 40px;
+            font-size: 36px;
         }
 
-        .cta-button {
+        .hero-content p {
+            font-size: 18px;
+            padding: 0 20px;
+        }
+
+        .cta-button, .login-button {
             font-size: 16px;
             padding: 12px 24px;
+            width: 80%;
+            max-width: 300px;
+            margin: 10px auto;
+            display: block;
+        }
+    }
+
+    @media (max-width: 480px) {
+        header .hero-content h1 {
+            font-size: 28px;
+        }
+
+        .hero-content p {
+            font-size: 16px;
+        }
+
+        #courses h2 {
+            font-size: 28px;
         }
     }
 
@@ -233,15 +297,25 @@
     .login-button {
         display: inline-flex;
         align-items: center;
-        background-color: #e74c3c;
-        /* Red color for Login button */
+        background: linear-gradient(45deg, #304ffe, #1a237e);
         color: white;
-        padding: 15px 25px;
+        padding: 15px 30px;
         text-decoration: none;
-        border-radius: 5px;
-        font-weight: 500;
-        margin-top: 20px;
+        border-radius: 50px;
+        font-weight: 600;
+        margin-top: 30px;
         font-size: 18px;
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+        transition: all 0.3s ease;
+        border: 2px solid transparent;
+    }
+
+    .login-button:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 6px 20px rgba(0, 0, 0, 0.3);
+        background: white;
+        color: #304ffe;
+        border: 2px solid #304ffe;
     }
 
     .login-button .button-text {

@@ -335,6 +335,13 @@ $course_titles = mysqli_fetch_all($result, MYSQLI_ASSOC);
      h2{
         color: #16308b;
      }
+     @media (max-width: 768px) {
+        .table_list{
+        overflow-x: auto;
+        width: 100%;
+
+    }
+     }
     </style>
 </head>
 
@@ -347,7 +354,7 @@ $course_titles = mysqli_fetch_all($result, MYSQLI_ASSOC);
         <div class="container-fluid">
             <a class="navbar-brand text-light fw-bold" href="index.php">LMS Admin</a>
             <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
-                <span class="navbar-toggler-icon"></span>
+                <!-- <span class="navbar-toggler-icon"></span> -->
             </button>
             <div class="collapse navbar-collapse justify-content-end" id="navbarNav">
                 <ul class="navbar-nav align-items-center">
@@ -407,12 +414,13 @@ $course_titles = mysqli_fetch_all($result, MYSQLI_ASSOC);
 
                     <!-- Courses List -->
                     <h2>Courses</h2>
-                    <div class="view-toggle text-end mb-3">
+                    <div class="view-toggle text-end mb-3" style="position: relative; bottom:34px;">
                         <button class="btn btn-outline-primary" id="grid-view-btn"><i class="fas fa-th"></i></button>
                         <button class="btn btn-primary" id="list-view-btn"><i class="fas fa-list"></i> </button>
                     </div>
 
                     <div id="list-view">
+                        <div class="table_list">
                         <table class="table table-striped courses-list">
                             <thead>
                                 <tr>
@@ -450,37 +458,45 @@ $course_titles = mysqli_fetch_all($result, MYSQLI_ASSOC);
                                 <?php endforeach; ?>
                             </tbody>
                         </table>
+                        </div>
                     </div>
 
-                    <!-- Grid View -->
-                    <div id="grid-view" class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4" style="display: none;">
-                        <?php foreach ($courses as $course): ?>
-                            <div class="col" id="course-card-<?php echo $course['id']; ?>">
-                                <div class="card h-100 shadow-sm">
-                                    <div class="card-body">
-                                        <!-- Title with Buttons on Same Line -->
-                                        <div class="d-flex justify-content-between align-items-center mb-3">
-                                            <h5 class="card-title" style="color: black; margin: 0;">Title: <?php echo htmlspecialchars($course['title']); ?></h5>
-                                            <div class="d-flex gap-2">
-                                                <!-- Edit Button -->
-                                                <button type="button" class="btn btn-sm edit-btn" data-bs-toggle="modal" data-bs-target="#editCourse<?php echo $course['id']; ?>">
-                                                    <i class="bi bi-pencil"></i>
-                                                </button>
-                                                <!-- Delete Button -->
-                                                <button type="button" class="btn btn-sm delete-btn" onclick="confirmDelete(event, <?php echo $course['id']; ?>)">
-                                                    <i class="bi bi-trash"></i>
-                                                </button>
-                                            </div>
-                                        </div>
-
-                                        <!-- Description and Tutor -->
-                                        <p class="card-text text-muted">Description: <?php echo htmlspecialchars(truncateText($course['description'], 50)); ?></p>
-                                        <p class="card-text" style="color: black;">Tutor: <?php echo htmlspecialchars($course['tutor_name']); ?></p>
-                                    </div>
-                                </div>
-                            </div>
-                        <?php endforeach; ?>
+     <!-- Grid View -->
+     <div id="grid-view" class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4" style="display: none;">
+    <?php foreach ($courses as $course): ?>
+        <div class="col" id="course-card-<?php echo $course['id']; ?>">
+            <div class="card h-100 shadow-sm">
+                <div class="card-body">
+                    <!-- Image on the top -->
+                    <img
+                        src="../assets/images/<?php echo htmlspecialchars($course['title']); ?>.jpg"
+                        alt="<?php echo htmlspecialchars($course['title']); ?>"
+                        class="rounded"
+                        style="width: 100px; height: 100px; object-fit: contain; margin-bottom: 10px;" />
+                    
+                    <!-- Title with Buttons on Same Line -->
+                    <div class="d-flex justify-content-between align-items-center mb-3">
+                        <h5 class="card-title" style="color: black; margin: 0;">Title: <?php echo htmlspecialchars($course['title']); ?></h5>
+                        <div class="d-flex gap-2">
+                            <!-- Edit Button -->
+                            <button type="button" class="btn btn-sm edit-btn" data-bs-toggle="modal" data-bs-target="#editCourse<?php echo $course['id']; ?>">
+                                <i class="bi bi-pencil"></i>
+                            </button>
+                            <!-- Delete Button -->
+                            <button type="button" class="btn btn-sm delete-btn" onclick="confirmDelete(event, <?php echo $course['id']; ?>)">
+                                <i class="bi bi-trash"></i>
+                            </button>
+                        </div>
                     </div>
+
+                    <!-- Description and Tutor -->
+                    <p class="card-text text-muted">Description: <?php echo htmlspecialchars(truncateText($course['description'], 50)); ?></p>
+                    <p class="card-text" style="color: black;">Tutor: <?php echo htmlspecialchars($course['tutor_name']); ?></p>
+                </div>
+            </div>
+        </div>
+    <?php endforeach; ?>
+</div>
 
 
 

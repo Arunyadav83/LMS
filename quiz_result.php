@@ -83,13 +83,30 @@ $course_id = $class['course_id'];
         <?php unset($_SESSION['quiz_data']); ?>
     <?php endif; ?>
 
-    <div class="mt-4">
-        <form action="unlock_next_class.php" method="post">
-            <input type="hidden" name="class_id" value="<?php echo $class_id; ?>">
-            <input type="hidden" name="course_id" value="<?php echo $course_id; ?>">
-            <button type="submit" class="btn btn-primary mb-3">Unlock Next Lesson</button>
-        </form>
-    </div>
+    <?php
+    // Check if user has passed the quiz
+    $quiz_check_query = "SELECT percentage FROM quiz_results WHERE user_id = ? AND class_id = ? ORDER BY submitted_at DESC LIMIT 1";
+    $quiz_check_stmt = mysqli_prepare($conn, $quiz_check_query);
+    mysqli_stmt_bind_param($quiz_check_stmt, "ii", $_SESSION['user_id'], $class_id);
+    mysqli_stmt_execute($quiz_check_stmt);
+    $quiz_result = mysqli_stmt_get_result($quiz_check_stmt);
+    $quiz_score = mysqli_fetch_assoc($quiz_result);
+    
+    if ($quiz_score && $quiz_score['percentage'] >= 70): ?>
+        <div class="mt-4">
+            <form action="unlock_next_class.php" method="post">
+                <input type="hidden" name="class_id" value="<?php echo $class_id; ?>">
+                <input type="hidden" name="course_id" value="<?php echo $course_id; ?>">
+                <input type="hidden" name="user_id" value="<?php echo $_SESSION['user_id']; ?>">
+                <input type="hidden" name="quiz_score" value="<?php echo $quiz_score['percentage']; ?>">
+                <button type="submit" class="btn btn-primary mb-3">Unlock Next Lesson</button>
+            </form>
+        </div>
+    <?php else: ?>
+        <div class="alert alert-warning mt-4">
+            You need to score at least 70% on the quiz to unlock the next lesson.
+        </div>
+    <?php endif; ?>
 
     <a href="course.php?id=<?php echo $course_id; ?>" class="btn btn-secondary">Back to Course</a>
 </div>

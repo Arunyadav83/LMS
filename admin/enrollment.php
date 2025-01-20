@@ -110,6 +110,19 @@ foreach ($enrollments as $enrollment) {
         color: white;
         border-radius: 30px !important;
     }
+    @media (max-width: 768px) {
+        .table_list{
+            overflow-x: auto;
+            width: 100%;
+        }
+        .a{
+            margin-left: 120px !important;
+            text-align: center;
+        
+            
+        }
+    }
+
 </style>
 
 <body>
@@ -150,24 +163,25 @@ foreach ($enrollments as $enrollment) {
                 <div class="container mt-4">
                     <h1 class="mb-4">Enrollments</h1>
 
-                    <div style="margin-left: 1000px;">
-                        <button id="listViewBtn" class="btn btn-primary me" onclick="showListView()">
+                    <div style="margin-left: 900px;margin-top: -71px;" class="a">
+                        <button id="listViewBtn" class="btn btn-primary me-2" onclick="showListView()">
                             <i class="fas fa-list"></i>
                         </button>
-                        <button id="gridViewBtn" class="btn btn-secondary me" onclick="showGridView()">
+                        <button id="gridViewBtn" class="btn btn-secondary" onclick="showGridView()">
                             <i class="fas fa-th"></i>
                         </button>
                     </div>
                     <!-- List View -->
                     <div id="listView" class="view">
-                        <div class="card shadow-sm mb-4">
+                        <div class="card shadow-sm mb-4" style=" margin-top: 25px;">
                             <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
-                                <h2 class="mb-0">Enrollments List</h2>
+                                <!-- <h2 class="mb-0">Enrollments List</h2> -->
                                 <!-- <button class="btn btn-light btn-sm">
                                     <i class="fas fa-plus"></i> Add Enrollment
                                 </button> -->
                             </div>
                             <div class="card-body">
+                                <div class="table_list">
                                 <table class="table table-hover table-striped align-middle">
                                     <thead class="table-primary">
                                         <tr>
@@ -241,6 +255,7 @@ foreach ($enrollments as $enrollment) {
                                         <?php endforeach; ?>
                                     </tbody>
                                 </table>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -248,10 +263,10 @@ foreach ($enrollments as $enrollment) {
 
                     <!-- Grid View -->
                     <div id="gridView" class="view" style="display: none;">
-                        <h2>Grid View</h2>
+                        <!-- <h2>Grid View</h2> -->
                         <!-- Search Bar for Grid View -->
                         <div class="mb-3">
-                            <input type="text" id="searchBar" class="form-control" placeholder="Search by username or email" onkeyup="filterEnrollments()">
+                            <input type="text" id="searchBar" class="form-control" placeholder="Search by username or email" onkeyup="filterEnrollments()" style="margin-top: 25px;">
                         </div>
                         <div class="row g-4" id="enrollmentGrid">
                             <?php foreach ($grouped_enrollments as $username => $enrollments): ?>

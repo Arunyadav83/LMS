@@ -75,11 +75,13 @@
             color: #fff;
             width: 100%;
             height: auto;
+            margin-top: 78px;
         }
 
         .contact-info {
             background: rgba(0, 0, 0, 0.7);
             border-radius: 20px; 
+            margin-top: 90px;
         }
 
         .contact-info div {
@@ -93,6 +95,7 @@
             display: flex;
             flex-direction: column;
             margin-left: 23px;
+            /* margin-top: 92px; */
             
         }
 

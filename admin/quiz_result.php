@@ -11,30 +11,45 @@ if (!is_admin_logged_in()) {
 
 $current_page = 'quiz_results';
 
-// Handle search and filter
-$search = isset($_GET['search']) ? mysqli_real_escape_string($conn, $_GET['search']) : '';
-$tutor_filter = isset($_GET['tutor']) ? mysqli_real_escape_string($conn, $_GET['tutor']) : '';
-$course_filter = isset($_GET['course']) ? mysqli_real_escape_string($conn, $_GET['course']) : '';
+// Handle search and filter inputs
+$search = isset($_GET['search']) ? trim($_GET['search']) : '';
+$tutor_filter = isset($_GET['tutor']) ? trim($_GET['tutor']) : '';
+$course_filter = isset($_GET['course']) ? trim($_GET['course']) : '';
 
-// Fetch all quiz results with search and filter
+// Initialize the base query
 $query = "SELECT qr.*, u.username, c.class_name, co.title as course_title
           FROM quiz_results qr
           JOIN users u ON qr.user_id = u.id
           JOIN classes c ON qr.class_id = c.id
           JOIN courses co ON c.course_id = co.id
-          WHERE (u.username LIKE '%$search%' OR c.class_name LIKE '%$search%' OR qr.tutor_name LIKE '%$search%')";
+          WHERE 1=1";
 
-if ($tutor_filter) {
+// Append conditions based on user inputs
+if ($search !== '') {
+    $search = mysqli_real_escape_string($conn, $search);
+    $query .= " AND (u.username LIKE '%$search%' OR c.class_name LIKE '%$search%' OR qr.tutor_name LIKE '%$search%')";
+}
+
+if ($tutor_filter !== '') {
+    $tutor_filter = mysqli_real_escape_string($conn, $tutor_filter);
     $query .= " AND qr.tutor_name = '$tutor_filter'";
 }
 
-if ($course_filter) {
+if ($course_filter !== '') {
+    $course_filter = mysqli_real_escape_string($conn, $course_filter);
     $query .= " AND co.title = '$course_filter'";
 }
 
+// Append the order by clause
 $query .= " ORDER BY qr.submitted_at DESC";
 
+// Execute the query
 $result = mysqli_query($conn, $query);
+
+// Check for query execution errors
+if (!$result) {
+    die("Error executing query: " . mysqli_error($conn));
+}
 
 // Fetch unique tutors and courses for filter dropdowns
 $tutors_query = "SELECT DISTINCT tutor_name FROM quiz_results ORDER BY tutor_name";
@@ -67,17 +82,8 @@ if (isset($_GET['export']) && $_GET['export'] == 'excel') {
     }
     exit;
 }
-$query = "SELECT full_name FROM tutors"; // Modify this query based on your table and column names
-$tutors_result = mysqli_query($conn, $query);
-
-if (!$tutors_result) {
-    die("Error fetching tutors: " . mysqli_error($conn));
-}
-
-// Check if tutor filter is set (optional)
-$tutor_filter = isset($_GET['tutor']) ? $_GET['tutor'] : '';
-
 ?>
+
 
 <!DOCTYPE html>
 <html lang="en">
@@ -99,6 +105,14 @@ $tutor_filter = isset($_GET['tutor']) ? $_GET['tutor'] : '';
         color: #16308b;
     }
 
+
+    @media (max-width: 768px) {
+        .table_list{
+        overflow-x: auto;
+        width: 100%;
+
+    }
+    }
 </style>
 <body>
     <!-- Navigation Bar -->
@@ -143,8 +157,8 @@ $tutor_filter = isset($_GET['tutor']) ? $_GET['tutor'] : '';
                                 <select name="tutor" class="form-select">
                                     <option value="">All Tutors</option>
                                     <?php while ($tutor = mysqli_fetch_assoc($tutors_result)): ?>
-                                        <option value="<?php echo htmlspecialchars($tutor['full_name']); ?>" <?php echo $tutor_filter == $tutor['full_name'] ? 'selected' : ''; ?>>
-                                            <?php echo htmlspecialchars($tutor['full_name']); ?>
+                                        <option value="<?php echo htmlspecialchars($tutor['tutor_name']); ?>" <?php echo $tutor_filter == $tutor['tutor_name'] ? 'selected' : ''; ?>>
+                                            <?php echo htmlspecialchars($tutor['tutor_name']); ?>
                                         </option>
                                     <?php endwhile; ?>
                                 </select>
@@ -171,6 +185,7 @@ $tutor_filter = isset($_GET['tutor']) ? $_GET['tutor'] : '';
                                             echo $course_filter ? '&course=' . urlencode($course_filter) : ''; ?>" class="btn btn-success mb-3">Export to Excel</a>
 
                     <!-- Quiz Results Table -->
+                     <div class="table_list">
                     <table class="table table-striped">
                         <thead>
                             <tr>
@@ -201,6 +216,7 @@ $tutor_filter = isset($_GET['tutor']) ? $_GET['tutor'] : '';
                             <?php endwhile; ?>
                         </tbody>
                     </table>
+                    </div>
                 </div>
             </main>
         </div>

@@ -26,8 +26,68 @@
             margin: 0;
             padding: 0;
             color: #2c3e50;
-
             overflow-x: hidden;
+        }
+
+        /* Container fluid styles */
+        .container-fluid {
+            width: 100%;
+            padding-right: 15px;
+            padding-left: 15px;
+            margin-right: auto;
+            margin-left: auto;
+            max-width: none !important;
+        }
+
+        /* Zoom level adjustments */
+        @media screen and (min-width: 1200px) {
+            body {
+                zoom: 1; /* Default zoom */
+            }
+        }
+
+        /* Adjust for different zoom levels */
+        @media screen and (max-width: 1199px) {
+            .container-fluid {
+                width: 100vw;
+                overflow-x: hidden;
+            }
+            
+            .row {
+                margin-left: 0;
+                margin-right: 0;
+            }
+        }
+
+        /* Support for 25% zoom */
+        @media screen and (min-width: 2400px) {
+            .container-fluid {
+                max-width: 100vw;
+            }
+            
+            .welcome-section,
+            .tutors-section,
+            .why-choose-us-cards {
+                transform-origin: top left;
+                transform: scale(1);
+            }
+        }
+
+        /* Ensure content stays readable at different zoom levels */
+        @media (max-width: 768px) {
+            .container-fluid {
+                padding-left: 10px;
+                padding-right: 10px;
+            }
+            
+            .welcome-section h1 {
+                font-size: calc(2vw + 20px);
+                margin-top: 84px;
+            }
+            
+            .welcome-section p {
+                font-size: calc(1vw + 12px);
+            }
         }
 
         /* Make the content visible after it's loaded */
@@ -112,6 +172,7 @@
         .welcome-section h1 {
             text-align: center;
             font-size: 40px;
+            margin-top: 81px;
         }
 
         .welcome-section p {
@@ -131,13 +192,104 @@
         }
 
         .tutors-section {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            width: 100%;
+            overflow-x: hidden;
+            position: relative;
+            padding: 20px 0;
+        }
+
+        .tutors-slider {
+            display: flex;
             gap: 20px;
-            /* Space between grid items */
-            animation: scroll-carousel 10s linear infinite;
-            margin-top: 30px;
-            padding: 10px;
+            animation: infinite-scroll 30s linear infinite;
+            width: max-content;
+        }
+
+        /* Add hover pause effect */
+        .tutors-section:hover .tutors-slider {
+            animation-play-state: paused;
+        }
+
+        @keyframes infinite-scroll {
+            0% {
+                transform: translateX(0);
+            }
+            100% {
+                transform: translateX(calc(-300px * var(--total-cards))); /* Will be set by JavaScript */
+            }
+        }
+
+        .tutor-card {
+            flex: 0 0 300px;
+            background-color: #ffffff;
+            border-radius: 8px;
+            padding: 20px;
+            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.1);
+            margin: 0;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        /* Add smooth transition for hover effect */
+        .tutor-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+        }
+
+        @media (max-width: 768px) {
+            .tutors-slider {
+                gap: 15px;
+            }
+            
+            .tutor-card {
+                flex: 0 0 250px;
+            }
+        }
+
+        /* Adjust for different zoom levels */
+        @media (max-width: 1199px) {
+            .container-fluid {
+                width: 100vw;
+                overflow-x: hidden;
+            }
+            
+            .tutors-section {
+                padding: 5px;
+                gap: 10px;
+            }
+        }
+
+        /* Support for very small screens and extreme zoom out */
+        @media screen and (max-width: 480px), screen and (zoom: 0.25) {
+            .tutors-section {
+                grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+                gap: 10px;
+            }
+            
+            .tutor-card {
+                margin: 0;
+                padding: 10px;
+            }
+            
+            .tutor-image {
+                width: 100px;
+                height: 100px;
+            }
+            
+            .container-fluid {
+                padding: 5px;
+            }
+        }
+
+        /* Ensure content stays readable at different zoom levels */
+        @media (max-width: 768px) {
+            .container-fluid {
+                padding-left: 5px;
+                padding-right: 5px;
+            }
+            
+            .tutors-section {
+                margin-top: 15px;
+            }
         }
 
 
@@ -183,6 +335,7 @@
             .welcome-section {
                 padding: 0px;
                 width: 100%;
+
             }
 
             .why-card {
@@ -280,6 +433,7 @@
             /* Adjusted line height to prevent overlap */
             margin: 40px 0;
             font-family: 'Montserrat', sans-serif;
+            margin-bottom: 23px;
         }
 
         .subtitle {
@@ -291,6 +445,7 @@
             margin-bottom: 20px;
             /* Added space to separate elements */
             display: block;
+            margin-top: 65px;
         }
 
         /* Responsive styles */
@@ -429,31 +584,42 @@
                     }
                 ]
             });
+        });
 
+        document.addEventListener('DOMContentLoaded', function() {
+            const tutorsSlider = document.querySelector('.tutors-slider');
+            if (tutorsSlider) {
+                // Count the number of original cards
+                const totalCards = tutorsSlider.children.length;
+                
+                // Set CSS variable for animation
+                tutorsSlider.style.setProperty('--total-cards', totalCards);
+                
+                // Clone the cards for seamless scrolling
+                const cards = [...tutorsSlider.children];
+                cards.forEach(card => {
+                    const clone = card.cloneNode(true);
+                    tutorsSlider.appendChild(clone);
+                });
+            }
+        });
 
-            $('.tutors-section').slick({
-                slidesToShow: 2,
-                slidesToScroll: 1,
-                autoplay: true,
-                autoplaySpeed: 2000,
-                responsive: [{
-                        breakpoint: 768,
-                        settings: {
-                            slidesToShow: 1,
-                            slidesToScroll: 1,
-                        },
-
-                    },
-                    {
-                        breakpoint: 1024,
-                        settings: {
-                            slidesToShow: 2,
-                            slidesToScroll: 1,
-                        }
-                    }
-                ]
-
-            });
+        document.addEventListener('DOMContentLoaded', function() {
+            const tutorsSlider = document.querySelector('.tutors-slider');
+            if (tutorsSlider) {
+                // Count the number of original cards
+                const totalCards = tutorsSlider.children.length;
+                
+                // Set CSS variable for animation
+                tutorsSlider.style.setProperty('--total-cards', totalCards);
+                
+                // Clone the cards for seamless scrolling
+                const cards = [...tutorsSlider.children];
+                cards.forEach(card => {
+                    const clone = card.cloneNode(true);
+                    tutorsSlider.appendChild(clone);
+                });
+            }
         });
 
         function showBio(tutorId) {
@@ -533,28 +699,52 @@ class About
 
     public function displayAbout()
     {
-        echo "<div class='container-fluid'>";
+        echo "<div class='container-fluid p-0'>";
+        echo "<div class='row g-0'>";
         echo "<h2 class='section-title'>
                 <span class='subtitle'>World-Class Instructors</span><br>
                 Classes Taught By Real Creators
               </h2>";
-              echo "<div class='tutors-section container-fluid'>";
+              echo "<div class='tutors-section'>";
+              echo "<div class='tutors-slider'>";
 
-
+        // First set of cards
         foreach ($this->tutors as $tutor) {
             echo "<div class='tutor-card'>
                     <div class='card'>
                         <div class='card-body'>
                             <div class='d-flex flex-column align-items-center'>
-                                <img src='" . htmlspecialchars($tutor['image']) . "' alt='" . htmlspecialchars($tutor['full_name']) . "' class='tutor-image mb-4'>
+                                <img src='" . htmlspecialchars($tutor['image']) . "' 
+                                     alt='" . htmlspecialchars($tutor['full_name']) . "' 
+                                     class='tutor-image mb-4'>
                                 <h3 class='tutor-name'>" . htmlspecialchars($tutor['full_name']) . "</h3>
                                 <p class='tutor-specialization'>" . htmlspecialchars($tutor['specialization']) . "</p>
                                 <button class='btn btn-primary bio-btn' onclick='showBio(" . $tutor['id'] . ")'>View Bio</button>
                             </div>
                         </div>
                     </div>
-                </div>";
+                  </div>";
         }
+
+        // Duplicate cards for seamless scrolling
+        foreach ($this->tutors as $tutor) {
+            echo "<div class='tutor-card'>
+                    <div class='card'>
+                        <div class='card-body'>
+                            <div class='d-flex flex-column align-items-center'>
+                                <img src='" . htmlspecialchars($tutor['image']) . "' 
+                                     alt='" . htmlspecialchars($tutor['full_name']) . "' 
+                                     class='tutor-image mb-4'>
+                                <h3 class='tutor-name'>" . htmlspecialchars($tutor['full_name']) . "</h3>
+                                <p class='tutor-specialization'>" . htmlspecialchars($tutor['specialization']) . "</p>
+                                <button class='btn btn-primary bio-btn' onclick='showBio(" . $tutor['id'] . ")'>View Bio</button>
+                            </div>
+                        </div>
+                    </div>
+                  </div>";
+        }
+
+        echo "</div>"; // Close tutors-slider
 
         echo "</div>"; // Close tutors section
 
@@ -569,12 +759,14 @@ class About
         }
 
         echo "</div>"; // Close courses slider
+        echo "</div>"; // Close row
         echo "</div>"; // Close container-fluid
     }
 
     public function displayWelcomeMessage()
     {
-        echo "<div class='container-fluid'>";
+        echo "<div class='container-fluid p-0'>";
+        echo "<div class='row g-0'>";
         echo "<div class='welcome-section'>";
         echo "<h1>About Us</h1>";
 
@@ -604,9 +796,9 @@ class About
               </div>";
 
         echo "</div>"; // Close why-choose-us-cards
-        echo "</div>";
-        echo  "</div>";
-        // Close welcome-section
+        echo "</div>"; // Close welcome-section
+        echo "</div>"; // Close row
+        echo "</div>"; // Close container-fluid
     }
 }
 

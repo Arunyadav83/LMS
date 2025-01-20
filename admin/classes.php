@@ -149,6 +149,23 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             }
         }
 
+          // Handle class thumbnail image upload
+          $thumbnail_path = '';
+          if (isset($_FILES['class_thumbnail']) && $_FILES['class_thumbnail']['error'] == 0) {
+              $target_dir = "../assets/images/";
+  
+              // Create a safe file name based on class name
+              $file_name = strtolower(str_replace(' ', '_', $class_name)) . '.jpg';
+              $target_file = $target_dir . $file_name;
+  
+              if (move_uploaded_file($_FILES['class_thumbnail']['tmp_name'], $target_file)) {
+                  $thumbnail_path = $file_name; // Save the filename to insert into the database
+              } else {
+                  $error = "Sorry, there was an error uploading your thumbnail.";
+              }
+          }
+  
+
         // Handle online class scheduling
         $is_online = isset($_POST['is_online']) ? 1 : 0;
         $online_link = mysqli_real_escape_string($conn, $_POST['online_link'] ?? '');
@@ -187,30 +204,30 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 
                 if (mysqli_stmt_execute($stmt)) {
                     $question_id = mysqli_insert_id($conn);
-                    
+
                     if (isset($_POST['answers'][$index]) && isset($_POST['feedback'][$index])) {
                         foreach ($_POST['answers'][$index] as $answer_index => $answer) {
                             $answer_text = mysqli_real_escape_string($conn, $answer);
                             $feedback_text = mysqli_real_escape_string($conn, $_POST['feedback'][$index][$answer_index]);
-                            
+
                             if (empty($answer_text) || empty($feedback_text)) {
                                 echo "Error: Answer or feedback is empty!";
                                 continue;
                             }
-                            
+
                             // Set 'is_correct' dynamically based on the selected correct answer
                             $is_correct = ($_POST['correct_answers'][$index] == $answer_index) ? 1 : 0;
-                            
+
                             $query = "INSERT INTO quiz_answers (question_id, answer_text, feedback, is_correct) VALUES (?, ?, ?, ?)";
                             $stmt = mysqli_prepare($conn, $query);
-                            
+
                             if (!$stmt) {
                                 echo "Error preparing statement for quiz answer: " . mysqli_error($conn);
                                 continue;
                             }
-                            
+
                             mysqli_stmt_bind_param($stmt, "issi", $question_id, $answer_text, $feedback_text, $is_correct);
-                            
+
                             if (!mysqli_stmt_execute($stmt)) {
                                 echo "Error executing query for quiz answer: " . mysqli_error($conn);
                             }
@@ -461,6 +478,10 @@ $classes = mysqli_fetch_all($result, MYSQLI_ASSOC);
                         <label for="class_video" class="form-label">Class Video</label>
                         <input type="file" class="form-control" id="class_video" name="class_video">
                     </div>
+                    <div class="mb-3">
+                        <label for="class_thumbnail" class="form-label">Class Thumbnail (Image)</label>
+                        <input type="file" class="form-control" id="class_thumbnail" name="class_thumbnail" accept="image/*">
+                    </div>
                     <div class="mb-3 form-check">
                         <input type="checkbox" class="form-check-input" id="is_online" name="is_online">
                         <label class="form-check-label" for="is_online">Online Class</label>
@@ -663,14 +684,86 @@ $classes = mysqli_fetch_all($result, MYSQLI_ASSOC);
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
     <script>
-      document.addEventListener('DOMContentLoaded', function () {
-    const quizForm = document.getElementById('quizForm'); // Ensure your form has this ID
-    const addQuestionBtn = document.getElementById('addQuestion');
-    const quizQuestionsContainer = document.getElementById('quizQuestions');
-    let questionCount = 0;
+        document.addEventListener('DOMContentLoaded', function() {
+            const quizForm = document.getElementById('quizForm');
+            const addQuestionBtn = document.getElementById('addQuestion');
+            const quizQuestionsContainer = document.getElementById('quizQuestions');
+            let questionCount = 0;
 
-    function createQuestionTemplate(index) {
-        return `
+            function createQuestionTemplate(index) {
+                return `
+        <div class="card mb-3" data-question-index="${index}">
+            <div class="card-body">
+                <h5 class="card-title">Question ${index + 1}</h5>
+                <div class="mb-3">
+                    <label for="question${index}" class="form-label">Question</label>
+                    <input type="text" class="form-control" id="question${index}" name="questions[${index}]" required>
+                </div>
+                <div class="mb-3">
+                    <label class="form-label">Answers</label>
+                    ${[0, 1, 2, 3].map(answerIndex => `
+                        <div class="mb-3">
+                            <div class="input-group mb-2">
+                                <div class="input-group-text">
+                                    <input type="radio" name="correct_answers[${index}]" value="${answerIndex}" required>
+                                </div>
+                                <input type="text" class="form-control" name="answers[${index}][]" placeholder="Answer option" required>
+                            </div>
+                            <input type="text" class="form-control" name="feedback[${index}][]" placeholder="Feedback for this answer" required>
+                        </div>
+                    `).join('')}
+                </div>
+            </div>
+        </div>
+        `;
+            }
+
+            // Add initial question
+            quizQuestionsContainer.insertAdjacentHTML('beforeend', createQuestionTemplate(questionCount));
+            questionCount++;
+
+            // Add event listener for adding more questions
+            addQuestionBtn.addEventListener('click', function() {
+                quizQuestionsContainer.insertAdjacentHTML('beforeend', createQuestionTemplate(questionCount));
+                questionCount++;
+            });
+
+            // Form submission handler
+            quizForm.addEventListener('submit', function(e) {
+                e.preventDefault(); // Prevent default form submission
+
+                const formData = new FormData(quizForm);
+                const data = {};
+                formData.forEach((value, key) => {
+                    if (key.includes('answers') || key.includes('feedback') || key.includes('correct_answers')) {
+                        // Handle array data
+                        const keys = key.split(/\[|\]/).filter(k => k !== '');
+                        let temp = data;
+                        keys.forEach((k, i) => {
+                            if (i === keys.length - 1) {
+                                if (!temp[k]) temp[k] = [];
+                                temp[k].push(value);
+                            } else {
+                                if (!temp[k]) temp[k] = {};
+                                temp = temp[k];
+                            }
+                        });
+                    } else {
+                        data[key] = value;
+                    }
+                });
+
+                console.log(data); // Replace this with your AJAX/Fetch API logic to send data to the backend
+            });
+        });
+
+        const quizForm = document.getElementById('quizForm'); // Ensure your form has this ID
+        const addQuestionBtn = document.getElementById('addQuestion');
+        const quizQuestionsContainer = document.getElementById('quizQuestions');
+        let questionCount = 0;
+
+        function createQuestionTemplate(index) {
+            return `
         <div class="card mb-3" data-question-index="${index}">
             <div class="card-body">
                 <h5 class="card-title">Question ${index + 1}</h5>
@@ -694,62 +787,61 @@ $classes = mysqli_fetch_all($result, MYSQLI_ASSOC);
                 </div>
             </div>
         </div>`;
-    }
-
-    // Add event listener for adding more questions
-    addQuestionBtn.addEventListener('click', function () {
-        quizQuestionsContainer.insertAdjacentHTML('beforeend', createQuestionTemplate(questionCount));
-        questionCount++;
-    });
-
-    // Validate form on submit
-    quizForm.addEventListener('submit', function (e) {
-        e.preventDefault(); // Prevent default form submission
-
-        const formData = new FormData(quizForm);
-        const payload = [];
-
-        // Loop through questions to construct payload
-        for (let i = 0; i < questionCount; i++) {
-            const questionText = formData.get(`questions[${i}]`);
-            const answers = formData.getAll(`answers[${i}][]`);
-            const feedbacks = formData.getAll(`feedback[${i}][]`);
-            const correctAnswerIndex = formData.get(`correct_answers[${i}]`);
-
-            if (!questionText || correctAnswerIndex === null) {
-                alert(`Error: Question ${i + 1} or its correct answer is not properly filled.`);
-                return;
-            }
-
-            answers.forEach((answer, idx) => {
-                payload.push({
-                    question_id: i + 1,
-                    answer_text: answer,
-                    is_correct: idx == correctAnswerIndex ? 1 : 0, // Mark correct answer as 1
-                    feedback: feedbacks[idx],
-                });
-            });
         }
 
-        // Submit data via fetch
-        fetch('/submit-quiz', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify(payload),
-        })
-            .then((response) => response.json())
-            .then((data) => {
-                console.log('Quiz submitted successfully:', data);
-                alert('Quiz submitted successfully!');
-            })
-            .catch((error) => {
-                console.error('Error submitting quiz:', error);
-                alert('An error occurred while submitting the quiz.');
-            });
-    });
-});
+        // Add event listener for adding more questions
+        addQuestionBtn.addEventListener('click', function() {
+            quizQuestionsContainer.insertAdjacentHTML('beforeend', createQuestionTemplate(questionCount));
+            questionCount++;
+        });
+
+        // Validate form on submit
+        quizForm.addEventListener('submit', function(e) {
+            e.preventDefault(); // Prevent default form submission
+
+            const formData = new FormData(quizForm);
+            const payload = [];
+
+            // Loop through questions to construct payload
+            for (let i = 0; i < questionCount; i++) {
+                const questionText = formData.get(`questions[${i}]`);
+                const answers = formData.getAll(`answers[${i}][]`);
+                const feedbacks = formData.getAll(`feedback[${i}][]`);
+                const correctAnswerIndex = formData.get(`correct_answers[${i}]`);
+
+                if (!questionText || correctAnswerIndex === null) {
+                    alert(`Error: Question ${i + 1} or its correct answer is not properly filled.`);
+                    return;
+                }
+
+                answers.forEach((answer, idx) => {
+                    payload.push({
+                        question_id: i + 1,
+                        answer_text: answer,
+                        is_correct: idx == correctAnswerIndex ? 1 : 0, // Mark correct answer as 1
+                        feedback: feedbacks[idx],
+                    });
+                });
+            }
+
+            // Submit data via fetch
+            fetch('/submit-quiz', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(payload),
+                })
+                .then((response) => response.json())
+                .then((data) => {
+                    console.log('Quiz submitted successfully:', data);
+                    alert('Quiz submitted successfully!');
+                })
+                .catch((error) => {
+                    console.error('Error submitting quiz:', error);
+                    alert('An error occurred while submitting the quiz.');
+                });
+        });
     </script>
 
 </body>

@@ -7,103 +7,181 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Admin Dashboard - Messages</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <style>
+        :root {
+            --primary-color: #1a237e;
+            --secondary-color: #f5f5f5;
+            --accent-color: #304ffe;
+            --text-color: #333;
+            --shadow-color: rgba(0, 0, 0, 0.1);
+        }
+
         body {
-            font-family: Arial, sans-serif;
-            background-color: #f4f4f4;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: var(--secondary-color);
             margin: 0;
-            padding: 20px;
+            padding: 0;
+            color: var(--text-color);
         }
-        .container {
-            max-width: 800px;
-            margin: 20px auto;
-            background: white;
-            padding: 20px;
-            border-radius: 8px;
-            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-        }
-        .message {
-            border-bottom: 1px solid #ddd;
-            padding: 10px 0;
-        }
-        .message h2 {
-            margin: 0;
-            font-size: 1.5em;
-            color: #333;
-        }
-        .message p {
-            margin: 5px 0;
-            color: #555;
-        }
-        .timestamp {
-            font-size: 0.9em;
-            color: #999;
-        }
-        .message:last-child {
-            border-bottom: none;
-        }
+
         .navbar {
-            background-color: #333;
-            overflow: hidden;
+            background-color: var(--primary-color);
+            padding: 1rem;
+            box-shadow: 0 2px 4px var(--shadow-color);
+        }
+
+        .navbar a {
+            color: white;
+            text-decoration: none;
+            padding: 0.5rem 1rem;
+            border-radius: 4px;
+            transition: all 0.3s ease;
+        }
+
+        .navbar a:hover {
+            background-color: rgba(255, 255, 255, 0.1);
+            transform: translateY(-2px);
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 2rem auto;
+            padding: 0 1rem;
+        }
+
+        .messages-container {
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 4px 6px var(--shadow-color);
+            padding: 2rem;
+            margin-top: 2rem;
+        }
+
+        h1 {
+            color: var(--primary-color);
+            font-size: 2rem;
+            margin-bottom: 2rem;
+            text-align: center;
+        }
+
+        .message {
+            background: var(--secondary-color);
             border-radius: 8px;
-            margin-bottom: 20px;
-            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+            transition: transform 0.3s ease;
+            position: relative;
+            border-left: 4px solid var(--accent-color);
+        }
+
+        .message:hover {
+            transform: translateX(5px);
+            box-shadow: 0 2px 4px var(--shadow-color);
+        }
+
+        .message h2 {
+            color: var(--primary-color);
+            font-size: 1.25rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .message p {
+            color: var(--text-color);
+            line-height: 1.6;
+            margin-bottom: 1rem;
+        }
+
+        .message-footer {
             display: flex;
             justify-content: space-between;
-            padding: 10px 20px;
-            
+            align-items: center;
+            font-size: 0.9rem;
+            color: #666;
         }
-        .navbar a {
-            float: left;
-            display: block;
-            color: white;
-            text-align: center;
-            padding: 14px 16px;
-            text-decoration: none;
+
+        .timestamp {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
         }
-        .navbar a:hover {
-            background-color: #ddd;
-            color: black;
+
+        .delete-icon {
+            cursor: pointer;
+            color: #dc3545;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+            font-size: 1.2rem;
         }
-        .container h1 {
-            margin-bottom: 20px;
+
+        .message:hover .delete-icon {
+            opacity: 1;
         }
-        .message {
-        position: relative; /* Added for positioning delete icon */
-    }
-    .delete-icon {
-        display: none; /* Initially hidden */
-        position: absolute; /* Positioning */
-        right: 10px; /* Adjust as needed */
-        top: 10px; /* Adjust as needed */
-        cursor: pointer;
-        color: black;
-        font-size: 1.5em; /* Increased font size */
-         /* Default color */
-    }
-    .message:hover .delete-icon {
-        display: block; /* Show on hover */
-    }
-    .delete-icon:hover {
-        color: red; /* Change color on hover */
-    }
-    .message-footer {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-    }
+
+        @media (max-width: 768px) {
+            .container {
+                padding: 0.5rem;
+            }
+
+            .messages-container {
+                padding: 1rem;
+            }
+
+            .message {
+                padding: 1rem;
+            }
+
+            .message-footer {
+                flex-direction: column;
+                gap: 0.5rem;
+            }
+
+            .delete-icon {
+                opacity: 1;
+                position: absolute;
+                top: 1rem;
+                right: 1rem;
+            }
+        }
+
+        @media (max-width: 480px) {
+            h1 {
+                font-size: 1.5rem;
+            }
+
+            .message h2 {
+                font-size: 1.1rem;
+            }
+
+            .navbar {
+                padding: 0.5rem;
+            }
+
+            .navbar a {
+                padding: 0.3rem 0.6rem;
+                font-size: 0.9rem;
+            }
+        }
     </style>
 </head>
 <body>
 
-<div class="navbar">
-    <a href="index.php">Dashboard</a>
-    <a href="fetchmessages.php">Messages</a>
-    <a href="settings.php">Settings</a>
-    <a href="logout.php">Logout</a>
-</div>
+<nav class="navbar">
+    <div class="container-fluid">
+        <div>
+            <a href="index.php"><i class="fas fa-home"></i> Dashboard</a>
+            <a href="fetchmessages.php" class="active"><i class="fas fa-envelope"></i> Messages</a>
+            <a href="settings.php"><i class="fas fa-cog"></i> Settings</a>
+        </div>
+        <div>
+            <a href="logout.php"><i class="fas fa-sign-out-alt"></i> Logout</a>
+        </div>
+    </div>
+</nav>
 
 <div class="container">
+    <div class="messages-container">
     <h1>Messages</h1>
     <?php
     // Database connection

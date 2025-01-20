@@ -83,7 +83,13 @@ $students = mysqli_fetch_all($result, MYSQLI_ASSOC);
             color: white;
             border-radius: 30px !important;
         }
-        
+        @media (max-width: 768px) {
+        .table_list{
+        overflow-x: auto;
+        width: 100%;
+
+    }
+}
 </style>
 <body>
     <!-- Navigation Bar -->
@@ -123,6 +129,7 @@ $students = mysqli_fetch_all($result, MYSQLI_ASSOC);
                 <div class="container mt-4">
                     <h1 class="mb-4">Registered Students</h1>
                     <?php if (count($students) > 0): ?>
+                        <div class="table_list">
                         <table class="table table-striped">
                             <thead>
                                 <tr>
@@ -159,6 +166,7 @@ $students = mysqli_fetch_all($result, MYSQLI_ASSOC);
                                 <?php endforeach; ?>
                             </tbody>
                         </table>
+                        </div>
                     <?php else: ?>
                         <p>No students found.</p>
                     <?php endif; ?>

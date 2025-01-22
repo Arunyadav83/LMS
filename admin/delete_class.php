@@ -20,6 +20,7 @@ if (isset($_GET['id'])) {
          INNER JOIN quiz_questions qq ON qa.question_id = qq.id 
          WHERE qq.class_id = ?",
         "DELETE FROM quiz_questions WHERE class_id = ?",
+        "DELETE FROM classes where id=?"
     ];
     
     // Execute each cleanup query

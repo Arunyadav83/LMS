@@ -155,7 +155,8 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
               $target_dir = "../assets/images/";
   
               // Create a safe file name based on class name
-              $file_name = strtolower(str_replace(' ', '_', $class_name)) . '.jpg';
+              $file_name = str_replace(' ', '', $class_name) . '.jpg';
+
               $target_file = $target_dir . $file_name;
   
               if (move_uploaded_file($_FILES['class_thumbnail']['tmp_name'], $target_file)) {
@@ -684,110 +685,43 @@ $classes = mysqli_fetch_all($result, MYSQLI_ASSOC);
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
     <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            const quizForm = document.getElementById('quizForm');
-            const addQuestionBtn = document.getElementById('addQuestion');
-            const quizQuestionsContainer = document.getElementById('quizQuestions');
-            let questionCount = 0;
-
-            function createQuestionTemplate(index) {
-                return `
-        <div class="card mb-3" data-question-index="${index}">
-            <div class="card-body">
-                <h5 class="card-title">Question ${index + 1}</h5>
-                <div class="mb-3">
-                    <label for="question${index}" class="form-label">Question</label>
-                    <input type="text" class="form-control" id="question${index}" name="questions[${index}]" required>
-                </div>
-                <div class="mb-3">
-                    <label class="form-label">Answers</label>
-                    ${[0, 1, 2, 3].map(answerIndex => `
-                        <div class="mb-3">
-                            <div class="input-group mb-2">
-                                <div class="input-group-text">
-                                    <input type="radio" name="correct_answers[${index}]" value="${answerIndex}" required>
-                                </div>
-                                <input type="text" class="form-control" name="answers[${index}][]" placeholder="Answer option" required>
-                            </div>
-                            <input type="text" class="form-control" name="feedback[${index}][]" placeholder="Feedback for this answer" required>
-                        </div>
-                    `).join('')}
-                </div>
-            </div>
-        </div>
-        `;
-            }
-
-            // Add initial question
-            quizQuestionsContainer.insertAdjacentHTML('beforeend', createQuestionTemplate(questionCount));
-            questionCount++;
-
-            // Add event listener for adding more questions
-            addQuestionBtn.addEventListener('click', function() {
-                quizQuestionsContainer.insertAdjacentHTML('beforeend', createQuestionTemplate(questionCount));
-                questionCount++;
-            });
-
-            // Form submission handler
-            quizForm.addEventListener('submit', function(e) {
-                e.preventDefault(); // Prevent default form submission
-
-                const formData = new FormData(quizForm);
-                const data = {};
-                formData.forEach((value, key) => {
-                    if (key.includes('answers') || key.includes('feedback') || key.includes('correct_answers')) {
-                        // Handle array data
-                        const keys = key.split(/\[|\]/).filter(k => k !== '');
-                        let temp = data;
-                        keys.forEach((k, i) => {
-                            if (i === keys.length - 1) {
-                                if (!temp[k]) temp[k] = [];
-                                temp[k].push(value);
-                            } else {
-                                if (!temp[k]) temp[k] = {};
-                                temp = temp[k];
-                            }
-                        });
-                    } else {
-                        data[key] = value;
-                    }
-                });
-
-                console.log(data); // Replace this with your AJAX/Fetch API logic to send data to the backend
-            });
-        });
-
-        const quizForm = document.getElementById('quizForm'); // Ensure your form has this ID
+    document.addEventListener('DOMContentLoaded', function() {
+        const quizForm = document.getElementById('quizForm');
         const addQuestionBtn = document.getElementById('addQuestion');
         const quizQuestionsContainer = document.getElementById('quizQuestions');
         let questionCount = 0;
 
         function createQuestionTemplate(index) {
             return `
-        <div class="card mb-3" data-question-index="${index}">
-            <div class="card-body">
-                <h5 class="card-title">Question ${index + 1}</h5>
-                <div class="mb-3">
-                    <label for="question${index}" class="form-label">Question</label>
-                    <input type="text" class="form-control" id="question${index}" name="questions[${index}]" required>
-                </div>
-                <div class="mb-3">
-                    <label class="form-label">Answers</label>
-                    ${[0, 1, 2, 3].map(answerIndex => `
+                <div class="card mb-3" data-question-index="${index}">
+                    <div class="card-body">
+                        <h5 class="card-title">Question ${index + 1}</h5>
                         <div class="mb-3">
-                            <div class="input-group mb-2">
-                                <div class="input-group-text">
-                                    <input type="radio" name="correct_answers[${index}]" value="${answerIndex}" required>
-                                </div>
-                                <input type="text" class="form-control" name="answers[${index}][]" placeholder="Answer option" required>
-                            </div>
-                            <input type="text" class="form-control" name="feedback[${index}][]" placeholder="Feedback for this answer" required>
+                            <label for="question${index}" class="form-label">Question</label>
+                            <input type="text" class="form-control" id="question${index}" name="questions[${index}]" required>
                         </div>
-                    `).join('')}
+                        <div class="mb-3">
+                            <label class="form-label">Answers</label>
+                            ${[0, 1, 2, 3].map(answerIndex => `
+                                <div class="mb-3">
+                                    <div class="input-group mb-2">
+                                        <div class="input-group-text">
+                                            <input type="radio" name="correct_answers[${index}]" value="${answerIndex}" required>
+                                        </div>
+                                        <input type="text" class="form-control" name="answers[${index}][]" placeholder="Answer option" required>
+                                    </div>
+                                    <input type="text" class="form-control" name="feedback[${index}][]" placeholder="Feedback for this answer" required>
+                                </div>
+                            `).join('')}
+                        </div>
+                    </div>
                 </div>
-            </div>
-        </div>`;
+            `;
         }
+
+        // Add initial question
+        quizQuestionsContainer.insertAdjacentHTML('beforeend', createQuestionTemplate(questionCount));
+        questionCount++;
 
         // Add event listener for adding more questions
         addQuestionBtn.addEventListener('click', function() {
@@ -795,7 +729,7 @@ $classes = mysqli_fetch_all($result, MYSQLI_ASSOC);
             questionCount++;
         });
 
-        // Validate form on submit
+        // Form submission handler
         quizForm.addEventListener('submit', function(e) {
             e.preventDefault(); // Prevent default form submission
 
@@ -842,7 +776,9 @@ $classes = mysqli_fetch_all($result, MYSQLI_ASSOC);
                     alert('An error occurred while submitting the quiz.');
                 });
         });
-    </script>
+    });
+</script>
+
 
 </body>
 

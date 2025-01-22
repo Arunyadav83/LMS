@@ -67,7 +67,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                         </ul>
                         <p><strong>Note:</strong> Please keep your password secure and do not share it with anyone.</p>
                         <p>If you did not request this change, please contact support immediately.</p>
-                        <p>Best regards,<br>Your Company Team</p>
+                        <p>Best regards,<br>Ultrakey Learning</p>
                     ";
 
                     $mail->send();

@@ -98,19 +98,98 @@ if (isset($_POST['add_course'])) {
                     confirmButtonText: 'OK'
                 }).then(() => {
                     // Redirect after SweetAlert is closed with a 3-second delay
-                    setTimeout(function() {
-                        window.location.href = "courses.php";
-                    }, 3000); // 3 seconds delay
+                    location.href = "courses.php";
+                     // 3 seconds delay
                 });
             });
             <?php unset($_SESSION['course_added']); ?>
         <?php endif; ?>
     </script>
+    <style>
+        
+    .navbar {
+        background-color: #1a237e;
+        margin: 0;
+        padding: 24px 5px;
+        /* Adjust padding for comfortable spacing */
+        line-height: 1.2;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        /* Adds a subtle shadow */
+        /* position: fixed; */
+        /* Makes the navbar fixed */
+        top: 0;
+        /* Sticks to the top of the viewport */
+        left: 0;
+        width: 100%;
+        position: sticky;
+        /* Ensures the navbar spans the full width */
+        z-index: 1000;
+        /* Keeps the navbar above other elements */
+    }
+    h1{
+        color: #1a237e;
+        text-align: center;
+        margin: 34px;
+    }
+    .container{
+        width: 100%;
+        height: auto;
+        margin-top: 23%;
+        margin-bottom: 15%;
+        padding: 54px;
+        background-color:rgb(148, 156, 248);
+    }
+    .button {
+        padding-inline: 30px;
+        font-weight: bolder;
+        text-decoration: none;
+        color: #0433c3;
+        padding-block: 10px;
+        border-radius: 30px;
+        transition: all 0.3s ease;
+    }
+
+    .button:hover {
+        color: white;
+        background-color: #0433c3;
+        border-radius: 30px;
+    }
+
+    </style>
 </head>
 
 <body>
+
+<nav class="navbar navbar-expand-lg custom-navbar">
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="container-fluid">
+            <a class="navbar-brand text-light fw-bold" href="index.php">LMS Admin</a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+                <!-- <span class="navbar-toggler-icon"></span> -->
+            </button>
+            <div class="collapse navbar-collapse justify-content-end" id="navbarNav">
+                <ul class="navbar-nav align-items-center">
+                    <li class="nav-item">
+                        <a class="nav-link text-light d-flex align-items-center" href="#">
+                            <i class="fas fa-user me-2"></i> Profile
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link text-light d-flex align-items-center" href="logout.php">
+                            <i class="fas fa-sign-out-alt me-2"></i> Logout
+                        </a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+    <h1>Add New Course</h1>
+    
     <div class="container mt-4">
-        <h1>Add New Course</h1>
+   
+        
         <form action="" method="post">
             <div class="mb-3">
                 <label for="modal_title" class="form-label">Title</label>
@@ -133,7 +212,7 @@ if (isset($_POST['add_course'])) {
                 <label for="modal_course_price" class="form-label">Course Price</label>
                 <input type="number" class="form-control" id="modal_course_price" name="course_price" required>
             </div>
-            <button type="submit" name="add_course" class="btn btn-primary">Add Course</button>
+            <button type="submit" name="add_course" class="button">Add Course</button>
         </form>
     </div>
 </body>

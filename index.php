@@ -1,7 +1,8 @@
 <?php
+include 'header.php';
 require_once 'config.php';
 require_once 'functions.php';
-include 'header.php';
+
 
 // // Fetch counts from the database
 // $students_count_result = mysqli_query($conn, "SELECT COUNT(DISTINCT user_id) as count FROM enrollments WHERE user_id IS NOT NULL");
@@ -157,9 +158,9 @@ include 'header.php';
                     <div class="col-md-4 mb-4">
                         <div class="card h-100 animate__animated animate__fadeIn" style="height: 150px; overflow: hidden;">
                             <img
-                                src="assets/images/<?php echo htmlspecialchars($course['title'], ENT_QUOTES, 'UTF-8'); ?>.jpg" style="height: 180px; width: 100%; object-fit: contain;">
+                                src="assets/images/<?php echo htmlspecialchars($course['title'], ENT_QUOTES, 'UTF-8'); ?>.jpg" style="height: 180px; width: 100%; object-fit: cover;">
                             <div class="card-body" style="padding: 28px;">
-                                <h5 class="card-title" style="font-size: 14px;"><?php echo htmlspecialchars($course['title']); ?></h5>
+                                <h5 class="card-title" style="font-size: 20px;"><?php echo htmlspecialchars($course['title']); ?></h5>
                                 <p class="card-text" style="font-size: 12px;"><?php echo htmlspecialchars(substr($course['description'], 0, 60)) . '...'; ?></p>
                                 <p class="card-text" style="font-size: 10px;"><small class="text-muted">Tutor: <?php echo htmlspecialchars($course['tutor_name']); ?></small></p>
                             </div>

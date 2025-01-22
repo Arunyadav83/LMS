@@ -5,8 +5,10 @@ require_once 'config.php';
 require_once 'functions.php';
 include 'header.php';
 
+// $duration = htmlspecialchars($course['duration']); 
+
 // Fetch all courses from the database
-$query = "SELECT c.id, c.title, c.description, c.course_prize, t.full_name AS tutor_name 
+$query = "SELECT c.id, c.title, c.description, c.course_prize, t.full_name AS tutor_name ,duration 
           FROM courses c
           LEFT JOIN tutors t ON c.tutor_id = t.id
           ORDER BY c.created_at DESC";
@@ -30,7 +32,7 @@ $razorpayKey = 'rzp_test_Bvq9kiuaq8gkcs'; // Your Razorpay API key
     <div id="searchResults" class="dropdown-menu" style="display: none; max-height: 200px; overflow-y: hidden;"></div>
 </div>
 <div class="container mt-2">
-<div id="searchError" class="text-danger text-center" style="display: none;">No matching courses found!</div>
+    <div id="searchError" class="text-danger text-center" style="display: none;">No matching courses found!</div>
 
     <h4 class="mb-2 text-center text-md-left" style="margin-top: -4%; ">All Courses</h4>
 
@@ -38,18 +40,24 @@ $razorpayKey = 'rzp_test_Bvq9kiuaq8gkcs'; // Your Razorpay API key
         <div class="row">
             <?php while ($course = mysqli_fetch_assoc($result)): ?>
                 <div class="col-12 col-sm-6 col-md-3 mb-3">
-                     <div class="card h-60" style="padding: 0px;!important">
+                    <div class="card h-60" style="padding: 0px;!important">
                         <img
                             src="assets/images/<?php echo htmlspecialchars($course['title'], ENT_QUOTES, 'UTF-8'); ?>.jpg"
                             class="card-img-top img-fluid"
-                            style="max-height: 150px; object-fit: contain;"
+                            style="max-height: 150px; object-fit: cover;"
                             alt="<?php echo htmlspecialchars($course['title']); ?>">
                         <div class="card-body">
                             <h5 class="card-title"><?php echo htmlspecialchars($course['title']); ?></h5>
                             <p class="card-text" style="max-height: 50px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;"><?php echo htmlspecialchars($course['description']); ?></p>
                             <p class="card-text"><small class="text-muted">Tutor: <?php echo htmlspecialchars($course['tutor_name']); ?></small></p>
                             <p class="card-text"><strong>Price:</strong> ₹<?php echo number_format((float)$course['course_prize'], 2); ?></p>
+                            <p class="card-text">
+                                <strong>Duration:</strong>
+                                <i class="fas fa-clock" style="color: gray; margin-left: 10px;"></i>
+                                <?php echo isset($course['duration']) ? htmlspecialchars($course['duration']) : 'Not Available'; ?>
+                            </p>
                         </div>
+
                         <div class="card-footer bg-transparent border-0">
                             <?php if (is_logged_in()): ?>
                                 <a href="course.php?id=<?php echo $course['id']; ?>"
@@ -95,91 +103,104 @@ $razorpayKey = 'rzp_test_Bvq9kiuaq8gkcs'; // Your Razorpay API key
     .card-footer .btn-success {
         width: 100px;
     }
-    .input-group-append {
-    display: flex;
-    align-items: center;
-}
-body, html {
-    overflow-x: hidden;  /* Prevent horizontal overflow */
-}
-
-
-
-.input-group .btn {
-    background-color: #007bff; /* Bootstrap primary color */
-    color: #fff;
-    border: 1px solid #007bff;
-    border-radius: 0 4px 4px 0; /* Rounded corners for the right side */
-    padding: 8px 12px;
-    cursor: pointer;
-    transition: background-color 0.3s ease;
-}
-
-.input-group .btn:hover {
-    background-color: #0056b3; /* Darker shade on hover */
-}
-
-.input-group .fa-search {
-    font-size: 16px;
-}
-
-#searchInput {
-    border-right: none; /* Remove right border to merge with the button */
-    border-radius: 4px 0 0 4px;
-    margin-right: 16px;
-    margin-bottom: 1%;
-    height: auto;
-     /* Rounded corners for the left side */
-}
-
-.search-bar-container {
-    margin-top: 120px;  /* Space above the search bar */
-    position: relative;
-    transform: translateX(30px);  /* Move the search bar slightly to the right without causing overflow */
-    width: 100%;
-    left: 430px;                    
-    /* Add space above the search bar */
-}
-
-
-/* For screens smaller than or equal to 768px */
-@media (max-width: 768px) {
-    .search-bar-container {
-        margin-top: 90px;
-        left: 0;
-        width: 100%;
-        padding: 0 10px;
-    }z
-
-    .input-group {
-        width: 100%; /* Make input group take full width */
-    }
 
     .input-group-append {
-        width: 100%; /* Make button take full width */
-        justify-content: flex-end; /* Align button to the right */
+        display: flex;
+        align-items: center;
     }
+
+    body,
+    html {
+        overflow-x: hidden;
+        /* Prevent horizontal overflow */
+    }
+
+
 
     .input-group .btn {
-        width: 40px; /* Make the button smaller for mobile view */
-        /* padding: 8px; */
-        position: relative;
-        bottom: 43px;
-        right: 22px;
+        background-color: #007bff;
+        /* Bootstrap primary color */
+        color: #fff;
+        border: 1px solid #007bff;
+        border-radius: 0 4px 4px 0;
+        /* Rounded corners for the right side */
+        padding: 8px 12px;
+        cursor: pointer;
+        transition: background-color 0.3s ease;
+    }
+
+    .input-group .btn:hover {
+        background-color: #0056b3;
+        /* Darker shade on hover */
+    }
+
+    .input-group .fa-search {
+        font-size: 16px;
     }
 
     #searchInput {
-    width: calc(100% - 50px); /* Ensure input takes the remaining space */
-    margin-right: 34px;
-    position: relative;
-    right: 34px;
- /* Adds a margin at the top */
-    border-radius: 4px 0 0 4px;
-}
+        border-right: none;
+        /* Remove right border to merge with the button */
+        border-radius: 4px 0 0 4px;
+        margin-right: 16px;
+        margin-bottom: 1%;
+        height: auto;
+        /* Rounded corners for the left side */
+    }
 
-}
+    .search-bar-container {
+        margin-top: 120px;
+        /* Space above the search bar */
+        position: relative;
+        transform: translateX(30px);
+        /* Move the search bar slightly to the right without causing overflow */
+        width: 100%;
+        left: 430px;
+        /* Add space above the search bar */
+    }
 
 
+    /* For screens smaller than or equal to 768px */
+    @media (max-width: 768px) {
+        .search-bar-container {
+            margin-top: 90px;
+            left: 0;
+            width: 100%;
+            padding: 0 10px;
+        }
+
+        z .input-group {
+            width: 100%;
+            /* Make input group take full width */
+        }
+
+        .input-group-append {
+            width: 100%;
+            /* Make button take full width */
+            justify-content: flex-end;
+            /* Align button to the right */
+        }
+
+        .input-group .btn {
+            width: 40px;
+            /* Make the button smaller for mobile view */
+            /* padding: 8px; */
+            position: relative;
+            bottom: 43px;
+            right: 22px;
+        }
+
+        #searchInput {
+            width: calc(100% - 50px);
+            /* Ensure input takes the remaining space */
+            margin-right: 34px;
+            position: relative;
+            right: 34px;
+            /* Adds a margin at the top */
+            border-radius: 4px 0 0 4px;
+        }
+
+    }
 </style>
 <script>
     var username = '<?php echo isset($_SESSION['username']) ? htmlspecialchars($_SESSION['username'], ENT_QUOTES, 'UTF-8') : ''; ?>';
@@ -187,27 +208,27 @@ body, html {
 
 <script>
     function performSearch() {
-    const query = document.getElementById('searchInput').value.toLowerCase();
-    const courses = document.querySelectorAll('.card');
-    let found = false;
+        const query = document.getElementById('searchInput').value.toLowerCase();
+        const courses = document.querySelectorAll('.card');
+        let found = false;
 
-    courses.forEach(course => {
-        const title = course.querySelector('.card-title').textContent.toLowerCase();
-        const description = course.querySelector('.card-text').textContent.toLowerCase();
-        if (title.includes(query) || description.includes(query)) {
-            course.style.display = 'block';
-            found = true;
+        courses.forEach(course => {
+            const title = course.querySelector('.card-title').textContent.toLowerCase();
+            const description = course.querySelector('.card-text').textContent.toLowerCase();
+            if (title.includes(query) || description.includes(query)) {
+                course.style.display = 'block';
+                found = true;
+            } else {
+                course.style.display = 'none';
+            }
+        });
+
+        if (!found) {
+            document.getElementById('searchError').style.display = 'block';
         } else {
-            course.style.display = 'none';
+            document.getElementById('searchError').style.display = 'none';
         }
-    });
-
-    if (!found) {
-        document.getElementById('searchError').style.display = 'block';
-    } else {
-        document.getElementById('searchError').style.display = 'none';
     }
-}
 
     function enrollCourse(courseId, userId) {
         $.ajax({

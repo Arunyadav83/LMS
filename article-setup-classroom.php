@@ -17,6 +17,7 @@
             color: #1e90ff;
             font-size: 36px;
             margin-bottom: 30px;
+            margin: 99px;
         }
 
         .container {
@@ -63,8 +64,13 @@
         @media (max-width: 768px) {
             header .navbar {
                 flex-direction: column;
+                
             }
 
+            .container p{
+                width: 95%;
+
+            }
             header .navbar a {
                 margin: 5px 0;
             }
@@ -75,7 +81,7 @@
     <!-- Include Header -->
     <?php include 'header.php'; ?>
 
-    <h1>How UltraKey IT Solutions Pvt Ltd Sets Up Classes</h1>
+    <h1 style="margin: 89px;">How UltraKey IT Solutions Pvt Ltd Sets Up Classes</h1>
 
     <div class="container">
         <div class="section">

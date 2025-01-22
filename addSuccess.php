@@ -64,7 +64,7 @@
             <textarea name="successtory" placeholder="Your Success Story" rows="5" required></textarea>
             <input type="file" name="image_path" placeholder="Select an image" required onchange="previewImage(event)">
             <img id="imagePreview" class="image-preview" alt="Image Preview">
-            <input type="text" name="image_alt" placeholder="Alt text for the image" required>
+            <!-- <input type="text" name="image_alt" placeholder="Alt text for the image" required> -->
             <button type="submit">Submit</button>
         </form>
     </div>

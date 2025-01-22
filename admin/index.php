@@ -121,63 +121,55 @@ LIMIT 3;
 $recent_enrollments = mysqli_query($conn, $query);
 function time_ago($datetime, $full = false)
 {
-    // Set the time zone to match your data
-    $timezone = new DateTimeZone('Asia/Kolkata'); // Adjust to your time zone
+    // Set the timezone to match your data
+    $timezone = new DateTimeZone('Asia/Kolkata'); // Adjust to your time zone if needed
 
+    // Create DateTime objects
     $now = new DateTime('now', $timezone);
     $ago = new DateTime($datetime, $timezone);
     $diff = $now->diff($ago);
 
-    // If the time is in the future, return "just now"
+    // If the provided time is in the future
     if ($diff->invert) {
         return 'just now';
     }
 
-    // Handle cases for less than 1 minute
+    // Check if the difference is less than 1 minute
     if ($diff->h == 0 && $diff->i == 0 && $diff->s < 60) {
         return 'just now';
     }
 
-    // Handle cases for less than 1 hour
-    if ($diff->h == 0 && $diff->i > 0) {
-        return $diff->i . ' minute' . ($diff->i > 1 ? 's' : '') . ' ago';
-    }
-
-    // Handle cases for hours
-    if ($diff->h > 0 && $diff->d == 0) {
-        return $diff->h . ' hour' . ($diff->h > 1 ? 's' : '') . ' ago';
-    }
-
-    // Calculate weeks manually based on days
-    $weeks = floor($diff->d / 7);
-    $diff->d -= $weeks * 7;
-
-    // Build the time difference string
+    // Handle time differences dynamically
     $string = [];
     $units = [
         'y' => 'year',
         'm' => 'month',
-        'w' => 'week',
         'd' => 'day',
         'h' => 'hour',
         'i' => 'minute',
         's' => 'second',
     ];
 
-    foreach ($units as $k => $v) {
-        if ($k === 'w' && $weeks) {
-            $string[] = $weeks . ' ' . $v . ($weeks > 1 ? 's' : '');
-        } elseif ($k !== 'w' && $diff->$k) {
-            $string[] = $diff->$k . ' ' . $v . ($diff->$k > 1 ? 's' : '');
+    foreach ($units as $key => $unit) {
+        if ($diff->$key) {
+            $string[] = $diff->$key . ' ' . $unit . ($diff->$key > 1 ? 's' : '');
         }
     }
 
+    // Handle weeks separately (if days exceed 7)
+    if ($diff->d >= 7) {
+        $weeks = floor($diff->d / 7);
+        $string = [$weeks . ' week' . ($weeks > 1 ? 's' : '')];
+    }
+
+    // Return the first unit for a concise output or full string
     if (!$full) {
         $string = array_slice($string, 0, 1);
     }
 
     return $string ? implode(', ', $string) . ' ago' : 'just now';
 }
+
 $query = "
 SELECT 
     p.id,
@@ -518,6 +510,10 @@ function get_recent_students()
                 overflow-x: auto;
                 width: 100%
             }
+            :root {
+            --sidebar-width: 250px;
+        }
+
 
         }
     </style>
@@ -595,7 +591,7 @@ function get_recent_students()
     <div class="container-fluid">
         <div class="row">
             <!-- Sidebar -->
-            <?php include 'sidebar.php'; ?>
+            <?php include 'sidebar.php'; ?> 
 
             <!-- Main Content -->
             <main class="col main-content">
@@ -860,9 +856,7 @@ function get_recent_students()
                 }
             })
             .catch(error => {
-        console.error('Error fetching messages:', error);
-        // // Optionally show an error message to the user
-        // document.getElementById('messagesContainer').innerHTML = '<p>Error loading messages.</p>';
+            //   document.getElementById('messagesContainer').innerHTML = '<p>Error loading messages.</p>';
     });
     }
 
@@ -896,7 +890,7 @@ function get_recent_students()
             })
             .catch(error => console.error('Error resetting message status:', error));
     });
-    // fetchNewMessages()
+     fetchNewMessages()
 
     // Set interval to fetch new messages every 5 seconds
     setInterval(fetchNewMessages, 5000);

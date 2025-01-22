@@ -86,7 +86,7 @@ $current_page = 'videos';
                                         <?php if (!empty($item['video_path'])): ?>
                                             <?php
                                             // Correct base path for videos in admin dashboard
-                                            $base_url = '/LMS/uploads/class_videos/'; // Use the full URL relative to the root of the website
+                                            $base_url = '../uploads/class_videos/'; // Use the full URL relative to the root of the website
                                             $video_url = $base_url . $item['video_path'];
                                             ?>
 

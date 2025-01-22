@@ -1,3 +1,6 @@
+
+<?php include 'header.php'; ?>
+
 <!DOCTYPE html>
 <html lang="en">
 
@@ -96,6 +99,7 @@
             cursor: pointer;
             font-size: 1rem;
             transition: background-color 0.3s ease;
+            
         }
 
         button:hover {
@@ -115,6 +119,8 @@
             border-radius: 12px;
             /* overflow: hidden; */
             box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            max-width: 410px;
+
             transition: transform 0.3s ease, box-shadow 0.3s ease;
         }
 
@@ -126,8 +132,10 @@
         .class-card img {
             width: auto;
             height: 300px;
-            object-fit: cover;
+            object-fit: contain;
             border-bottom: 2px solid #f1f1f1;
+            margin-left: 25px;
+            margin-top: 4%;
         }
 
         .class-card-content {
@@ -150,6 +158,7 @@
             font-size: 16px;
             border-radius: 8px;
             cursor: pointer;
+            margin-bottom: 24px;
             transition: background-color 0.3s ease;
         }
 
@@ -365,13 +374,17 @@
             .right {
                 left: 0%;
             }
+             .class-card img {
+                width: auto;
+                height: auto;
+            }
+            
         }
       
     </style>
 </head>
 
 <body>
-    <?php include 'header.php'; ?>
 
     <header>
         <h1>Welcome to Ultrakey</h1>
@@ -522,9 +535,10 @@
                         const classElement = document.createElement('div');
                         classElement.classList.add('class-card');
                         classElement.innerHTML = `
-                    <img src="assets/images/${classItem.class_name}" alt="${classItem.class_name}">
+                    <img src="assets/images/${classItem.class_name.replace(/\s+/g, '')}.jpg" alt="${classItem.class_name}">
                     <div class="class-card-content md3">
                         <h3>${classItem.class_name}</h3>
+                        
                         <button onclick="watchClass('${classItem.video_path}')">Watch Now</button>
                     </div>
                 `;

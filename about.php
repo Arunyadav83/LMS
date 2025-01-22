@@ -1,3 +1,6 @@
+
+<?php include 'header.php'; ?>
+
 <!DOCTYPE html>
 <html lang="en">
 
@@ -7,18 +10,7 @@
     <title>About Us - Ultrakey</title>
     <link rel="stylesheet" type="text/css" href="https://cdnjs.cloudflare.com/ajax/libs/slick-carousel/1.8.1/slick.min.css" />
     <link rel="stylesheet" type="text/css" href="https://cdnjs.cloudflare.com/ajax/libs/slick-carousel/1.8.1/slick-theme.min.css" />
-    <!-- <script>
-        document.onreadystatechange = function() {
-            if (document.readyState == "interactive") {
-                document.body.classList.add('page-loaded');
-            }
-        };
-    </script> -->
     <style>
-        /* .page-loaded {
-            opacity: 1;
-            transition: opacity 0.5s ease-in-out;
-        } */
 
         body {
             font-family: 'Poppins', sans-serif;
@@ -89,13 +81,6 @@
                 font-size: calc(1vw + 12px);
             }
         }
-
-        /* Make the content visible after it's loaded */
-        /* body.loaded {
-            opacity: 1;
-            visibility: visible;
-            transition: opacity 0.5s ease-in-out;
-        } */
 
         h1,
         h2 {
@@ -633,8 +618,6 @@
 
 
 <?php
-include 'header.php';
-
 class About
 {
     private $courses;

@@ -263,8 +263,6 @@ foreach ($enrollments as $enrollment) {
 
                     <!-- Grid View -->
                     <div id="gridView" class="view" style="display: none;">
-                        <!-- <h2>Grid View</h2> -->
-                        <!-- Search Bar for Grid View -->
                         <div class="mb-3">
                             <input type="text" id="searchBar" class="form-control" placeholder="Search by username or email" onkeyup="filterEnrollments()" style="margin-top: 25px;">
                         </div>

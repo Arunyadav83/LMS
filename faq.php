@@ -10,6 +10,7 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <!-- Styling -->
     <style>
+       
         body {
             font-family: 'Poppins', sans-serif;
             margin: 0;
@@ -80,6 +81,7 @@
                 padding: 1rem;
             }
             h1 {
+                
                 font-size: 2rem;
             }
         }
@@ -93,7 +95,7 @@
 
     <!-- FAQ Section -->
     <div class="container">
-        <h1>Frequently Asked Questions</h1>
+        <h1 style="margin: 25px;">Frequently Asked Questions</h1>
         <div class="faq-list">
             <div class="faq-item">
                 <div class="faq-question">

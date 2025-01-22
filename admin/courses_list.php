@@ -70,12 +70,14 @@ if (isset($_POST['delete_course'])) {
 echo '<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>';
 
 // Handle update action
+// Handle update action
 if (isset($_POST['update_course'])) {
     $course_id = (int)$_POST['course_id'];
     $course_title = mysqli_real_escape_string($conn, $_POST['course_title']);
     $course_description = mysqli_real_escape_string($conn, $_POST['course_description']);
     $course_topics = mysqli_real_escape_string($conn, $_POST['course_topics']);
     $course_prize = (float)$_POST['course_prize'];
+    $course_duration = mysqli_real_escape_string($conn, $_POST['course_duration']); // Handle duration as a string
     $tutor_id = isset($_POST['tutor_id']) ? (int)$_POST['tutor_id'] : null;
 
     // Handle image upload (optional)
@@ -106,6 +108,9 @@ if (isset($_POST['update_course'])) {
         if ($course_prize > 0) {
             $update_query_parts[] = "course_prize = $course_prize";
         }
+        if (!empty($course_duration)) { // Add the duration as a string if it's provided
+            $update_query_parts[] = "duration = '$course_duration'";
+        }
         if ($tutor_id !== null) {
             $update_query_parts[] = "tutor_id = $tutor_id";
         }
@@ -131,11 +136,9 @@ if (isset($_POST['update_course'])) {
                     Swal.fire({
                         title: 'Success',
                         text: " . json_encode($successMessage) . ", 
-
                         icon: 'success'
                     }).then(() => {
                         window.location.href = '$redirectURL';
-                    
                     });
                 };
                 </script>";
@@ -164,9 +167,11 @@ if (isset($_POST['update_course'])) {
     }
 }
 
+
+
 // Fetch all courses with their topics
 // Fetch all courses
-$query = "SELECT id, title, description, course_prize, topics FROM courses";
+$query = "SELECT id, title, description, course_prize, topics ,duration  FROM courses";
 
 
 $result = mysqli_query($conn, $query);
@@ -325,6 +330,10 @@ if ($result->num_rows > 0) {
         /* Keeps the navbar above other elements */
     }
 
+    .a {
+        margin-left: 850px;
+    }
+
     .navbar-brand {
         font-size: 23px;
         color: white;
@@ -345,7 +354,6 @@ if ($result->num_rows > 0) {
         font-weight: bolder;
         text-decoration: none;
         color: #0433c3;
-        /* background-color: white; */
         padding-block: 10px;
         border-radius: 30px;
         transition: all 0.3s ease;
@@ -404,43 +412,57 @@ if ($result->num_rows > 0) {
             margin: 0 5px;
             /* Reduce spacing on smaller screens */
         }
-        main{
+
+        main {
             max-width: 800px;
         }
     }
+
     @media (max-width: 768px) {
 
-    #listView h2 {
-        font-size: 1.5rem;
-        top: 0; /* Reset position */
-    }
-    .table td, .table th {
-        font-size: 0.875rem; /* Smaller font for better fit */
-        white-space: normal;
-        
-         /* Prevent text overflow */
-    }
-    main{
+        #listView h2 {
+            font-size: 1.5rem;
+            top: 0;
+            /* Reset position */
+        }
+
+        .table td,
+        .table th {
+            font-size: 0.875rem;
+            /* Smaller font for better fit */
+            white-space: normal;
+
+            /* Prevent text overflow */
+        }
+
+        main {
             max-width: 800px;
         }
-    .badge {
-        font-size: 0.75rem; /* Smaller badge size */
-    }
-    .dropdown-menu {
-        font-size: 0.875rem; /* Smaller dropdown text */
-    }
-    /* .a{
-        margin-left: 340px;
-        
-    } */
-     .table_list{
-        overflow-x: auto;
-        width: 100%;
 
-    }
-}
+        .badge {
+            font-size: 0.75rem;
+            /* Smaller badge size */
+        }
 
-    
+        .dropdown-menu {
+            font-size: 0.875rem;
+            /* Smaller dropdown text */
+        }
+
+        .a {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            margin-right: 840px;
+
+        }
+
+        .table_list {
+            overflow-x: auto;
+            width: 100%;
+
+        }
+    }
 </style>
 
 <body>
@@ -485,8 +507,8 @@ if ($result->num_rows > 0) {
                         <a href="add_course.php" class="button">Add New Course</a>
                     </div>
 
-                    <div style="overflow-x: auto; display: flex; justify-content: center; position:relative;bottom: 34px;margin-left: 165px;" >
-                        <div  class="a">
+                    <div style=" display: flex; justify-content: center; position:relative;bottom: 34px;margin-left: 185px;">
+                        <div class="a">
                             <button id="listViewBtn" class="btn btn-primary me" onclick="showListView()">
                                 <i class="fas fa-list"></i>
                             </button>
@@ -498,62 +520,67 @@ if ($result->num_rows > 0) {
 
 
                     <!-- List View -->
-                    <div id="listView" class="view container mt-5" >
+                    <div id="listView" class="view container mt-5">
                         <h2 class="mb-4">List View</h2>
                         <div class="table_list">
-                        <table class="table table-striped table-bordered align-middle">
-                            <thead class="table-dark">
-                                <tr>
-                                    <th scope="col">ID</th>
-                                    <th scope="col">Title</th>
-                                    <th scope="col">Description</th>
-                                    <th scope="col">Topics</th>
-                                    <th scope="col" class="text-center">Actions</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <?php foreach ($courses as $course): ?>
+                            <table class="table table-striped table-bordered align-middle">
+                                <thead class="table-dark">
                                     <tr>
-                                        <td data-label="ID"><?php echo htmlspecialchars($course['id']); ?></td>
-                                        <td data-label="Title"><?php echo htmlspecialchars($course['title']); ?></td>
-                                        <td data-label="Description"><?php echo htmlspecialchars($course['description']); ?></td>
-                                        <td data-label="Topics">
-                                            <?php
-                                            $topics = explode(',', $course['topics']);
-                                            foreach ($topics as $topic): ?>
-                                                <span class="badge bg-primary me-1"><?php echo htmlspecialchars(trim($topic)); ?></span>
-                                            <?php endforeach; ?>
-                                        </td>
-                                        <td data-label="Actions" class="text-center">
-                                            <div class="dropdown">
-                                                <button class="btn btn-light btn-sm" type="button" id="dropdownMenuButton" data-bs-toggle="dropdown" aria-expanded="false">
-                                                    <i class="fas fa-ellipsis-v"></i>
-                                                </button>
-                                                <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="dropdownMenuButton">
-                                                    <li>
-                                                        <button class="dropdown-item edit-btn" data-bs-toggle="modal" data-bs-target="#editModal"
-                                                            data-id="<?php echo $course['id']; ?>"
-                                                            data-title="<?php echo htmlspecialchars($course['title']); ?>"
-                                                             data-description="<?php echo htmlspecialchars(substr($course['description'], 0, 10)); ?>..."
-                                                            data-topics="<?php echo htmlspecialchars($course['topics']); ?>"
-                                                            data-prize="<?php echo htmlspecialchars($course['course_prize']); ?>">Edit</button>
-                                                    </li>
-                                                    <li>
-                                                        <form action="" method="post" class="d-inline" onsubmit="return confirm('Are you sure you want to delete this course?');">
-                                                            <input type="hidden" name="course_id" value="<?php echo $course['id']; ?>">
-                                                            <button type="submit" name="delete_course" class="dropdown-item">Delete</button>
-                                                        </form>
-                                                    </li>
-                                                </ul>
-                                            </div>
-                                        </td>
+                                        <th scope="col">ID</th>
+                                        <th scope="col">Title</th>
+                                        <th scope="col">Description</th>
+                                        <th scope="col">Topics</th>
+                                        <th scope="col">Duration</th>
+                                        <th scope="col" class="text-center">Actions</th>
                                     </tr>
-                                <?php endforeach; ?>
-                            </tbody>
+                                </thead>
+                                <tbody>
+                                    <?php foreach ($courses as $course): ?>
+                                        <tr>
+                                            <td data-label="ID"><?php echo htmlspecialchars($course['id']); ?></td>
+                                            <td data-label="Title"><?php echo htmlspecialchars($course['title']); ?></td>
+                                            <td data-label="Description"><?php echo htmlspecialchars($course['description']); ?></td>
 
-                        </table>
+                                            <td data-label="Topics">
+                                                <?php
+                                                $topics = explode(',', $course['topics']);
+                                                foreach ($topics as $topic): ?>
+                                                    <span class="badge bg-primary me-1"><?php echo htmlspecialchars(trim($topic)); ?></span>
+                                                <?php endforeach; ?>
+                                            </td>
+                                            <td data-label="Duration"><?php echo htmlspecialchars($course['duration'] . " "); ?></td> <!-- Added Duration -->
+                                            <td data-label="Actions" class="text-center">
+                                                <div class="dropdown">
+                                                    <button class="btn btn-light btn-sm" type="button" id="dropdownMenuButton" data-bs-toggle="dropdown" aria-expanded="false">
+                                                        <i class="fas fa-ellipsis-v"></i>
+                                                    </button>
+                                                    <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="dropdownMenuButton">
+                                                        <li>
+                                                            <button class="dropdown-item edit-btn" data-bs-toggle="modal" data-bs-target="#editModal"
+                                                                data-id="<?php echo htmlspecialchars($course['id'] ?? ''); ?>"
+                                                                data-title="<?php echo htmlspecialchars($course['title'] ?? ''); ?>"
+                                                                data-description="<?php echo htmlspecialchars(substr($course['description'] ?? '', 0, 100)); ?>..."
+                                                                data-topics="<?php echo htmlspecialchars($course['topics'] ?? ''); ?>"
+                                                                data-prize="<?php echo htmlspecialchars($course['course_prize'] ?? ''); ?>"
+                                                                data-duration="<?php echo htmlspecialchars($course['duration'] ?? ''); ?>">Edit</button>
+                                                        </li>
+
+                                                        <li>
+                                                            <form action="" method="post" class="d-inline" onsubmit="return confirm('Are you sure you want to delete this course?');">
+                                                                <input type="hidden" name="course_id" value="<?php echo $course['id']; ?>">
+                                                                <button type="submit" name="delete_course" class="dropdown-item">Delete</button>
+                                                            </form>
+                                                        </li>
+                                                    </ul>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                    <?php endforeach; ?>
+                                </tbody>
+                            </table>
                         </div>
                     </div>
+
 
 
                     <!-- Grid View -->
@@ -584,7 +611,9 @@ if ($result->num_rows > 0) {
                                                                 data-title="<?php echo htmlspecialchars($course['title']); ?>"
                                                                 data-description="<?php echo htmlspecialchars(substr($course['description'], 0, 100)); ?>..."
                                                                 data-topics="<?php echo htmlspecialchars($course['topics']); ?>"
-                                                                data-prize="<?php echo isset($course['course_prize']) ? htmlspecialchars($course['course_prize']) : ''; ?>">
+                                                                data-prize="<?php echo isset($course['course_prize']) ? htmlspecialchars($course['course_prize']) : ''; ?>"
+                                                                data-duration="<?php echo htmlspecialchars($course['duration'] ?? ''); ?>"
+                                                                >
                                                                 Edit
                                                             </button>
                                                         </li>
@@ -604,6 +633,7 @@ if ($result->num_rows > 0) {
                                                     <span class="full-description d-none" id="full-desc-<?php echo $course['id']; ?>">
                                                         <?php echo htmlspecialchars($course['description']); ?>
                                                     </span>
+
                                                     <!-- <a href="javascript:void(0);" class="read-more-link" onclick="toggleDescription('<?php echo $course['id']; ?>')">Read More</a> -->
                                                 </p>
                                                 <p class="card-text"><strong>Topics Covered:</strong> <?php echo htmlspecialchars($course['topics']); ?></p>
@@ -656,6 +686,7 @@ if ($result->num_rows > 0) {
     </div>
 
     <!-- Edit Course Modal -->
+    <!-- Modal for editing course -->
     <div class="modal fade" id="editModal" tabindex="-1" aria-labelledby="editModalLabel" aria-hidden="true">
         <div class="modal-dialog">
             <div class="modal-content">
@@ -665,22 +696,29 @@ if ($result->num_rows > 0) {
                 </div>
                 <div class="modal-body">
                     <form id="editCourseForm" method="post" action="">
-                        <input type="hidden" name="course_id" id="course_id">
+                        <input type="hidden" name="course_id" id="course_id" value="<?php echo $course['id']; ?>">
+
                         <div class="mb-3">
                             <label for="course_title" class="form-label">Title</label>
-                            <input type="text" class="form-control" id="course_title" name="course_title" required>
+                            <input type="text" class="form-control" id="course_title" name="course_title" value="<?php echo $course['title']; ?>" required>
                         </div>
                         <div class="mb-3">
                             <label for="course_description" class="form-label">Description</label>
-                            <textarea class="form-control" id="course_description" name="course_description" required></textarea>
+                            <textarea class="form-control" id="course_description" name="course_description" required><?php echo $course['description']; ?></textarea>
                         </div>
                         <div class="mb-3">
                             <label for="course_topics" class="form-label">Topics</label>
-                            <input type="text" class="form-control" id="course_topics" name="course_topics">
+                            <input type="text" class="form-control" id="course_topics" name="course_topics" value="<?php echo $course['topics']; ?>">
                         </div>
                         <div class="mb-3">
+                            <label for="course_duration" class="form-label">Course Duration:</label>
+                            <input type="text" class="form-control" id="course_duration" name="course_duration"
+                                value="<?php echo htmlspecialchars($course['duration'] ?? ''); ?>" required>
+                        </div>
+
+                        <div class="mb-3">
                             <label for="course_prize" class="form-label">Course Price</label>
-                            <input type="number" class="form-control" id="course_prize" name="course_prize" required>
+                            <input type="number" class="form-control" id="course_prize" name="course_prize" value="<?php echo $course['course_prize']; ?>" required>
                         </div>
                         <button type="submit" name="update_course" class="btn btn-primary">Save changes</button>
                     </form>
@@ -688,6 +726,7 @@ if ($result->num_rows > 0) {
             </div>
         </div>
     </div>
+
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
 
@@ -737,6 +776,7 @@ if ($result->num_rows > 0) {
 
         // Populate the edit modal with course data
         const editModal = document.getElementById('editModal');
+
         editModal.addEventListener('show.bs.modal', function(event) {
             const button = event.relatedTarget; // Button that triggered the modal
             const courseId = button.getAttribute('data-id');
@@ -744,6 +784,7 @@ if ($result->num_rows > 0) {
             const courseDescription = button.getAttribute('data-description');
             const courseTopics = button.getAttribute('data-topics');
             const coursePrize = button.getAttribute('data-prize');
+            const courseDuration = button.getAttribute('data-duration'); // Retrieve the duration
 
             // Update the modal's content
             const modalTitle = editModal.querySelector('.modal-title');
@@ -752,14 +793,17 @@ if ($result->num_rows > 0) {
             const courseDescriptionInput = editModal.querySelector('#course_description');
             const courseTopicsInput = editModal.querySelector('#course_topics');
             const coursePrizeInput = editModal.querySelector('#course_prize');
+            const courseDurationInput = editModal.querySelector('#course_duration'); // For duration field
 
-            modalTitle.textContent = 'Edit Course: ' + courseTitle;
+            // Populate the modal fields
             courseIdInput.value = courseId;
             courseTitleInput.value = courseTitle;
             courseDescriptionInput.value = courseDescription;
             courseTopicsInput.value = courseTopics;
             coursePrizeInput.value = coursePrize;
+            courseDurationInput.value = courseDuration; // Populate the duration field
         });
+
 
         // Ensure only one view is visible on load
         document.addEventListener('DOMContentLoaded', function() {

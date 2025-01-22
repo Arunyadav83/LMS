@@ -144,7 +144,10 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         }
 
         #loginImage {
-            display: none;
+           
+            width: 100%;
+            max-width: 300px;
+            margin: 30px auto 20px auto;
             /* Hide image on small screens */
         }
     }

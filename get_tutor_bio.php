@@ -31,7 +31,7 @@ if (isset($_GET['id'])) {
             }
 
             // Clean up the bio text (remove unwanted \r characters and manage newlines)
-           $cleanBio = str_replace(["\r\n\r\n", "\r"], "\n", $tutor['bio']); // Replace '\r\n\r\n' with '\n' and remove '\r'
+            $cleanBio = str_replace(["\r\n\r\n", "\r"], "\n", $tutor['bio']); // Replace '\r\n\r\n' with '\n' and remove '\r'
             $cleanBio = preg_replace('/\n{3,}/', "\n\n", $cleanBio); // Replace 3 or more consecutive newlines with 2
             $cleanBio = trim($cleanBio); // Remove leading and trailing whitespace
 
@@ -44,64 +44,85 @@ if (isset($_GET['id'])) {
                 <meta name="viewport" content="width=device-width, initial-scale=1.0">
                 <title>Tutor Details</title>
                 <style>
-                    body {
-                        font-family: Arial, sans-serif;
-                        line-height: 1.6;
-                        margin: 20px;
-                        /* background-color: #f9f9f9; */
-                    }
+                     body {
+            font-family: Arial, sans-serif;
+            line-height: 1.6;
+            margin: 20px;
+        }
 
-                    .container {
-                        max-width: 800px;
-                        border-radius: 10px;
-                    }
+        .container {
+            max-width: 800px;
+            margin: auto;
+            border-radius: 10px;
+        }
 
-                    .heading {
-                        font-size: 2rem;
-                        /* color: #333; */
-                        margin-bottom: 20px;
-                        text-align: center;
-                    }
+        .heading {
+            font-size: 2rem;
+            margin-bottom: 20px;
+            text-align: center;
+            margin-top: 80px;
+            margin-right: 233px;
+        }
 
-                    .tutor-details {
-                        display: flex;
-                        align-items: flex-start;
-                        gap: 20px;
-                    }
+        .tutor-details {
+            display: flex;
+            align-items: flex-start;
+            gap: 20px;
+        }
 
-                    .tutor-info {
-                        flex: 1;
-                    }
+        .tutor-info {
+            flex: 1;
+        }
 
-                    .tutor-info h1,
-                    .tutor-info h2 {
-                        margin: 0;
-                        color: #0433c3;
-                    }
+        .tutor-info h1,
+        .tutor-info h2 {
+            margin: 0;
+            color: #0433c3;
+        }
 
-                    .tutor-info h2 {
-                        margin-top: 10px;
-                        font-size: 1.2rem;
-                        color: lightblue;
-                    }
+        .tutor-info h2 {
+            margin-top: 10px;
+            font-size: 1.2rem;
+            color: lightblue;
+        }
 
-                    .tutor-info p {
-                        margin-top: 15px;
-                        white-space: pre-wrap;
-                        color: #555;
-                    }
+        .tutor-info p {
+            margin-top: 15px;
+            white-space: pre-wrap;
+            color: #555;
+        }
 
-                    .tutor-image {
-                        flex-shrink: 0;
-                        text-align: center;
-                    }
+        .tutor-image {
+            flex-shrink: 0;
+            text-align: center;
+        }
 
-                    .tutor-image img {
-                        max-width: 200px;
-                        border-radius: 10px;
-                        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
-                    }
-                </style>
+        .tutor-image img {
+            max-width: 200px;
+            border-radius: 10px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+        }
+
+        @media (max-width: 768px) {
+            .tutor-details {
+                flex-direction: column; /* Make the layout column on smaller screens */
+                align-items: center;
+                text-align: center;
+            }
+            .heading{
+                margin-top: 87px;
+            }
+
+            .tutor-image img {
+                width: 100%;
+                max-width: 300px;
+                margin-bottom: 20px;
+            }
+
+            .tutor-info {
+                width: 100%;
+            }
+        }                </style>
             </head>
 
             <body>

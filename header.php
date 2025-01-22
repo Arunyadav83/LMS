@@ -1,15 +1,15 @@
 <?php
+// Start output buffering
 ob_start();
-
-// Check if session is not already started
+// Start session
 if (session_status() === PHP_SESSION_NONE) {
+   
     session_start();
 }
 
 // Include required files
 require_once 'config.php';
 require_once 'functions.php';
-
 // Clear any existing output buffers and start fresh
 if (ob_get_length()) ob_clean();
 ?>
@@ -24,9 +24,10 @@ if (ob_get_length()) ob_clean();
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
     <!-- Font Awesome CSS -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.1.1/css/all.min.css">
-    <!-- Custom CSS -->
     <link rel="stylesheet" href="styles.css">
-    <style>
+</head>
+<style>
+    
         .container {
             margin-top: 20px !important;
             position: relative;
@@ -37,20 +38,7 @@ if (ob_get_length()) ob_clean();
             /* background-color: #007bff !important; */
         }
 
-        .dropdown-item:hover {
-            background-color: #f8f9fa;
-            /* Light background on hover */
-            color: #007bff;
-            /* Change text color on hover */
-        }
-
-        /* .nav-link.dropdown-toggle:hover {
-          padding: 0.5rem 1rem !important;
-        } */
-         
-    </style>
-</head>
-
+</style>
 <body>
     <nav class="navbar navbar-expand-lg navbar-light bg-light fixed-top">
         <div class="container">
@@ -73,15 +61,26 @@ if (ob_get_length()) ob_clean();
                             <a class="nav-link" href="dashboard.php"><i class="fas fa-tachometer-alt"></i> Dashboard</a>
                         </li>
                         <li class="nav-item dropdown">
-                            <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="true">
+                            <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
                                 <i class="fas fa-user-circle"></i> <?php echo htmlspecialchars($_SESSION['username']); ?>
                             </a>
-                            <ul class="dropdown-menu" aria-labelledby="navbarDropdown">
-                                <li><a class="dropdown-item" href="user_profile.php"><i class="fas fa-id-card"></i> Profile</a></li>
+                            <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="navbarDropdown">
                                 <li>
-                                    <hr class="dropdown-divider">
+                                    <a class="dropdown-item" href="user_profile.php">
+                                        <i class="fas fa-id-card"></i> Profile
+                                    </a>
                                 </li>
-                                <li><a class="dropdown-item" href="logout.php"><i class="fas fa-sign-out-alt"></i> Logout</a></li>
+                                <li><hr class="dropdown-divider"></li>
+                                <li>
+                                    <a class="dropdown-item" href="logout.php">
+                                        <i class="fas fa-sign-out-alt"></i> Logout
+                                    </a>
+                                </li>
+                                <li>
+                                    <a class="dropdown-item" href="user_enrolled_courses.php">
+                                        <i class="fas fa-sign-out-alt"></i> UserEnrollCourses
+                                    </a>
+                                </li>
                             </ul>
                         </li>
                     <?php else: ?>
@@ -99,9 +98,5 @@ if (ob_get_length()) ob_clean();
     <div class="container" style="margin-top: 80px;">
         <!-- Add any page content here -->
     </div>
-
-    <!-- Bootstrap JS -->
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
 </body>
-
 </html>

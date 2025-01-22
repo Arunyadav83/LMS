@@ -23,7 +23,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $fileTmpPath = $_FILES['image_path']['tmp_name'];
         $fileName = basename($_FILES['image_path']['name']);
         $fileName = str_replace(' ', '_', $fileName); // Replace spaces with underscores for consistency
-        $uploadFileDir = '/uploaded_images/'; // Relative path for storing images
+        $uploadFileDir = 'D:/Xampp/htdocs/LMS/LMS/uploaded_images/uploaded_images/';
+ // Absolute path for storing images
         $dest_path = $uploadFileDir . $fileName;
 
         // Check if the directory exists, if not, create it
@@ -33,8 +34,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
         // Move the file to the specified directory
         if (move_uploaded_file($fileTmpPath, $dest_path)) {
-            // Store the relative path in the database (e.g., 'uploaded_images/filename.jpg')
-            $relativePath = $dest_path;
+            // Store the relative path for database storage
+            $relativePath = 'uploaded_images/' . $fileName;
 
             // Prepare the SQL query using prepared statements
             $stmt = $conn->prepare("INSERT INTO student_success_stories (name, successtory, image_path) VALUES (?, ?, ?)");
@@ -58,6 +59,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 } else {
     echo "Invalid request method.";
 }
+
 
 $conn->close();
 ?>

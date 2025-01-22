@@ -106,7 +106,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['course_id']) && isset
                 <img
                     src="<?php echo $tutor_image_path; ?>"
                     class="img-fluid rounded-square"
-                    style="max-height: 150px; object-fit: cover;"
+                    style="max-height: 150px; object-fit: cover;margin-top: 26px;"
                     alt="<?php echo htmlspecialchars($course['title']); ?>">
             <?php else: ?>
                 <img

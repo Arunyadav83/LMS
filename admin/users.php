@@ -126,26 +126,31 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     // Delete tutor
     elseif (isset($_POST['delete_tutor'])) {
         $id = intval($_POST['id']);
-
-        // First, delete the related enrollments
+        error_log("Processing delete for tutor ID: $id");
+    
+        // Delete enrollments first
         $enrollment_query = "DELETE FROM enrollments WHERE tutor_id = ?";
         $enrollment_stmt = mysqli_prepare($conn, $enrollment_query);
         mysqli_stmt_bind_param($enrollment_stmt, "i", $id);
-        mysqli_stmt_execute($enrollment_stmt);
-
-        // Now, delete the tutor
+        if (!mysqli_stmt_execute($enrollment_stmt)) {
+            error_log("Error deleting enrollments: " . mysqli_error($conn));
+            header("Location: users.php?error=Failed to delete enrollments");
+            exit();
+        }
+    
+        // Delete the tutor
         $query = "DELETE FROM tutors WHERE id = ?";
         $stmt = mysqli_prepare($conn, $query);
         mysqli_stmt_bind_param($stmt, "i", $id);
-
         if (mysqli_stmt_execute($stmt)) {
             header("Location: users.php?success=Tutor and related enrollments deleted successfully");
-            exit();
         } else {
-            header("Location: users.php?error=Error deleting tutor: " . mysqli_error($conn));
-            exit();
+            error_log("Error deleting tutor: " . mysqli_error($conn));
+            header("Location: users.php?error=Failed to delete tutor");
         }
+        exit();
     }
+    
 }
 
 // Fetch all tutors
@@ -399,53 +404,68 @@ $view = isset($_GET['view']) ? $_GET['view'] : 'grid';
     } */
 
     /* Default styling for larger screens */
-   /* Default styling for larger screens */
-.responsive-buttons {
-    margin-left: 840px;
-    margin-top: -7%;
-    text-align: right; /* Align to the right for larger screens */
-}
-
-/* Button spacing and styling */
-.responsive-buttons a {
-    margin: 5px; /* Add spacing between buttons */
-    padding: 10px 20px; /* Increase clickable area */
-    font-size: 14px; /* Adjust text size */
-}
-
-/* For screens between 468px and 768px */
-@media (max-width: 768px) and (min-width: 468px) {
+    /* Default styling for larger screens */
     .responsive-buttons {
-        margin-left: auto; /* Center the buttons horizontally */
-        margin-right: auto;
-        margin-top: 10px;
-        text-align: center; /* Align center for medium screens */
+        margin-left: 840px;
+        margin-top: -7%;
+        text-align: right;
+        /* Align to the right for larger screens */
     }
 
+    /* Button spacing and styling */
     .responsive-buttons a {
-        margin: 5px; /* Spacing between buttons */
-        font-size: 16px; /* Slightly larger text */
-        padding: 12px 25px; /* Adjust padding for better appearance */
-    }
-}
-
-/* For screens below 468px */
-@media (max-width: 467px) {
-    .responsive-buttons {
-        margin-left: auto;
-        margin-right: auto;
-        margin-top: 15px;
-        text-align: center; /* Center buttons */
+        margin: 5px;
+        /* Add spacing between buttons */
+        padding: 10px 20px;
+        /* Increase clickable area */
+        font-size: 14px;
+        /* Adjust text size */
     }
 
-    .responsive-buttons a {
-        display: block; /* Stack buttons vertically */
-        margin: 10px auto; /* Add vertical spacing */
-        width: 90%; /* Full width with some margin */
-        font-size: 16px; /* Increase text size for readability */
-        padding: 15px; /* Larger padding for smaller screens */
+    /* For screens between 468px and 768px */
+    @media (max-width: 768px) and (min-width: 468px) {
+        .responsive-buttons {
+            margin-left: auto;
+            /* Center the buttons horizontally */
+            margin-right: auto;
+            margin-top: 10px;
+            text-align: center;
+            /* Align center for medium screens */
+        }
+
+        .responsive-buttons a {
+            margin: 5px;
+            /* Spacing between buttons */
+            font-size: 16px;
+            /* Slightly larger text */
+            padding: 12px 25px;
+            /* Adjust padding for better appearance */
+        }
     }
-}
+
+    /* For screens below 468px */
+    @media (max-width: 467px) {
+        .responsive-buttons {
+            margin-left: auto;
+            margin-right: auto;
+            margin-top: 15px;
+            text-align: center;
+            /* Center buttons */
+        }
+
+        .responsive-buttons a {
+            display: block;
+            /* Stack buttons vertically */
+            margin: 10px auto;
+            /* Add vertical spacing */
+            width: 90%;
+            /* Full width with some margin */
+            font-size: 16px;
+            /* Increase text size for readability */
+            padding: 15px;
+            /* Larger padding for smaller screens */
+        }
+    }
 
 
     .card {
@@ -595,10 +615,16 @@ $view = isset($_GET['view']) ? $_GET['view'] : 'grid';
 
 
     .button {
-        padding-inline: 10px;
+        /* padding-inline: 10px; */
         text-decoration: none;
         color: #0433c3;
         padding-block: 10px;
+        border-radius: 10px;
+        margin-bottom: 5%;
+        padding-inline: 30px;
+        font-weight: bolder;
+        border: 0px;
+        /* text-decoration: none; */
 
     }
 
@@ -650,7 +676,7 @@ $view = isset($_GET['view']) ? $_GET['view'] : 'grid';
 
                     <!-- Add Tutor Button -->
                     <div class="mb-3">
-                        <button type="button" class="btn btn-navy" data-bs-toggle="offcanvas" data-bs-target="#addTutorOffCanvas" aria-controls="addTutorOffCanvas" style="margin-bottom: 3%;">
+                        <button type="button" class="button" data-bs-toggle="offcanvas" data-bs-target="#addTutorOffCanvas" aria-controls="addTutorOffCanvas" style="margin-bottom: 3%;">
                             Add Tutor
                         </button>
                     </div>
@@ -702,7 +728,11 @@ $view = isset($_GET['view']) ? $_GET['view'] : 'grid';
 
 
                     <!-- Add View Toggle Buttons -->
-                    <div class="mb-3 responsive-buttons">
+                    <div class="mb-3 responsive-buttons" style="
+    display: flex;
+    justify-content: center;
+    gap: 14px;
+">
                         <a href="?view=grid" class="btn btn-primary">
                             <i class="fa fa-th-large"></i> Grid
                         </a>

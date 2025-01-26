@@ -3,7 +3,6 @@ session_start();
 require_once 'config.php';
 require_once 'functions.php';
 
-// Check if the user is logged in and has access to the video
 if (!is_logged_in()) {
     die("Access denied");
 }
@@ -16,20 +15,38 @@ $video_path = urldecode($_GET['video']);
 $full_path = __DIR__ . '/' . $video_path;
 
 if (!file_exists($full_path)) {
-    die("Video file not found");
+    die("Video file not found: $full_path");
 }
+
+
+error_log("Serving video: $full_path");
 
 $file_extension = strtolower(pathinfo($full_path, PATHINFO_EXTENSION));
-$content_type = 'video/mp4';
-if ($file_extension === 'webm') {
-    $content_type = 'video/webm';
-} elseif ($file_extension === 'ogg') {
-    $content_type = 'video/ogg';
-}
+$content_type = match ($file_extension) {
+    'webm' => 'video/webm',
+    'ogg' => 'video/ogg',
+    default => 'video/mp4',
+};
 
 header("Content-Type: $content_type");
-header("Content-Length: " . filesize($full_path));
 header("Accept-Ranges: bytes");
 
-readfile($full_path);
+if (isset($_SERVER['HTTP_RANGE'])) {
+    $range = $_SERVER['HTTP_RANGE'];
+    list(, $range) = explode('=', $range, 2);
+    list($start, $end) = explode('-', $range);
+    $start = intval($start);
+    $end = $end ? intval($end) : filesize($full_path) - 1;
+    $length = $end - $start + 1;
+    header("HTTP/1.1 206 Partial Content");
+    header("Content-Range: bytes $start-$end/" . filesize($full_path));
+    header("Content-Length: $length");
+    $file = fopen($full_path, 'rb');
+    fseek($file, $start);
+    echo fread($file, $length);
+    fclose($file);
+} else {
+    header("Content-Length: " . filesize($full_path));
+    readfile($full_path);
+}
 exit;

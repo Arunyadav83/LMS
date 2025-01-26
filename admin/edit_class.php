@@ -75,6 +75,15 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     // Handle video upload if a new video is provided
     if (isset($_FILES['class_video']) && $_FILES['class_video']['error'] == 0) {
         $upload_dir = '../uploads/class_videos/';
+
+        // Ensure the function is defined
+        function ensure_directory_exists($dir) {
+            if (!is_dir($dir)) {
+                mkdir($dir, 0777, true);
+            }
+        }
+        
+        // Call the function
         ensure_directory_exists($upload_dir);
         $video_path = $upload_dir . time() . '_' . $_FILES['class_video']['name'];
         if (move_uploaded_file($_FILES['class_video']['tmp_name'], $video_path)) {

@@ -30,7 +30,7 @@
             z-index: -1;
         }
 
-        
+
         footer {
             text-align: center;
             padding: 20px;
@@ -49,7 +49,8 @@
             text-decoration: underline;
         }
 
-        h1, h2 {
+        h1,
+        h2 {
             color: #fff;
             text-align: center;
             margin-bottom: 20px;
@@ -69,7 +70,8 @@
             margin: 20px auto;
         }
 
-        .contact-info, .contact-form {
+        .contact-info,
+        .contact-form {
             flex: 1;
             padding: 30px;
             color: #fff;
@@ -80,7 +82,7 @@
 
         .contact-info {
             background: rgba(0, 0, 0, 0.7);
-            border-radius: 20px; 
+            border-radius: 20px;
             margin-top: 90px;
         }
 
@@ -96,10 +98,11 @@
             flex-direction: column;
             margin-left: 23px;
             /* margin-top: 92px; */
-            
+
         }
 
-        .contact-form input, .contact-form textarea {
+        .contact-form input,
+        .contact-form textarea {
             width: 90%;
             padding: 10px;
             margin-bottom: 15px;
@@ -167,9 +170,10 @@
                 flex-direction: column;
             }
 
-            .contact-form input, .contact-form textarea {
+            .contact-form input,
+            .contact-form textarea {
                 width: 100%;
-                
+
             }
 
             .contact-form button {
@@ -186,7 +190,15 @@
 </head>
 
 <body>
-<?php include 'header.php'; ?>
+    <?php include 'header.php';
+
+    if ($_SERVER['REQUEST_METHOD'] == 'POST') {
+        // Handle the form submission (e.g., save to database, send email)
+
+        // For now, just simulate success
+        echo json_encode(['success' => true]);
+    }
+    ?>
     <div class="main-container">
         <div class="container">
             <div class="contact-info">
@@ -197,13 +209,19 @@
             </div>
             <div class="contact-form">
                 <h2>Send Message</h2>
-                <form action="submit_message.php" method="POST">
+                <form id="contactForm" action="submit_message.php" method="POST">
                     <input type="text" name="name" placeholder="Full Name" required>
                     <input type="email" name="email" placeholder="Email" required>
                     <textarea name="message" placeholder="Type your message..." rows="4" required></textarea>
                     <button type="submit">Send</button>
                 </form>
+                <!-- Container for displaying the success message after form submission -->
+                <div id="responseMessage" style="display:none;">
+                    <!-- Success message will be shown here -->
+                </div>
             </div>
+
+
         </div>
     </div>
 
@@ -224,5 +242,40 @@
     </div>
     <?php include 'footer.php'; ?>
 </body>
+
+<script>
+    $(document).ready(function() {
+        // When the contact form is submitted
+        $("#contactForm").submit(function(event) {
+            event.preventDefault(); // Prevent the default form submission
+
+            var formData = $(this).serialize(); // Serialize the form data
+
+            // Send the data using AJAX
+            $.ajax({
+                type: 'POST',
+                url: $(this).attr('action'), // URL from the form action attribute
+                data: formData,
+                dataType: 'json', // Expecting a JSON response from the server
+                success: function(response) {
+                    if (response.success) {
+                        // Hide the form after successful submission
+                        $(".contact-form form").hide();
+
+                        // Show the success message
+                        $("#responseMessage").html('<p>' + response.message + '</p>').show();
+                    } else {
+                        // If something went wrong, show an error message
+                        alert(response.message);
+                    }
+                },
+                error: function(xhr, status, error) {
+                    // Handle errors, such as network issues
+                    alert("Something went wrong. Please try again.");
+                }
+            });
+        });
+    });
+</script>
 
 </html>

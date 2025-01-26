@@ -141,7 +141,7 @@ require_once 'functions.php';
         </section>
     </div>
 
-    <section class="featured-courses mb-5">
+    <section class="featured-courses mb-5" style="margin: 43px;">
         <h2 class="text-center mb-4">Featured Courses</h2>
         <?php
         // Fetch featured courses (limit to 3 for this example)
@@ -164,14 +164,19 @@ require_once 'functions.php';
                                 <p class="card-text" style="font-size: 12px;"><?php echo htmlspecialchars(substr($course['description'], 0, 60)) . '...'; ?></p>
                                 <p class="card-text" style="font-size: 10px;"><small class="text-muted">Tutor: <?php echo htmlspecialchars($course['tutor_name']); ?></small></p>
                             </div>
-                            <div class="card-footer bg-transparent border-0" style="padding: 20px; display: flex; justify-content: center; align-items: center; margin-top: -10px;">
+                            <div class="card-footer bg-transparent border-0" style="padding: 35px; display: flex; justify-content: center; align-items: center; margin-top: -50px;">
                                 <?php if (is_logged_in()): ?>
                                     <a href="course.php?id=<?php echo $course['id']; ?>" class="btn btn-primary btn-sm" style="margin-right: 10px;">View Course</a>
-                                    <a href="courses.php" class="btn btn-success btn-sm">Enroll</a>
+                                    <a href="courses.php" class="btn btn-success btn-sm" style="margin-right: 10px;">Enroll</a>
+                                    <!-- Add to Cart Icon -->
+                                    <button class="btn btn-warning btn-sm" onclick="addToCart(<?php echo $course['id']; ?>)">
+                                        <i class="fa fa-shopping-cart"></i> Add to Cart
+                                    </button>
                                 <?php else: ?>
                                     <a href="login.php" class="btn btn-secondary btn-sm">Login to Enroll</a>
                                 <?php endif; ?>
                             </div>
+
 
                         </div>
                     </div>
@@ -287,7 +292,7 @@ require_once 'functions.php';
             <h2 class="text-center mb-5">Experience the Power of Ultrakey Learning</h2>
             <div class="row align-items-center mb-5">
                 <div class="col-md-6">
-                    <img src="assets/images/interactive-lessons.jpg" alt="Interactive Lessons" class="img-fluid rounded shadow-lg responsive-img"  style="max-width: 100%; height: 400px; margin-left: 15%">
+                    <img src="assets/images/interactive-lessons.jpg" alt="Interactive Lessons" class="img-fluid rounded shadow-lg responsive-img" style="max-width: 100%; height: 400px; margin-left: 15%">
                 </div>
                 <div class="col-md-6">
                     <h3>Interactive Lessons</h3>
@@ -307,11 +312,11 @@ require_once 'functions.php';
             </div>
             <div class="row align-items-center mb-5">
                 <div class="col-md-6">
-                    <img src="assets/images/community-forums.jpg" alt="Community Forums" class="img-fluid rounded shadow-lg" >
+                    <img src="assets/images/community-forums.jpg" alt="Community Forums" class="img-fluid rounded shadow-lg">
                 </div>
-                <div class="col-md-6" >
-                    <h3 style="margin-left:30px ;"class="a" >Vibrant Learning Community</h3>
-                    <p  style="margin-left: 28px" >Join our thriving community of learners and educators. Participate in discussions, share knowledge, and get support from peers and instructors.</p>
+                <div class="col-md-6">
+                    <h3 style="margin-left:30px ;" class="a">Vibrant Learning Community</h3>
+                    <p style="margin-left: 28px">Join our thriving community of learners and educators. Participate in discussions, share knowledge, and get support from peers and instructors.</p>
                     <a href="#" class="btn btn-outline-primary" style="margin-left: 34px;">Join the Community</a>
                 </div>
             </div>
@@ -321,6 +326,11 @@ require_once 'functions.php';
 </div>
 
 <script>
+
+function addToCart(courseId) {
+    window.location.href = `courses.php?addToCart=${courseId}`;
+
+    }
     function animateCounter(element, start, end, duration) {
         let startTimestamp = null;
         const step = (timestamp) => {
@@ -360,9 +370,10 @@ require_once 'functions.php';
         background-position: center;
         position: relative;
     }
+
     .testimonials {
-    box-shadow: 0px 3px 2px grey;
-}
+        box-shadow: 0px 3px 2px grey;
+    }
 
     .stats-counter {
         background: linear-gradient(135deg, rgb(166, 208, 250), rgb(124, 244, 224));
@@ -392,23 +403,29 @@ require_once 'functions.php';
 
         /* Ensure content appears above the overlay */
     }
+
     .img-fluid {
-    max-width: 100%;
-    height: auto; /* Maintain aspect ratio */
-    display: block; /* Removes extra space below the image */
-    margin: 0 auto; /* Center the image */
-}
-/* General styles */
-.a {
-    margin-right: 23%; /* Apply the margin-right for larger screens */
-}
-
-/* Adjustments for Mobile View */
-@media (max-width: 768px) {
-    .a {
-        margin-right: 5%; /* Reduce the margin-right on smaller screens */
+        max-width: 100%;
+        height: auto;
+        /* Maintain aspect ratio */
+        display: block;
+        /* Removes extra space below the image */
+        margin: 0 auto;
+        /* Center the image */
     }
-}
 
+    /* General styles */
+    .a {
+        margin-right: 23%;
+        /* Apply the margin-right for larger screens */
+    }
+
+    /* Adjustments for Mobile View */
+    @media (max-width: 768px) {
+        .a {
+            margin-right: 5%;
+            /* Reduce the margin-right on smaller screens */
+        }
+    }
 </style>
 <?php include 'footer.php'; ?>

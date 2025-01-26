@@ -26,9 +26,10 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
     // Execute the statement
     if ($stmt->execute()) {
-        echo "Message sent successfully!";
+        // Send a JSON response
+        echo json_encode(['success' => true, 'message' => 'Message sent successfully!']);
     } else {
-        echo "Error: " . $stmt->error;
+        echo json_encode(['success' => false, 'message' => 'Error: ' . $stmt->error]);
     }
 
     // Close the statement and connection

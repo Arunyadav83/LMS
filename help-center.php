@@ -118,11 +118,11 @@
     </div>
 
     <div class="grid-container">
-        <div class="grid-item" onclick="navigateTo('community')">
+        <!-- <div class="grid-item" onclick="navigateTo('community')">
             <img src="assets/images/community.png" alt="Community">
             <h2>Community</h2>
             <p>Join discussions, share solutions, and gain insights from experts.</p>
-        </div>
+        </div> -->
         <div class="grid-item" onclick="navigateTo('knowledge-base')">
             <img src="assets/images/knowledge-base.png" alt="Knowledge Base">
             <h2>Knowledge Base</h2>
@@ -145,9 +145,9 @@
     <script>
         function navigateTo(section) {
             switch (section) {
-                case 'community':
-                    window.location.href = 'community.php'; // Replace with actual URL
-                    break;
+                // case 'community':
+                //     window.location.href = 'community.php'; // Replace with actual URL
+                //     break;
                 case 'knowledge-base':
                     window.location.href = 'knowledge-base.php'; // Replace with actual URL
                     break;

@@ -33,43 +33,40 @@ $username = '';
 $role = '';
 $created_at = '';
 $is_active = 0;
+$profile_image = '';
 
 // Handle file upload
-if (isset($_FILES['profile_image']) && $_FILES['profile_image']['error'] === UPLOAD_ERR_OK) {
-    $file_tmp = $_FILES['profile_image']['tmp_name'];
-    $file_name = preg_replace('/\s+/', '-', strtolower($username)) . '.jpg'; // Generate file name based on username
-    $upload_path = $upload_directory . $file_name;
-
-    if (move_uploaded_file($file_tmp, $upload_path)) {
-        $uploaded_image = $file_name;
-    } else {
-        echo "<p class='error'>Failed to upload image.</p>";
-    }
+$upload_directory = 'uploads/profile_images/';
+if (!file_exists($upload_directory)) {
+    mkdir($upload_directory, 0777, true); // Create directory if it doesn't exist
 }
 
-// Fetch user details from the database
-if ($user_email || $user_username) {
-    $stmt = $conn->prepare("SELECT username, email, role, created_at, is_active, father_name, phone_number, emergency_contact FROM users WHERE email = ? OR username = ?");
-    $stmt->bind_param("ss", $user_email, $user_username);
-    $stmt->execute();
-    $stmt->bind_result($username, $email, $role, $created_at, $is_active, $father_name, $phone_number, $emergency_contact);
-
-    if (!$stmt->fetch()) {
-        echo "<p class='error'>No user found with the given email or username.</p>";
-    }
-    $stmt->close();
-}
-
-// Handle form submission for additional details
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    // Fetch additional details from form
     $father_name = $_POST['father_name'] ?? '';
     $phone_number = $_POST['phone_number'] ?? '';
     $emergency_contact = $_POST['emergency_contact'] ?? '';
 
+    // Handle file upload
+    if (isset($_FILES['profile_image']) && $_FILES['profile_image']['error'] === UPLOAD_ERR_OK) {
+        $file_tmp = $_FILES['profile_image']['tmp_name'];
+        $file_ext = pathinfo($_FILES['profile_image']['name'], PATHINFO_EXTENSION);
+        $file_name = uniqid('profile_', true) . '.' . $file_ext; // Generate unique file name
+        $upload_path = $upload_directory . $file_name;
+
+        if (move_uploaded_file($file_tmp, $upload_path)) {
+            $profile_image = $file_name; // Save file name to the database
+        } else {
+            echo "<p class='error'>Failed to upload image.</p>";
+        }
+    }
+
     // Update details in the database
     if ($user_email || $user_username) {
-        $stmt = $conn->prepare("UPDATE users SET father_name = ?, phone_number = ?, emergency_contact = ? WHERE email = ? OR username = ?");
-        $stmt->bind_param("sssss", $father_name, $phone_number, $emergency_contact, $user_email, $user_username);
+        $stmt = $conn->prepare(
+            "UPDATE users SET father_name = ?, phone_number = ?, emergency_contact = ?, profile_image = ? WHERE email = ? OR username = ?"
+        );
+        $stmt->bind_param("ssssss", $father_name, $phone_number, $emergency_contact, $profile_image, $user_email, $user_username);
         if ($stmt->execute()) {
             echo "<p class='success'>Details updated successfully!</p>";
         } else {
@@ -78,11 +75,35 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $stmt->close();
     }
 }
+
+// Fetch user details from the database
+if ($user_email || $user_username) {
+    $stmt = $conn->prepare("SELECT username, email, role, created_at, is_active, father_name, phone_number, emergency_contact, profile_image FROM users WHERE email = ? OR username = ?");
+    $stmt->bind_param("ss", $user_email, $user_username);
+    $stmt->execute();
+    $stmt->bind_result($username, $email, $role, $created_at, $is_active, $father_name, $phone_number, $emergency_contact, $profile_image);
+
+    if (!$stmt->fetch()) {
+        echo "<p class='error'>No user found with the given email or username.</p>";
+    }
+    $stmt->close();
+}
+if ($profile_image): ?>
+    <div class="profile-image-container">
+        <img src="uploads/profile_images/<?php echo htmlspecialchars($profile_image); ?>" alt="Profile Image">
+    </div>
+<?php else: ?>
+    <p>No profile image uploaded.</p>
+<?php endif;
+
 $conn->close();
+
 ?>
+
 
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -104,6 +125,22 @@ $conn->close();
             box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
         }
 
+
+        .profile-image-container {
+            text-align: center;
+            margin-top: 20px;
+        }
+
+        .profile-image-container img {
+            width: 100px;
+            height: 100px;
+            border-radius: 50%;
+            object-fit: cover;
+            margin: 10px auto;
+            /* Center the image */
+            display: block;
+        }
+
         h1 {
             text-align: center;
             color: #333;
@@ -119,6 +156,7 @@ $conn->close();
             font-weight: bold;
             color: #333;
         }
+
         .profile-info img {
             display: block;
             margin: 0 auto 20px;
@@ -205,6 +243,7 @@ $conn->close();
             color: red;
             text-align: center;
         }
+
         @media (max-width: 768px) {
             .container {
                 margin: 20px;
@@ -233,6 +272,7 @@ $conn->close();
         }
     </script>
 </head>
+
 <body>
     <div class="container">
         <h1>User Profile</h1>
@@ -252,7 +292,15 @@ $conn->close();
         </div>
 
         <div id="additional-details">
-            <form method="POST">
+            <form method="POST" enctype="multipart/form-data">
+                <!-- <div class="profile-image-container">
+                    <?php if ($profile_image): ?>
+                        <img src="uploads/profile_images/<?php echo htmlspecialchars($profile_image); ?>" alt="Profile Image">
+                    <?php else: ?>
+                        <p>No profile image uploaded.</p>
+                    <?php endif; ?>
+                </div> -->
+
                 <label for="father_name">Father's Name:</label>
                 <input type="text" id="father_name" name="father_name" value="<?php echo htmlspecialchars($father_name); ?>" required>
 
@@ -262,9 +310,15 @@ $conn->close();
                 <label for="emergency_contact">Emergency Contact:</label>
                 <input type="text" id="emergency_contact" name="emergency_contact" value="<?php echo htmlspecialchars($emergency_contact); ?>" required>
 
+                <label for="profile_image">Profile Image:</label>
+                <input type="file" class="profile-info" name="profile_image" accept="image/*">
+                <small id="dimensionError" style="color: red;"></small>
+
                 <input type="submit" value="Save Details">
             </form>
         </div>
+
     </div>
 </body>
+
 </html>

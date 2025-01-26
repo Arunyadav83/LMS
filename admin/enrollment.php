@@ -139,7 +139,7 @@ foreach ($enrollments as $enrollment) {
             <div class="collapse navbar-collapse justify-content-end" id="navbarNav">
                 <ul class="navbar-nav align-items-center">
                     <li class="nav-item">
-                        <a class="nav-link text-light d-flex align-items-center" href="#">
+                        <a class="nav-link text-light d-flex align-items-center" href="#"  style="justify-content: space-between; gap:2px;margin-right: 25px;">
                             <i class="fas fa-user me-2"></i> Profile
                         </a>
                     </li>

@@ -15,6 +15,30 @@ $query = "SELECT c.id, c.title, c.description, c.course_prize, t.full_name AS tu
 
 $result = mysqli_query($conn, $query);
 
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && $_POST['action'] === 'enrollCourse') {
+    $class_id = $_POST['class_id'];
+    $course_id = $_POST['course_id'];
+    $user_id = $_POST['user_id'];
+
+    // Enroll logic
+    $enroll_query = "INSERT INTO enrollments (user_id, course_id, class_id, enrolled_at) VALUES (?, ?, ?, NOW())";
+    $stmt = mysqli_prepare($conn, $enroll_query);
+    mysqli_stmt_bind_param($stmt, "iii", $user_id, $course_id, $class_id);
+    if (mysqli_stmt_execute($stmt)) {
+        $_SESSION['message'] = "Enrolled successfully!";
+        header("Location: courses.php");
+        exit;
+    } else {
+        $_SESSION['error'] = "Failed to enroll. Please try again.";
+        header("Location: courses.php");
+        exit;
+    }
+}
+
+function generateOrderId() {
+    // Your logic to generate an order ID (e.g., using a random number or database)
+    return uniqid('order_');
+}
 // Razorpay API key from the config
 $razorpayKey = 'rzp_test_Bvq9kiuaq8gkcs'; // Your Razorpay API key
 ?>
@@ -34,7 +58,7 @@ $razorpayKey = 'rzp_test_Bvq9kiuaq8gkcs'; // Your Razorpay API key
 <div class="container mt-2">
     <div id="searchError" class="text-danger text-center" style="display: none;">No matching courses found!</div>
 
-    <h4 class="mb-2 text-center text-md-left" style="margin-top: -4%; ">All Courses</h4>
+    <h4 class="mb-2 text-center text-md-left" style="margin-top: -4%;">All Courses</h4>
 
     <?php if (mysqli_num_rows($result) > 0): ?>
         <div class="row">
@@ -47,7 +71,14 @@ $razorpayKey = 'rzp_test_Bvq9kiuaq8gkcs'; // Your Razorpay API key
                             style="max-height: 150px; object-fit: cover;"
                             alt="<?php echo htmlspecialchars($course['title']); ?>">
                         <div class="card-body">
-                            <h5 class="card-title"><?php echo htmlspecialchars($course['title']); ?></h5>
+                            <!-- Make the title clickable -->
+                            <h5 class="card-title">
+                                <a
+                                    href="course.php?id=<?php echo $course['id']; ?>"
+                                    style="text-decoration: none; color: inherit;">
+                                    <?php echo htmlspecialchars($course['title']); ?>
+                                </a>
+                            </h5>
                             <p class="card-text" style="max-height: 50px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;"><?php echo htmlspecialchars($course['description']); ?></p>
                             <p class="card-text"><small class="text-muted">Tutor: <?php echo htmlspecialchars($course['tutor_name']); ?></small></p>
                             <p class="card-text"><strong>Price:</strong> ₹<?php echo number_format((float)$course['course_prize'], 2); ?></p>
@@ -57,21 +88,17 @@ $razorpayKey = 'rzp_test_Bvq9kiuaq8gkcs'; // Your Razorpay API key
                                 <?php echo isset($course['duration']) ? htmlspecialchars($course['duration']) : 'Not Available'; ?>
                             </p>
                         </div>
-
-                        <div class="card-footer bg-transparent border-0">
+                        <div class="card-footer bg-transparent border-0" style="padding: 20px;">
                             <?php if (is_logged_in()): ?>
-                                <a href="course.php?id=<?php echo $course['id']; ?>"
-                                    class="btn btn-primary btn-sm">View Course</a>
-                                <a href="javascript:void(0)"
-                                    onclick="enrollCourse(<?php echo $course['id']; ?>, <?php echo $_SESSION['user_id']; ?>)"
-                                    class="btn btn-success btn-sm">Enroll</a>
+                                <!-- <a href="course.php?id=<?php echo $course['id']; ?>" class="btn btn-primary btn-sm custom-btn">View Course</a> -->
+                                <a href="javascript:void(0)" onclick="enrollCourse(<?php echo $course['id']; ?>, <?php echo $_SESSION['user_id']; ?>)" class="btn btn-success btn-sm custom">Enroll</a>
+                                <button class="btn btn-warning btn-sm custom-btn" onclick="addToCart(<?php echo $course['id']; ?>)">
+                                    <i class="fa fa-shopping-cart"></i> Add to Cart
+                                </button>
                             <?php else: ?>
-                                <a href="login.php"
-                                    class="btn btn-secondary btn-sm">Login to Enroll</a>
+                                <a href="login.php" class="btn btn-secondary btn-sm custom-btn">Login to Enroll</a>
                             <?php endif; ?>
                         </div>
-
-
                     </div>
                 </div>
             <?php endwhile; ?>
@@ -80,6 +107,7 @@ $razorpayKey = 'rzp_test_Bvq9kiuaq8gkcs'; // Your Razorpay API key
         <p>No courses available at the moment.</p>
     <?php endif; ?>
 </div>
+
 
 <!-- Include jQuery and Razorpay scripts -->
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
@@ -100,6 +128,12 @@ $razorpayKey = 'rzp_test_Bvq9kiuaq8gkcs'; // Your Razorpay API key
         margin-left: 6px;
     }
 
+    a {
+        text-decoration: none;
+        color: inherit;
+
+    }
+
     .card-footer .btn-success {
         width: 100px;
     }
@@ -115,6 +149,71 @@ $razorpayKey = 'rzp_test_Bvq9kiuaq8gkcs'; // Your Razorpay API key
         /* Prevent horizontal overflow */
     }
 
+
+    /* General button styles */
+    .custom-btn {
+        padding: 10px 20px;
+        font-size: 6px;
+        font-weight: bold;
+        text-align: center;
+        border-radius: 3px;
+        margin-right: 10px;
+        /* Spacing between buttons */
+        transition: all 0.3s ease;
+    }
+
+    .custom {
+        width: 100%;
+        font-size: 15px;
+        padding: auto;
+    }
+
+    /* Button colors */
+    .custom-btn.btn-primary {
+        background-color: #007bff;
+        /* Blue */
+        color: #fff;
+        border: none;
+    }
+
+    .custom-btn.btn-primary:hover {
+        background-color: #0056b3;
+        /* Darker blue on hover */
+    }
+
+    .custom-btn.btn-success {
+        background-color: #28a745;
+        /* Green */
+        color: #fff;
+        border: none;
+    }
+
+    .custom-btn.btn-success:hover {
+        background-color: #218838;
+        /* Darker green on hover */
+    }
+
+    .custom-btn.btn-warning {
+        background-color: #ffc107;
+        /* Yellow */
+        color: #000;
+        border: none;
+    }
+
+    .custom-btn.btn-warning:hover {
+        background-color: #e0a800;
+        /* Darker yellow on hover */
+    }
+
+    /* Button alignment */
+    .card-footer {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        gap: 10px;
+        /* Space between buttons */
+        padding: 10px;
+    }
 
 
     .input-group .btn {
@@ -159,6 +258,16 @@ $razorpayKey = 'rzp_test_Bvq9kiuaq8gkcs'; // Your Razorpay API key
         /* Add space above the search bar */
     }
 
+    /* Ensure SweetAlert appears at the top-right corner */
+    .swal2-container {
+        position: fixed !important;
+        top: 10px;
+        right: 10px;
+        z-index: 9999;
+        /* Ensure it stays on top of other elements */
+    }
+
+
 
     /* For screens smaller than or equal to 768px */
     @media (max-width: 768px) {
@@ -200,12 +309,14 @@ $razorpayKey = 'rzp_test_Bvq9kiuaq8gkcs'; // Your Razorpay API key
             border-radius: 4px 0 0 4px;
         }
 
+
     }
 </style>
 <script>
     var username = '<?php echo isset($_SESSION['username']) ? htmlspecialchars($_SESSION['username'], ENT_QUOTES, 'UTF-8') : ''; ?>';
 </script>
 
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 <script>
     function performSearch() {
         const query = document.getElementById('searchInput').value.toLowerCase();
@@ -236,7 +347,7 @@ $razorpayKey = 'rzp_test_Bvq9kiuaq8gkcs'; // Your Razorpay API key
             url: 'create_order.php',
             data: {
                 course_id: courseId,
-                user_id: userId
+                user_id: userId,
             },
             dataType: 'json',
             success: function(response) {
@@ -251,6 +362,7 @@ $razorpayKey = 'rzp_test_Bvq9kiuaq8gkcs'; // Your Razorpay API key
                         image: 'assets/images/logo2.png',
                         order_id: response.order_id,
                         handler: function(paymentResponse) {
+                            showBuffering(); // Show buffering before verifying payment
                             verifyPayment(paymentResponse, response, courseId, userId);
                         },
                         modal: {
@@ -277,8 +389,98 @@ $razorpayKey = 'rzp_test_Bvq9kiuaq8gkcs'; // Your Razorpay API key
                 showErrorAlert("Enrollment Failed!", "An unexpected error occurred. Please try again.");
             }
         });
-
     }
+
+    function addToCart(courseId) {
+        fetch('add_to_cart.php', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    courseId: courseId
+                }),
+            })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                return response.json();
+            })
+            .then(data => {
+                if (data.success) {
+                    // Show success SweetAlert with a green color (without redirection)
+                    Swal.fire({
+                        title: 'Success!',
+                        text: 'Course added to cart successfully!',
+                        icon: 'success',
+                        position: 'top-end',
+                        showConfirmButton: false,
+                        timer: 3000,
+                        background: '#28a745', // Green background color
+                        color: '#fff', // White text color
+                        toast: true, // Makes it appear as a toast
+                        timerProgressBar: true // Adds a progress bar during the timer
+                    });
+                } else if (data.message === 'Course already in cart') {
+                    // Show message if the course is already in the cart
+                    Swal.fire({
+                        title: 'Already in Cart',
+                        text: 'You have already added this course to your cart.',
+                        icon: 'info',
+                        position: 'top-end',
+                        showConfirmButton: false,
+                        timer: 3000,
+                        background: '#ffc107', // Yellow background for info
+                        color: '#fff',
+                        toast: true,
+                        timerProgressBar: true
+                    });
+                } else {
+                    Swal.fire({
+                        title: 'Error!',
+                        text: 'Failed to add course to cart: ' + data.message,
+                        icon: 'error',
+                        position: 'top-end',
+                        showConfirmButton: false,
+                        timer: 3000,
+                        background: '#dc3545', // Red background for error
+                        color: '#fff',
+                        toast: true,
+                        timerProgressBar: true
+                    });
+                }
+            })
+            .catch(error => {
+                console.error('Error adding course to cart:', error);
+                Swal.fire({
+                    title: 'Error!',
+                    text: 'An error occurred. Please try again later.',
+                    icon: 'error',
+                    position: 'top-end',
+                    showConfirmButton: false,
+                    timer: 3000,
+                    background: '#dc3545', // Red background for error
+                    color: '#fff',
+                    toast: true,
+                    timerProgressBar: true
+                });
+            });
+    }
+
+
+    function showBuffering() {
+        Swal.fire({
+            title: "Processing...",
+            text: "Please wait while we verify your payment.",
+            allowOutsideClick: false, // Prevent clicking outside the alert
+            allowEscapeKey: false, // Disable escape key
+            didOpen: () => {
+                Swal.showLoading(); // Display a spinner or loader
+            }
+        });
+    }
+
 
     function verifyPayment(paymentResponse, orderResponse, courseId, userId) {
         $.ajax({
@@ -295,21 +497,23 @@ $razorpayKey = 'rzp_test_Bvq9kiuaq8gkcs'; // Your Razorpay API key
             },
             dataType: 'json',
             success: function(response) {
+                // showBuffering();
+                Swal.close(); // Close the buffering alert after payment verification
                 if (response.success) {
-
                     showSuccessAlert();
                 } else {
                     swal({
                         title: "Failed!",
                         text: response.message,
                         icon: "error",
-                        timer: 3000, // Time in milliseconds (3 seconds)
-                        button: false, // Disable the OK button
+                        timer: 2000,
+                        button: false,
                         className: "red-bg"
                     });
                 }
             },
             error: function(xhr, status, error) {
+                Swal.close(); // Close the buffering alert in case of an error
                 console.error("Verification error:", error);
                 swal("Failed!", "An unexpected error occurred while verifying the payment.", "error");
             }
@@ -320,13 +524,11 @@ $razorpayKey = 'rzp_test_Bvq9kiuaq8gkcs'; // Your Razorpay API key
         Swal.fire({
             title: "Enrollment Successful!",
             text: "Payment Verified and Enrollment Successful!",
-            icon: "success", // Ensures the green tick mark is shown
-            // timer: 1000, // Duration of the alert in milliseconds
-            showConfirmButton: true, // "OK" button
-            confirmButtonText: "OK", // Button text
+            icon: "success",
+            showConfirmButton: true,
+            confirmButtonText: "OK",
         });
     }
-
 
     function showErrorAlert(title, message) {
         swal({

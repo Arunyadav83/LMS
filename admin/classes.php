@@ -135,7 +135,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         $course_id = (int)$_POST['course_id'];
         $class_name = mysqli_real_escape_string($conn, $_POST['class_name']);
         $description = mysqli_real_escape_string($conn, $_POST['description']);
-
+    
         // Handle video upload
         $video_path = '';
         if (isset($_FILES['class_video']) && $_FILES['class_video']['error'] == 0) {
@@ -143,103 +143,67 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             ensure_directory_exists($upload_dir);
             $video_path = $upload_dir . time() . '_' . $_FILES['class_video']['name'];
             if (move_uploaded_file($_FILES['class_video']['tmp_name'], $video_path)) {
-                $video_path = str_replace('../', '', $video_path); // Remove the '../' from the beginning for database storage
+                $video_path = str_replace('../', '', $video_path); // Remove the '../' for database storage
             } else {
                 $error = "Failed to upload video. Error: " . $_FILES['class_video']['error'];
             }
         }
-
-          // Handle class thumbnail image upload
-          $thumbnail_path = '';
-          if (isset($_FILES['class_thumbnail']) && $_FILES['class_thumbnail']['error'] == 0) {
-              $target_dir = "../assets/images/";
-  
-              // Create a safe file name based on class name
-              $file_name = str_replace(' ', '', $class_name) . '.jpg';
-
-              $target_file = $target_dir . $file_name;
-  
-              if (move_uploaded_file($_FILES['class_thumbnail']['tmp_name'], $target_file)) {
-                  $thumbnail_path = $file_name; // Save the filename to insert into the database
-              } else {
-                  $error = "Sorry, there was an error uploading your thumbnail.";
-              }
-          }
-  
-
+    
+        // Handle class thumbnail image upload
+        $thumbnail_path = '';
+        if (isset($_FILES['class_thumbnail']) && $_FILES['class_thumbnail']['error'] == 0) {
+            $target_dir = "../assets/images/";
+    
+            // Create a safe file name based on class name
+            $file_name = str_replace(' ', '', $class_name) . '.jpg';
+    
+            $target_file = $target_dir . $file_name;
+    
+            if (move_uploaded_file($_FILES['class_thumbnail']['tmp_name'], $target_file)) {
+                $thumbnail_path = $file_name; // Save the filename to insert into the database
+            } else {
+                $error = "Sorry, there was an error uploading your thumbnail.";
+            }
+        }
+    
         // Handle online class scheduling
         $is_online = isset($_POST['is_online']) ? 1 : 0;
         $online_link = mysqli_real_escape_string($conn, $_POST['online_link'] ?? '');
         $schedule_time = mysqli_real_escape_string($conn, $_POST['schedule_time'] ?? '');
-
+    
         // Insert class data into the database
         $query = "INSERT INTO classes (course_id, tutor_id, class_name, description, video_path, is_online, online_link, schedule_time) 
                   VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
         $stmt = mysqli_prepare($conn, $query);
         mysqli_stmt_bind_param($stmt, "iisssiis", $course_id, $tutor_id, $class_name, $description, $video_path, $is_online, $online_link, $schedule_time);
-        mysqli_stmt_execute($stmt);
-        $class_id = mysqli_insert_id($conn);
+    
+        if (mysqli_stmt_execute($stmt)) {
+            $class_id = mysqli_insert_id($conn);
+    
+            // Show SweetAlert confirmation message
 
-        // Handle quiz questions
-        if (isset($_POST['questions'])) {
-            foreach ($_POST['questions'] as $index => $question) {
-                $question_text = trim($question);
-                $correct_answer = trim($_POST['correct_answers'][$index] ?? '');
-                $video_id = isset($_POST['video_id'][$index]) ? mysqli_real_escape_string($conn, $_POST['video_id'][$index]) : null;
-
-                // Validate required fields
-                if (empty($question_text) || empty($correct_answer)) {
-                    echo "Error: Question or correct answer is empty!";
-                    continue;
-                }
-
-                $query = "INSERT INTO quiz_questions (class_id, question_text, correct_answer, video_id) VALUES (?, ?, ?, ?)";
-                $stmt = mysqli_prepare($conn, $query);
-
-                if (!$stmt) {
-                    echo "Error preparing statement for quiz question: " . mysqli_error($conn);
-                    continue;
-                }
-
-                mysqli_stmt_bind_param($stmt, "isss", $class_id, $question_text, $correct_answer, $video_id);
-
-                if (mysqli_stmt_execute($stmt)) {
-                    $question_id = mysqli_insert_id($conn);
-
-                    if (isset($_POST['answers'][$index]) && isset($_POST['feedback'][$index])) {
-                        foreach ($_POST['answers'][$index] as $answer_index => $answer) {
-                            $answer_text = mysqli_real_escape_string($conn, $answer);
-                            $feedback_text = mysqli_real_escape_string($conn, $_POST['feedback'][$index][$answer_index]);
-
-                            if (empty($answer_text) || empty($feedback_text)) {
-                                echo "Error: Answer or feedback is empty!";
-                                continue;
-                            }
-
-                            // Set 'is_correct' dynamically based on the selected correct answer
-                            $is_correct = ($_POST['correct_answers'][$index] == $answer_index) ? 1 : 0;
-
-                            $query = "INSERT INTO quiz_answers (question_id, answer_text, feedback, is_correct) VALUES (?, ?, ?, ?)";
-                            $stmt = mysqli_prepare($conn, $query);
-
-                            if (!$stmt) {
-                                echo "Error preparing statement for quiz answer: " . mysqli_error($conn);
-                                continue;
-                            }
-
-                            mysqli_stmt_bind_param($stmt, "issi", $question_id, $answer_text, $feedback_text, $is_correct);
-
-                            if (!mysqli_stmt_execute($stmt)) {
-                                echo "Error executing query for quiz answer: " . mysqli_error($conn);
-                            }
-                        }
-                    }
-                } else {
-                    echo "Error inserting quiz question: " . mysqli_error($conn);
-                }
-            }  // <-- Close the foreach loop
-        }  // <-- Close the if for checking 'questions'
-    }  // <-- Close the if for 'add_class'
+            // echo "<script src='https://cdn.jsdelivr.net/npm/sweetalert2@11'></script>";
+            echo "<script>
+                    Swal.fire({
+                        title: 'Class Added Successfully!',
+                        text: 'The class \"$class_name\" has been added.',
+                        icon: 'success',
+                        confirmButtonText: 'OK'
+                    }).then(() => {
+                        window.location.href = 'your_redirect_page.php'; // Change this to your desired redirect page
+                    });
+                  </script>";
+        } else {
+            echo "<script>
+                    Swal.fire({
+                        title: 'Error!',
+                        text: 'There was a problem adding the class. Please try again.',
+                        icon: 'error',
+                        confirmButtonText: 'OK'
+                    });
+                  </script>";
+        }
+    } // <-- Close the if for 'add_class'
 }  // <-- Close the if for checking POST request
 
 
@@ -278,6 +242,8 @@ $classes = mysqli_fetch_all($result, MYSQLI_ASSOC);
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <!-- Bootstrap Bundle with Popper --><!-- Bootstrap CSS -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
 
     <!-- Bootstrap JS -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
@@ -534,6 +500,7 @@ $classes = mysqli_fetch_all($result, MYSQLI_ASSOC);
                     <p>You haven't created any classes yet.</p>
                 </div>
             <?php else: ?>
+
                 <table class="table table-striped table-hover custom-table">
                     <thead>
                         <tr>
@@ -640,22 +607,40 @@ $classes = mysqli_fetch_all($result, MYSQLI_ASSOC);
         }
         ?>
 
-        <!-- Grid View -->
-        <div id="gridView" class="row d-none">
+        <div id="gridView" class="row row-cols-1 row-cols-sm-2 row-cols-md-3 g-4 d-none">
             <?php if (empty($classes)): ?>
                 <p>You haven't created any classes yet.</p>
             <?php else: ?>
                 <?php foreach ($classes as $class): ?>
-                    <div class="col-md-4 mb-4">
-                        <div class="card">
+                    <div class="col">
+                        <div class="card h-100">
                             <div class="card-body">
                                 <h5 class="card-title"><?php echo htmlspecialchars($class['class_name']); ?></h5>
-                                <p class="card-text"><?php echo htmlspecialchars($class['description']); ?></p>
+                                <!-- Shortened description -->
+                                <p class="card-text">
+                                    <?php echo htmlspecialchars(substr($class['description'], 0, 100)); ?>
+                                    <?php if (strlen($class['description']) > 100): ?>
+                                        <span>...</span>
+                                        <button
+                                            class="btn btn-link text-primary p-0"
+                                            data-bs-toggle="modal"
+                                            data-bs-target="#descriptionModal<?php echo $class['id']; ?>">
+                                            Read More
+                                        </button>
+                                    <?php endif; ?>
+                                </p>
                                 <p><strong>Course:</strong> <?php echo htmlspecialchars($class['course_title']); ?></p>
                                 <p><strong>Online Class:</strong> <?php echo $class['is_online'] ? 'Yes - ' . htmlspecialchars($class['schedule_time']) : 'No'; ?></p>
                                 <?php if (!empty($class['video_path'])): ?>
-                                    <a href="<?php echo $class['video_path']; ?>" target="_blank" class="btn btn-info btn-sm mb-2">View Video</a>
+                                    <button
+                                        class="btn btn-info btn-sm mb-2"
+                                        data-bs-toggle="modal"
+                                        data-bs-target="#videoModal"
+                                        onclick="playVideo('<?php echo htmlspecialchars($class['video_path']); ?>')">
+                                        View Video
+                                    </button>
                                 <?php endif; ?>
+
                                 <div class="d-flex justify-content-start">
                                     <a href="edit_class.php?id=<?php echo $class['id']; ?>" class="btn btn-sm btn-primary me-2">Edit</a>
                                     <a href="view_quiz.php?class_id=<?php echo $class['id']; ?>" class="btn btn-sm btn-info me-2">View Quiz</a>
@@ -667,6 +652,75 @@ $classes = mysqli_fetch_all($result, MYSQLI_ASSOC);
                 <?php endforeach; ?>
             <?php endif; ?>
         </div>
+
+
+
+        <!-- Video Modal -->
+        <div class="modal fade" id="videoModal" tabindex="-1" aria-labelledby="videoModalLabel" aria-hidden="true">
+            <div class="modal-dialog modal-lg">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="videoModalLabel">Video Playback</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <video id="videoPlayer" controls style="width: 100%;">
+                            <source id="videoSource" src="" type="video/mp4">
+                            Your browser does not support the video tag.
+                        </video>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+
+        <script>
+            function playVideo(videoPath) {
+                try {
+                    const videoPlayer = document.getElementById('videoPlayer');
+                    const videoSource = document.getElementById('videoSource');
+                    const videoModal = new bootstrap.Modal(document.getElementById('videoModal'));
+
+                    if (!videoPlayer || !videoSource || !videoModal) {
+                        throw new Error('Required video elements not found.');
+                    }
+
+                    videoSource.src = videoPath;
+                    videoPlayer.load();
+                    videoPlayer.play();
+                    videoModal.show();
+
+                    console.log('Video source set to:', videoPath);
+                } catch (error) {
+                    console.error('Error playing video:', error);
+                    const errorLog = document.createElement('div');
+                    errorLog.innerText = `Error: ${error.message}`;
+                    errorLog.style.color = 'red';
+                    document.body.appendChild(errorLog);
+                }
+            }
+
+            document.addEventListener('DOMContentLoaded', () => {
+                const videoPlayer = document.getElementById('videoPlayer');
+                const videoSource = document.getElementById('videoSource');
+                const videoModal = document.getElementById('videoModal');
+                const closeModal = document.getElementById('closeModal');
+
+                // Set the video source
+                const videoPath = '/LMS/LMS/uploads/class_videos/' // Replace with your actual video path
+                videoSource.src = videoPath;
+                videoPlayer.load();
+                videoPlayer.play();
+
+                // Close Modal
+                closeModal.addEventListener('click', () => {
+                    videoModal.style.display = 'none';
+                    videoPlayer.pause();
+                });
+            });
+        </script>
+
+
 
         <!-- JS to Toggle Views -->
         <script>
@@ -685,14 +739,14 @@ $classes = mysqli_fetch_all($result, MYSQLI_ASSOC);
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
     <script>
-    document.addEventListener('DOMContentLoaded', function() {
-        const quizForm = document.getElementById('quizForm');
-        const addQuestionBtn = document.getElementById('addQuestion');
-        const quizQuestionsContainer = document.getElementById('quizQuestions');
-        let questionCount = 0;
+        document.addEventListener('DOMContentLoaded', function() {
+            const quizForm = document.getElementById('quizForm');
+            const addQuestionBtn = document.getElementById('addQuestion');
+            const quizQuestionsContainer = document.getElementById('quizQuestions');
+            let questionCount = 0;
 
-        function createQuestionTemplate(index) {
-            return `
+            function createQuestionTemplate(index) {
+                return `
                 <div class="card mb-3" data-question-index="${index}">
                     <div class="card-body">
                         <h5 class="card-title">Question ${index + 1}</h5>
@@ -717,67 +771,67 @@ $classes = mysqli_fetch_all($result, MYSQLI_ASSOC);
                     </div>
                 </div>
             `;
-        }
-
-        // Add initial question
-        quizQuestionsContainer.insertAdjacentHTML('beforeend', createQuestionTemplate(questionCount));
-        questionCount++;
-
-        // Add event listener for adding more questions
-        addQuestionBtn.addEventListener('click', function() {
-            quizQuestionsContainer.insertAdjacentHTML('beforeend', createQuestionTemplate(questionCount));
-            questionCount++;
-        });
-
-        // Form submission handler
-        quizForm.addEventListener('submit', function(e) {
-            e.preventDefault(); // Prevent default form submission
-
-            const formData = new FormData(quizForm);
-            const payload = [];
-
-            // Loop through questions to construct payload
-            for (let i = 0; i < questionCount; i++) {
-                const questionText = formData.get(`questions[${i}]`);
-                const answers = formData.getAll(`answers[${i}][]`);
-                const feedbacks = formData.getAll(`feedback[${i}][]`);
-                const correctAnswerIndex = formData.get(`correct_answers[${i}]`);
-
-                if (!questionText || correctAnswerIndex === null) {
-                    alert(`Error: Question ${i + 1} or its correct answer is not properly filled.`);
-                    return;
-                }
-
-                answers.forEach((answer, idx) => {
-                    payload.push({
-                        question_id: i + 1,
-                        answer_text: answer,
-                        is_correct: idx == correctAnswerIndex ? 1 : 0, // Mark correct answer as 1
-                        feedback: feedbacks[idx],
-                    });
-                });
             }
 
-            // Submit data via fetch
-            fetch('/submit-quiz', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                    body: JSON.stringify(payload),
-                })
-                .then((response) => response.json())
-                .then((data) => {
-                    console.log('Quiz submitted successfully:', data);
-                    alert('Quiz submitted successfully!');
-                })
-                .catch((error) => {
-                    console.error('Error submitting quiz:', error);
-                    alert('An error occurred while submitting the quiz.');
-                });
+            // Add initial question
+            quizQuestionsContainer.insertAdjacentHTML('beforeend', createQuestionTemplate(questionCount));
+            questionCount++;
+
+            // Add event listener for adding more questions
+            addQuestionBtn.addEventListener('click', function() {
+                quizQuestionsContainer.insertAdjacentHTML('beforeend', createQuestionTemplate(questionCount));
+                questionCount++;
+            });
+
+            // Form submission handler
+            quizForm.addEventListener('submit', function(e) {
+                e.preventDefault(); // Prevent default form submission
+
+                const formData = new FormData(quizForm);
+                const payload = [];
+
+                // Loop through questions to construct payload
+                for (let i = 0; i < questionCount; i++) {
+                    const questionText = formData.get(`questions[${i}]`);
+                    const answers = formData.getAll(`answers[${i}][]`);
+                    const feedbacks = formData.getAll(`feedback[${i}][]`);
+                    const correctAnswerIndex = formData.get(`correct_answers[${i}]`);
+
+                    if (!questionText || correctAnswerIndex === null) {
+                        alert(`Error: Question ${i + 1} or its correct answer is not properly filled.`);
+                        return;
+                    }
+
+                    answers.forEach((answer, idx) => {
+                        payload.push({
+                            question_id: i + 1,
+                            answer_text: answer,
+                            is_correct: idx == correctAnswerIndex ? 1 : 0, // Mark correct answer as 1
+                            feedback: feedbacks[idx],
+                        });
+                    });
+                }
+
+                // Submit data via fetch
+                fetch('/submit-quiz', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify(payload),
+                    })
+                    .then((response) => response.json())
+                    .then((data) => {
+                        console.log('Quiz submitted successfully:', data);
+                        alert('Quiz submitted successfully!');
+                    })
+                    .catch((error) => {
+                        console.error('Error submitting quiz:', error);
+                        alert('An error occurred while submitting the quiz.');
+                    });
+            });
         });
-    });
-</script>
+    </script>
 
 
 </body>

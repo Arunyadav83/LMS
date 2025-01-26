@@ -49,10 +49,10 @@
                     <h5>About Ultrakey Learning</h5>
                     <p>Empowering learners worldwide with cutting-edge online education. Join us on a journey of knowledge and growth.</p>
                     <div class="social-icons mt-3">
-                        <a href="#" class="text-light me-2"><i class="fab fa-facebook-f"></i></a>
-                        <a href="#" class="text-light me-2"><i class="fab fa-twitter"></i></a>
-                        <a href="#" class="text-light me-2"><i class="fab fa-linkedin-in"></i></a>
-                        <a href="#" class="text-light"><i class="fab fa-instagram"></i></a>
+                        <a href="https://www.facebook.com/ultrakeyit" class="text-light me-2"><i class="fab fa-facebook-f"></i></a>
+                        <a href="https://x.com/UltrakeyIT" class="text-light me-2"><i class="fab fa-twitter"></i></a>
+                        <a href="https://www.linkedin.com/company/ultrakeyit/" class="text-light me-2"><i class="fab fa-linkedin-in"></i></a>
+                        <a href="https://www.instagram.com/ultrakey_it/" class="text-light"><i class="fab fa-instagram"></i></a>
                     </div>
                 </div>
                 <div class="col-md-2 mb-4">

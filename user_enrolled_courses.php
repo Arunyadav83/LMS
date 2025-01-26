@@ -1,4 +1,5 @@
 <?php
+include 'header.php';
 // Start session and include necessary files
 session_start();
 require_once 'config.php'; // Database connection file
@@ -15,11 +16,11 @@ $user_id = $_SESSION['user_id'];
 // Fetch enrolled courses for the user
 $query = "
     SELECT e.course_id, e.status, e.enrolled_at, c.title, c.duration, 
-           t.username AS tutor_name
+           t.full_name AS tutor_name
     FROM enrollments e
     JOIN courses c ON e.course_id = c.id
     JOIN tutors t ON c.tutor_id = t.id
-    WHERE e.user_id = ?";
+    WHERE e.user_id = ?"; // Use placeholder
 
 // Prepare the statement
 $stmt = $conn->prepare($query);
@@ -28,7 +29,7 @@ if (!$stmt) {
 }
 
 // Bind the parameter
-$stmt->bind_param("i", $user_id);
+$stmt->bind_param("i", $user_id); // 'i' indicates integer
 
 // Execute the statement
 $stmt->execute();
@@ -43,10 +44,14 @@ while ($row = $result->fetch_assoc()) {
 
 // Close the statement
 $stmt->close();
+
+// // Optional: Display the courses for debugging
+// echo "<pre>";
+// print_r($courses);
+// echo "</pre>";
 ?>
 
-<?php
-include 'header.php'?>
+
 <!DOCTYPE html>
 <html lang="en">
 
@@ -81,6 +86,8 @@ include 'header.php'?>
 </head>
 
 <body>
+<?php
+include 'header.php';?>
     <div class="container mt-5">
         <h2 class="text-center mb-4" style="margin-top: 132px;">My Enrolled Courses</h2>
         <div class="row">
@@ -101,11 +108,11 @@ include 'header.php'?>
                                     <strong>Tutor:</strong> <?php echo htmlspecialchars($course['tutor_name']); ?><br>
                                     <strong>Enrolled At:</strong> <?php echo htmlspecialchars($course['enrolled_at']); ?><br>
                                 </p>
-                                <div class="progress mb-3">
+                                <!-- <div class="progress mb-3">
                                     <div class="progress-bar" role="progressbar" style="width: 50%;" aria-valuenow="50" aria-valuemin="0" aria-valuemax="100">
                                         50% Completed
                                     </div>
-                                </div>
+                                </div> -->
                                 <a href="courses.php?course_id=<?php echo $course['course_id']; ?>" class="btn btn-primary w-100">View Details</a>
                             </div>
                         </div>

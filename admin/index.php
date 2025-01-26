@@ -121,8 +121,8 @@ LIMIT 3;
 $recent_enrollments = mysqli_query($conn, $query);
 function time_ago($datetime, $full = false)
 {
-    // Set the timezone to match your data
-    $timezone = new DateTimeZone('Asia/Kolkata'); // Adjust to your time zone if needed
+    // Set the timezone to your required timezone
+    $timezone = new DateTimeZone('Asia/Kolkata'); // Change if needed
 
     // Create DateTime objects
     $now = new DateTime('now', $timezone);
@@ -130,7 +130,7 @@ function time_ago($datetime, $full = false)
     $diff = $now->diff($ago);
 
     // If the provided time is in the future
-    if ($diff->invert) {
+    if ($diff->invert == 0) {
         return 'just now';
     }
 
@@ -139,8 +139,7 @@ function time_ago($datetime, $full = false)
         return 'just now';
     }
 
-    // Handle time differences dynamically
-    $string = [];
+    // Units of time to be used in the result
     $units = [
         'y' => 'year',
         'm' => 'month',
@@ -150,25 +149,27 @@ function time_ago($datetime, $full = false)
         's' => 'second',
     ];
 
+    $string = [];
     foreach ($units as $key => $unit) {
         if ($diff->$key) {
             $string[] = $diff->$key . ' ' . $unit . ($diff->$key > 1 ? 's' : '');
         }
     }
 
-    // Handle weeks separately (if days exceed 7)
+    // Handle weeks separately if days exceed 7
     if ($diff->d >= 7) {
         $weeks = floor($diff->d / 7);
         $string = [$weeks . ' week' . ($weeks > 1 ? 's' : '')];
     }
 
-    // Return the first unit for a concise output or full string
+    // Return concise output (e.g., "1 day ago") or full string (e.g., "1 day, 3 hours ago")
     if (!$full) {
         $string = array_slice($string, 0, 1);
     }
 
     return $string ? implode(', ', $string) . ' ago' : 'just now';
 }
+
 
 $query = "
 SELECT 
@@ -212,6 +213,29 @@ function get_recent_students()
     $stmt->execute();
 
     return $stmt->fetchAll(PDO::FETCH_ASSOC);
+}
+
+
+// Fetch top instructors based on enrollments
+
+// Fetch top instructors based on enrollments
+$sql = "
+    SELECT 
+        tutor_id, 
+        COUNT(*) AS total_enrollments
+    FROM enrollments
+    WHERE status = 'enrolled' -- Only count successfully enrolled courses
+    GROUP BY tutor_id
+    ORDER BY total_enrollments DESC
+    LIMIT 5";
+
+$stmt = mysqli_query($conn, $sql);
+
+$instructors = []; // Initialize the array to prevent undefined variable warning
+if ($stmt && mysqli_num_rows($stmt) > 0) {
+    while ($row = mysqli_fetch_assoc($stmt)) {
+        $instructors[] = $row; // Add rows to the array
+    }
 }
 
 
@@ -510,9 +534,10 @@ function get_recent_students()
                 overflow-x: auto;
                 width: 100%
             }
+
             :root {
-            --sidebar-width: 250px;
-        }
+                --sidebar-width: 250px;
+            }
 
 
         }
@@ -591,7 +616,7 @@ function get_recent_students()
     <div class="container-fluid">
         <div class="row">
             <!-- Sidebar -->
-            <?php include 'sidebar.php'; ?> 
+            <?php include 'sidebar.php'; ?>
 
             <!-- Main Content -->
             <main class="col main-content">
@@ -812,6 +837,33 @@ function get_recent_students()
                             </table>
                         </div>
                     </div>
+                    <div class="dashboard">
+                        <div class="title">
+                            <h2>Top Instructors</h2>
+                            <a href="#">View all</a>
+                        </div>
+                        <div class="instructor-list">
+                            <?php if (!empty($instructors)): ?>
+                                <?php foreach ($instructors as $instructor): ?>
+                                    <div class="instructor-card">
+                                        <div class="profile">
+                                            <img src="profile-placeholder.jpg" alt="Profile Picture">
+                                        </div>
+                                        <div class="details">
+                                            <h4>Tutor ID: <?php echo $instructor['tutor_id']; ?></h4>
+                                            <span><?php echo $instructor['total_enrollments']; ?> Enrollments</span>
+                                            <div class="rating">⭐ 4.5/5.0</div> <!-- Replace with actual rating if available -->
+                                        </div>
+                                        <button class="view-btn">View</button>
+                                    </div>
+                                <?php endforeach; ?>
+                            <?php else: ?>
+                                <p>No instructors found.</p>
+                            <?php endif; ?>
+                        </div>
+                    </div>
+
+
 
                 </div>
 
@@ -826,75 +878,75 @@ function get_recent_students()
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
     <script>
-    let messageCount = 0; // Initialize message count
+        let messageCount = 0; // Initialize message count
 
-    // Fetch new messages count
-    function fetchNewMessages() {
-        fetch('fetchmessages.php')
-            .then(response => {
-                if (!response.ok) {
-                    throw new Error(`HTTP error! Status: ${response.status}`);
-                }
-                return response.json();
-            })
-            .then(messages => {
-                const messagesContainer = document.getElementById('messagesContainer');
-                messagesContainer.innerHTML = '';
+        // Fetch new messages count
+        function fetchNewMessages() {
+            fetch('fetchmessages.php')
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error(`HTTP error! Status: ${response.status}`);
+                    }
+                    return response.json();
+                })
+                .then(messages => {
+                    const messagesContainer = document.getElementById('messagesContainer');
+                    messagesContainer.innerHTML = '';
 
-                if (messages.length > 0) {
-                    messages.forEach(message => {
-                        const messageElement = document.createElement('div');
-                        messageElement.classList.add('message-item');
-                        messageElement.innerHTML = `
+                    if (messages.length > 0) {
+                        messages.forEach(message => {
+                            const messageElement = document.createElement('div');
+                            messageElement.classList.add('message-item');
+                            messageElement.innerHTML = `
                             <p>${message.content}</p>
                             <small>${time_ago(message.created_at)}</small>
                         `;
-                        messagesContainer.appendChild(messageElement);
-                    });
-                } else {
-                    messagesContainer.innerHTML = '<p>No new messages.</p>';
-                }
-            })
-            .catch(error => {
-            //   document.getElementById('messagesContainer').innerHTML = '<p>Error loading messages.</p>';
-    });
-    }
+                            messagesContainer.appendChild(messageElement);
+                        });
+                    } else {
+                        messagesContainer.innerHTML = '<p>No new messages.</p>';
+                    }
+                })
+                .catch(error => {
+                    //   document.getElementById('messagesContainer').innerHTML = '<p>Error loading messages.</p>';
+                });
+        }
 
-    // Function to reset message count and clear messages
-    function resetMessages() {
-        messageCount = 0; // Reset count
-        const messageCountElement = document.getElementById('messageCount');
-        messageCountElement.style.display = 'none'; // Hide the badge
+        // Function to reset message count and clear messages
+        function resetMessages() {
+            messageCount = 0; // Reset count
+            const messageCountElement = document.getElementById('messageCount');
+            messageCountElement.style.display = 'none'; // Hide the badge
 
-        const messagesContainer = document.getElementById('messagesContainer');
-        messagesContainer.innerHTML = ''; // Clear existing messages
-    }
+            const messagesContainer = document.getElementById('messagesContainer');
+            messagesContainer.innerHTML = ''; // Clear existing messages
+        }
 
-    // Call this function when the dashboard is loaded
-    document.addEventListener('DOMContentLoaded', function () {
+        // Call this function when the dashboard is loaded
+        document.addEventListener('DOMContentLoaded', function() {
+            fetchNewMessages()
+            resetMessages(); // Reset messages when the dashboard is loaded
+        });
+
+        // Reset message count and update status when the notification is clicked
+        document.getElementById('notificationLink').addEventListener('click', function() {
+            fetch('reset_message_status.php') // Call the PHP file to reset message status
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        messageCount = 0; // Reset count
+                        const messageCountElement = document.getElementById('messageCount');
+                        messageCountElement.style.display = 'none'; // Hide the badge
+                        fetchMessages(); // Fetch and display messages
+                    }
+                })
+                .catch(error => console.error('Error resetting message status:', error));
+        });
         fetchNewMessages()
-        resetMessages(); // Reset messages when the dashboard is loaded
-    });
 
-    // Reset message count and update status when the notification is clicked
-    document.getElementById('notificationLink').addEventListener('click', function () {
-        fetch('reset_message_status.php') // Call the PHP file to reset message status
-            .then(response => response.json())
-            .then(data => {
-                if (data.success) {
-                    messageCount = 0; // Reset count
-                    const messageCountElement = document.getElementById('messageCount');
-                    messageCountElement.style.display = 'none'; // Hide the badge
-                    fetchMessages(); // Fetch and display messages
-                }
-            })
-            .catch(error => console.error('Error resetting message status:', error));
-    });
-     fetchNewMessages()
-
-    // Set interval to fetch new messages every 5 seconds
-    setInterval(fetchNewMessages, 5000);
-</script>
+        // Set interval to fetch new messages every 5 seconds
+        setInterval(fetchNewMessages, 5000);
+    </script>
 
 </body>
 

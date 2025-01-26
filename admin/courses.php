@@ -172,6 +172,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             </script>";
         }
     }
+    
 }
 
 // Fetch all courses with tutor details
@@ -359,7 +360,7 @@ $course_titles = mysqli_fetch_all($result, MYSQLI_ASSOC);
             <div class="collapse navbar-collapse justify-content-end" id="navbarNav">
                 <ul class="navbar-nav align-items-center">
                     <li class="nav-item">
-                        <a class="nav-link text-light d-flex align-items-center" href="#">
+                        <a class="nav-link text-light d-flex align-items-center" href="#"  style="justify-content: space-between; gap:2px;margin-right: 25px;">
                             <i class="fas fa-user me-2"></i> Profile
                         </a>
                     </li>
@@ -580,23 +581,33 @@ $course_titles = mysqli_fetch_all($result, MYSQLI_ASSOC);
             });
         });
 
-        function confirmDelete(event) {
-            event.preventDefault();
-            Swal.fire({
-                title: 'Are you sure?',
-                text: "You won't be able to revert this!",
-                icon: 'warning',
-                showCancelButton: true,
-                confirmButtonColor: '#3085d6',
-                cancelButtonColor: '#d33',
-                confirmButtonText: 'Yes, delete it!'
-            }).then((result) => {
-                if (result.isConfirmed) {
-                    event.target.closest('form').submit();
-                }
-            });
-            return false;
+        function confirmDelete(id) {
+    Swal.fire({
+        title: "Are you sure?",
+        text: "You won't be able to revert this!",
+        icon: "warning",
+        showCancelButton: true,
+        confirmButtonColor: "#3085d6",
+        cancelButtonColor: "#d33",
+        confirmButtonText: "Yes, delete it!"
+    }).then((result) => {
+        if (result.isConfirmed) {
+            // Submit the form using JavaScript
+            const form = document.createElement("form");
+            form.method = "POST";
+            form.action = ""; // Current page
+
+            const input = document.createElement("input");
+            input.type = "hidden";
+            input.name = "delete_course";
+            input.value = id;
+
+            form.appendChild(input);
+            document.body.appendChild(form);
+            form.submit();
         }
+    });
+}
 
         // Ensure SweetAlert is properly initialized
         document.addEventListener('DOMContentLoaded', function() {

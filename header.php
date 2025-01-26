@@ -37,6 +37,9 @@ if (ob_get_length()) ob_clean();
             padding: 0.4px 10px !important;
             /* background-color: #007bff !important; */
         }
+        .dropdown-item{
+            color:black;
+        }
 
 </style>
 <body>
@@ -76,9 +79,16 @@ if (ob_get_length()) ob_clean();
                                         <i class="fas fa-sign-out-alt"></i> Logout
                                     </a>
                                 </li>
+                                <li><hr class="dropdown-divider"></li>
                                 <li>
                                     <a class="dropdown-item" href="user_enrolled_courses.php">
                                         <i class="fas fa-sign-out-alt"></i> UserEnrollCourses
+                                    </a>
+                                </li>
+                                <li><hr class="dropdown-divider"></li>
+                                <li>
+                                    <a class="dropdown-item" href="fetch_cart.php">
+                                        <i class="fas fa-sign-out-alt"></i> MyWishList
                                     </a>
                                 </li>
                             </ul>

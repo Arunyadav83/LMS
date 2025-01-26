@@ -125,7 +125,7 @@ if (isset($_GET['export']) && $_GET['export'] == 'excel') {
             <div class="collapse navbar-collapse" id="navbarNav">
                 <ul class="navbar-nav ms-auto">
                     <li class="nav-item">
-                        <a class="nav-link" href="#"><i class="fas fa-user"></i> Profile</a>
+                        <a class="nav-link" href="#"  style="justify-content: space-between; gap:2px;margin-right: 25px; padding-inline:20px ; text-decoration:none ; font-size:10px"><i class="fas fa-user"></i> Profile</a>
                     </li>
                     <li class="nav-item">
                         <a class="nav-link" href="logout.php"><i class="fas fa-sign-out-alt"></i> Logout</a>

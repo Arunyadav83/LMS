@@ -25,46 +25,37 @@ if ($class_id === 0 || $course_id === 0) {
     exit();
 }
 
-// Check if user has completed the quiz for current class
-$check_quiz_query = "SELECT COUNT(*) as quiz_count, AVG(percentage) as avg_score 
-                     FROM quiz_results 
-                     WHERE user_id = ? AND class_id = ?";
+// Check if the user has passed the quiz for the current class
+$quiz_query = "SELECT percentage FROM quiz_results WHERE user_id = ? AND class_id = ? ORDER BY submitted_at DESC LIMIT 1";
+$quiz_stmt = mysqli_prepare($conn, $quiz_query);
+mysqli_stmt_bind_param($quiz_stmt, "ii", $user_id, $class_id);
+mysqli_stmt_execute($quiz_stmt);
+$quiz_data = mysqli_fetch_assoc(mysqli_stmt_get_result($quiz_stmt));
 
-$check_quiz_stmt = mysqli_prepare($conn, $check_quiz_query);
-mysqli_stmt_bind_param($check_quiz_stmt, "ii", $user_id, $class_id);
-mysqli_stmt_execute($check_quiz_stmt);
-$quiz_result = mysqli_stmt_get_result($check_quiz_stmt);
-$quiz_data = mysqli_fetch_assoc($quiz_result);
-
-// Verify quiz completion and passing score (e.g., 70%)
-if ($quiz_data['quiz_count'] > 0 && $quiz_data['avg_score'] >= 70) {
-    // Get the next class that's not unlocked
-    $next_class_query = "SELECT id FROM classes 
-                        WHERE course_id = ? 
-                        AND id > ? 
-                        AND is_unlocked = FALSE 
-                        ORDER BY id ASC LIMIT 1";
+if ($quiz_data && $quiz_data['percentage'] >= 70) {
+    // Get the next class to unlock
+    $next_class_query = "SELECT id FROM classes WHERE course_id = ? AND id > ? ORDER BY id ASC LIMIT 1";
     $next_class_stmt = mysqli_prepare($conn, $next_class_query);
     mysqli_stmt_bind_param($next_class_stmt, "ii", $course_id, $class_id);
     mysqli_stmt_execute($next_class_stmt);
-    $next_class_result = mysqli_stmt_get_result($next_class_stmt);
-    
-    if ($next_class = mysqli_fetch_assoc($next_class_result)) {
-        // Unlock the next class
-        $unlock_query = "UPDATE classes SET is_unlocked = TRUE WHERE id = ?";
-        $unlock_stmt = mysqli_prepare($conn, $unlock_query);
-        mysqli_stmt_bind_param($unlock_stmt, "i", $next_class['id']);
+    $next_class = mysqli_fetch_assoc(mysqli_stmt_get_result($next_class_stmt));
 
+    if ($next_class) {
+        // Unlock the next class in the `class_progress` table
+        $unlock_query = "INSERT INTO class_progress (user_id, class_id, is_unlocked) VALUES (?, ?, 1) 
+                         ON DUPLICATE KEY UPDATE is_unlocked = 1";
+        $unlock_stmt = mysqli_prepare($conn, $unlock_query);
+        mysqli_stmt_bind_param($unlock_stmt, "ii", $user_id, $next_class['id']);
         if (mysqli_stmt_execute($unlock_stmt)) {
-            $_SESSION['success'] = "Congratulations! The next lesson has been unlocked.";
+            $_SESSION['success'] = "The next lesson has been unlocked!";
         } else {
-            $_SESSION['error'] = "Error unlocking next lesson: " . mysqli_error($conn);
+            $_SESSION['error'] = "Failed to unlock the next lesson. Try again.";
         }
     } else {
-        $_SESSION['success'] = "You've completed all available lessons in this course!";
+        $_SESSION['success'] = "You've completed all lessons!";
     }
 } else {
-    $_SESSION['error'] = "Please complete the quiz with a passing score (70% or higher) to unlock the next lesson.";
+    $_SESSION['error'] = "You must pass the quiz with at least 70% to unlock the next lesson.";
 }
 
 header("Location: course.php?id=" . $course_id);

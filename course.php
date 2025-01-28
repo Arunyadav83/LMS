@@ -153,110 +153,116 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['course_id']) && isset
     </div>
 
     <h2 class="mt-5 mb-4 text-center text-info">Course Content</h2>
-
     <?php if (mysqli_num_rows($classes_result) > 0): ?>
-        <div class="row row-cols-1 row-cols-md-3 g-4">
-            <?php
-            $lesson_number = 1; // Start lesson numbering
-            $previous_lesson_unlocked = true; // Preview is always unlocked
+    <div class="row row-cols-1 row-cols-md-3 g-4">
+        <?php
+        $lesson_number = 1;
 
-            while ($class = mysqli_fetch_assoc($classes_result)):
+        while ($class = mysqli_fetch_assoc($classes_result)):
 
-                $is_preview = ($lesson_number === 1); // First lesson is a preview
-                $is_enrolled = ($is_preview || $class['is_unlocked'] == 1 || $is_enrolled);
+            $is_preview = ($lesson_number === 1); // First lesson is a preview
 
-                // Check if user is enrolled in the course
-                $enrollment_check_query = "SELECT * FROM enrollments WHERE user_id = ? AND course_id = ?";
-                $enrollment_stmt = mysqli_prepare($conn, $enrollment_check_query);
-                mysqli_stmt_bind_param($enrollment_stmt, "ii", $_SESSION['user_id'], $class['course_id']);
-                mysqli_stmt_execute($enrollment_stmt);
-                $enrollment_result = mysqli_stmt_get_result($enrollment_stmt);
-                $is_enrolled = mysqli_num_rows($enrollment_result) > 0;
+            // Check if the user is enrolled in the course
+            $enrollment_query = "SELECT * FROM enrollments WHERE user_id = ? AND course_id = ?";
+            $enrollment_stmt = mysqli_prepare($conn, $enrollment_query);
+            mysqli_stmt_bind_param($enrollment_stmt, "ii", $_SESSION['user_id'], $class['course_id']);
+            mysqli_stmt_execute($enrollment_stmt);
+            $is_enrolled = mysqli_stmt_get_result($enrollment_stmt)->num_rows > 0;
 
-                // Check if previous lesson's quiz was completed with at least 70%
-                $prev_class_id = $class['id'] - 1;
-                $quiz_check_query = "SELECT percentage FROM quiz_results WHERE user_id = ? AND class_id = ? ORDER BY submitted_at DESC LIMIT 1";
-                $quiz_stmt = mysqli_prepare($conn, $quiz_check_query);
-                mysqli_stmt_bind_param($quiz_stmt, "ii", $_SESSION['user_id'], $prev_class_id);
-                mysqli_stmt_execute($quiz_stmt);
-                $quiz_result = mysqli_stmt_get_result($quiz_stmt);
-                $quiz_score = mysqli_fetch_assoc($quiz_result);
+            // Check if the current class is unlocked for this user
+            $is_unlocked = false;
+            if ($is_preview || $is_enrolled) {
+                $progress_query = "SELECT * FROM class_progress WHERE user_id = ? AND class_id = ?";
+                $progress_stmt = mysqli_prepare($conn, $progress_query);
+                mysqli_stmt_bind_param($progress_stmt, "ii", $_SESSION['user_id'], $class['id']);
+                mysqli_stmt_execute($progress_stmt);
+                $progress_result = mysqli_fetch_assoc(mysqli_stmt_get_result($progress_stmt));
 
-                // Determine if the current lesson is unlocked
-                $is_unlocked = ($is_preview || $is_enrolled) && ($lesson_number == 2 || ($quiz_score && $quiz_score['percentage'] >= 70));
+                // If the user has unlocked this class explicitly, allow access
+                $is_unlocked = $progress_result['is_unlocked'] ?? false;
 
-                // Display each lesson
-            ?>
-                <div class="col">
-                    <div class="card shadow-sm">
-                        <div class="card-body">
-                            <h5 class="card-title text-success">
-                                Lesson <?php echo $lesson_number; ?>: <?php echo htmlspecialchars($class['class_name']); ?>
-                            </h5>
+                // Check if the quiz for the previous class was completed with at least 70%
+                if ($lesson_number > 1 && !$is_unlocked) {
+                    $prev_class_id = $class['id'] - 1;
+                    $quiz_query = "SELECT percentage FROM quiz_results WHERE user_id = ? AND class_id = ? ORDER BY submitted_at DESC LIMIT 1";
+                    $quiz_stmt = mysqli_prepare($conn, $quiz_query);
+                    mysqli_stmt_bind_param($quiz_stmt, "ii", $_SESSION['user_id'], $prev_class_id);
+                    mysqli_stmt_execute($quiz_stmt);
+                    $quiz_result = mysqli_fetch_assoc(mysqli_stmt_get_result($quiz_stmt));
+                    $is_quiz_completed = $quiz_result && $quiz_result['percentage'] >= 70;
 
-                            <?php if ($is_preview): ?>
-                                <!-- Always show preview video -->
-                                <?php if (!empty($class['video_path'])): ?>
-                                    <?php $video_url = 'serve_video.php?video=' . urlencode($class['video_path']); ?>
-                                    <div class="video-container">
-                                        <video
-                                            class="rounded mb-3 video-player"
-                                            controls
-                                            controlsList="nodownload"
-                                            style="width: 100%; cursor: pointer;">
-                                            <source src="<?php echo $video_url; ?>" type="video/mp4">
-                                            Your browser does not support the video tag.
-                                        </video>
-                                    </div>
-                                <?php else: ?>
-                                    <p class="text-danger">No video available for this class.</p>
-                                <?php endif; ?>
+                    if ($is_quiz_completed) {
+                        // Unlock the current class for the user
+                        $unlock_query = "INSERT INTO class_progress (user_id, class_id, is_unlocked) VALUES (?, ?, 1)
+                                         ON DUPLICATE KEY UPDATE is_unlocked = 1";
+                        $unlock_stmt = mysqli_prepare($conn, $unlock_query);
+                        mysqli_stmt_bind_param($unlock_stmt, "ii", $_SESSION['user_id'], $class['id']);
+                        mysqli_stmt_execute($unlock_stmt);
 
-                            <?php elseif ($is_unlocked): ?>
-                                <!-- Show lesson video -->
-                                <?php if (!empty($class['video_path'])): ?>
-                                    <?php $video_url = 'serve_video.php?video=' . urlencode($class['video_path']); ?>
-                                    <div class="video-container">
-                                        <video
-                                            class="rounded mb-3 video-player"
-                                            controls
-                                            controlsList="nodownload"
-                                            style="width: 100%; cursor: pointer;">
-                                            <source src="<?php echo $video_url; ?>" type="video/mp4">
-                                            Your browser does not support the video tag.
-                                        </video>
-                                    </div>
+                        $is_unlocked = true;
+                    }
+                }
+            }
+        ?>
+        <div class="col">
+            <div class="card shadow-sm">
+                <div class="card-body">
+                    <h5 class="card-title text-success">
+                        Lesson <?php echo $lesson_number; ?>: <?php echo htmlspecialchars($class['class_name']); ?>
+                    </h5>
 
-                                    <!-- Show Take Quiz button for the current lesson -->
-                                    <a href="take_quiz.php?class_id=<?php echo $class['id']; ?>" class="btn btn-primary btn-block mt-3">
-                                        Take Quiz
-                                    </a>
-                                <?php else: ?>
-                                    <p class="text-danger">No video available for this class.</p>
-                                <?php endif; ?>
-
-                            <?php else: ?>
-                                <!-- Lesson is locked -->
-                                <p class="text-muted">
-                                    This lesson is locked. Complete the previous lesson's quiz with at least 70% to unlock.
-                                </p>
-                            <?php endif; ?>
+                    <?php if ($is_preview): ?>
+                        <div class="video-container">
+                            <video class="rounded mb-3 video-player" controls controlsList="nodownload" style="width: 100%; cursor: pointer;">
+                                <source src="<?php echo 'serve_video.php?video=' . urlencode($class['video_path']); ?>" type="video/mp4">
+                                Your browser does not support the video tag.
+                            </video>
                         </div>
-                    </div>
+
+                    <?php elseif ($is_unlocked): ?>
+                        <div class="video-container">
+                            <video class="rounded mb-3 video-player" controls controlsList="nodownload" style="width: 100%; cursor: pointer;">
+                                <source src="<?php echo 'serve_video.php?video=' . urlencode($class['video_path']); ?>" type="video/mp4">
+                                Your browser does not support the video tag.
+                            </video>
+                        </div>
+                        <a href="take_quiz.php?class_id=<?php echo $class['id']; ?>" class="btn btn-primary btn-block mt-3">Take Quiz</a>
+
+                    <?php else: ?>
+                        <p class="text-muted">
+                            <?php if (!$is_enrolled): ?>
+                                You must enroll in this course to unlock this lesson.
+                            <?php else: ?>
+                                This lesson is locked. Complete the previous lesson's quiz with at least 70% score to unlock.
+                            <?php endif; ?>
+                        </p>
+                        <?php if (!$is_enrolled): ?>
+                            <button class="btn btn-primary enrollButton"
+                                data-course-id="<?php echo htmlspecialchars($class['course_id']); ?>"
+                                data-user-id="<?php echo htmlspecialchars($_SESSION['user_id']); ?>"
+                                data-class-id="<?php echo htmlspecialchars($class['id']); ?>">
+                                Enroll to Unlock
+                            </button>
+                        <?php else: ?>
+                            <form method="POST" action="unlock_next_class.php">
+                                <input type="hidden" name="class_id" value="<?php echo $class['id']; ?>">
+                                <input type="hidden" name="course_id" value="<?php echo $class['course_id']; ?>">
+                                <input type="hidden" name="user_id" value="<?php echo $_SESSION['user_id']; ?>">
+                                <button type="submit" class="btn btn-warning">Unlock This Lesson</button>
+                            </form>
+                        <?php endif; ?>
+                    <?php endif; ?>
                 </div>
-            <?php
-                $lesson_number++;
-            endwhile;
-            ?>
-
+            </div>
         </div>
-    <?php else: ?>
-        <p>No classes available for this course.</p>
-    <?php endif; ?>
-
-
-
-
+        <?php
+            $lesson_number++;
+        endwhile;
+        ?>
+    </div>
+<?php else: ?>
+    <p>No classes available for this course.</p>
+<?php endif; ?>
 
 </div>
 <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
@@ -270,11 +276,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['course_id']) && isset
             var courseId = event.target.getAttribute('data-course-id');
             var userId = event.target.getAttribute('data-user-id');
             var classId = event.target.getAttribute('data-class-id');
-            enrollCourse(courseId, userId, classId);
+            var course_prize = event.target.getAttribute('data-course-prize')
+            enrollCourse(courseId, userId, classId, course_prize);
         }
     });
 
-    function enrollCourse(courseId, userId, classId) {
+    function enrollCourse(courseId, userId, classId, course_prize) {
         console.log("Initiating enrollment...");
 
         jQuery.ajax({
@@ -287,6 +294,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['course_id']) && isset
             },
             dataType: 'json',
             success: function(response) {
+                console.log(response);
+
                 if (response.success) {
                     var options = {
                         key: '<?php echo $razorpayKey; ?>',
@@ -351,8 +360,4 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['course_id']) && isset
         });
     }
 </script>
-
-
-
-
 <?php include 'footer.php'; ?>

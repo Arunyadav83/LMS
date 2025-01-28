@@ -16,6 +16,7 @@ function require_login() {
     }
 }
 
+
 function get_user_role() {
     return $_SESSION['user_role'] ?? null;
 }

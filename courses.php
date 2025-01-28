@@ -390,72 +390,61 @@ $razorpayKey = 'rzp_test_Bvq9kiuaq8gkcs'; // Your Razorpay API key
             }
         });
     }
-
     function addToCart(courseId) {
-        fetch('add_to_cart.php', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({
-                    courseId: courseId
-                }),
-            })
-            .then(response => {
-                if (!response.ok) {
-                    throw new Error(`HTTP error! status: ${response.status}`);
-                }
-                return response.json();
-            })
-            .then(data => {
-                if (data.success) {
-                    // Show success SweetAlert with a green color (without redirection)
-                    Swal.fire({
-                        title: 'Success!',
-                        text: 'Course added to cart successfully!',
-                        icon: 'success',
-                        position: 'top-end',
-                        showConfirmButton: false,
-                        timer: 3000,
-                        background: '#28a745', // Green background color
-                        color: '#fff', // White text color
-                        toast: true, // Makes it appear as a toast
-                        timerProgressBar: true // Adds a progress bar during the timer
-                    });
-                } else if (data.message === 'Course already in cart') {
-                    // Show message if the course is already in the cart
-                    Swal.fire({
-                        title: 'Already in Cart',
-                        text: 'You have already added this course to your cart.',
-                        icon: 'info',
-                        position: 'top-end',
-                        showConfirmButton: false,
-                        timer: 3000,
-                        background: '#ffc107', // Yellow background for info
-                        color: '#fff',
-                        toast: true,
-                        timerProgressBar: true
-                    });
-                } else {
-                    Swal.fire({
-                        title: 'Error!',
-                        text: 'Failed to add course to cart: ' + data.message,
-                        icon: 'error',
-                        position: 'top-end',
-                        showConfirmButton: false,
-                        timer: 3000,
-                        background: '#dc3545', // Red background for error
-                        color: '#fff',
-                        toast: true,
-                        timerProgressBar: true
-                    });
-                }
-            })
-            .catch(error => {
-                console.error('Error adding course to cart:', error);
+    fetch('add_to_cart.php', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                courseId: courseId
+            }),
+        })
+        .then(response => {
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
+            }
+            return response.json();
+        })
+        .then(data => {
+            if (data.success) {
+                // Show success SweetAlert with a green color
+                Swal.fire({
+                    title: 'Success!',
+                    text: 'Course added to cart successfully!',
+                    icon: 'success',
+                    position: 'top-end',
+                    showConfirmButton: false,
+                    timer: 3000,
+                    background: '#28a745', // Green background color
+                    color: '#fff', // White text color
+                    toast: true,
+                    timerProgressBar: true // Adds a progress bar during the timer
+                }).then(() => {
+                    // Redirect to fetch_cart.php after the alert
+                    window.location.href = 'fetch_cart.php';
+                });
+            } else if (data.message === 'Course already in cart') {
+                // Show message if the course is already in the cart
+                Swal.fire({
+                    title: 'Already in Cart',
+                    text: 'You have already added this course to your cart.',
+                    icon: 'info',
+                    position: 'top-end',
+                    showConfirmButton: false,
+                    timer: 3000,
+                    background: '#ffc107', // Yellow background for info
+                    color: '#fff',
+                    toast: true,
+                    timerProgressBar: true
+                }).then(() => {
+                    // Redirect to fetch_cart.php after the alert
+                    window.location.href = 'fetch_cart.php';
+                });
+            } else {
                 Swal.fire({
                     title: 'Error!',
-                    text: 'An error occurred. Please try again later.',
+                    text: 'Failed to add course to cart: ' + data.message,
                     icon: 'error',
                     position: 'top-end',
                     showConfirmButton: false,
@@ -465,9 +454,24 @@ $razorpayKey = 'rzp_test_Bvq9kiuaq8gkcs'; // Your Razorpay API key
                     toast: true,
                     timerProgressBar: true
                 });
+            }
+        })
+        .catch(error => {
+            console.error('Error adding course to cart:', error);
+            Swal.fire({
+                title: 'Error!',
+                text: 'An error occurred. Please try again later.',
+                icon: 'error',
+                position: 'top-end',
+                showConfirmButton: false,
+                timer: 3000,
+                background: '#dc3545', // Red background for error
+                color: '#fff',
+                toast: true,
+                timerProgressBar: true
             });
-    }
-
+        });
+}
 
     function showBuffering() {
         Swal.fire({

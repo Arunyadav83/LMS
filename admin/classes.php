@@ -176,9 +176,69 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                   VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
         $stmt = mysqli_prepare($conn, $query);
         mysqli_stmt_bind_param($stmt, "iisssiis", $course_id, $tutor_id, $class_name, $description, $video_path, $is_online, $online_link, $schedule_time);
+        if (isset($_POST['questions'])) {
+            foreach ($_POST['questions'] as $index => $question) {
+                $question_text = trim($question);
+                $correct_answer = trim($_POST['correct_answers'][$index] ?? '');
+                $video_id = isset($_POST['video_id'][$index]) ? mysqli_real_escape_string($conn, $_POST['video_id'][$index]) : null;
+
+                // Validate required fields
+                if (empty($question_text) || empty($correct_answer)) {
+                    echo "Error: Question or correct answer is empty!";
+                    continue;
+                }
+
+                $query = "INSERT INTO quiz_questions (class_id, question_text, correct_answer, video_id) VALUES (?, ?, ?, ?)";
+                $stmt = mysqli_prepare($conn, $query);
+
+                if (!$stmt) {
+                    echo "Error preparing statement for quiz question: " . mysqli_error($conn);
+                    continue;
+                }
+
+                mysqli_stmt_bind_param($stmt, "isss", $class_id, $question_text, $correct_answer, $video_id);
+
+                if (mysqli_stmt_execute($stmt)) {
+                    $question_id = mysqli_insert_id($conn);
+
+                    if (isset($_POST['answers'][$index]) && isset($_POST['feedback'][$index])) {
+                        foreach ($_POST['answers'][$index] as $answer_index => $answer) {
+                            $answer_text = mysqli_real_escape_string($conn, $answer);
+                            $feedback_text = mysqli_real_escape_string($conn, $_POST['feedback'][$index][$answer_index]);
+
+                            if (empty($answer_text) || empty($feedback_text)) {
+                                echo "Error: Answer or feedback is empty!";
+                                continue;
+                            }
+
+                            // Set 'is_correct' dynamically based on the selected correct answer
+                            $is_correct = ($_POST['correct_answers'][$index] == $answer_index) ? 1 : 0;
+
+                            $query = "INSERT INTO quiz_answers (question_id, answer_text, feedback, is_correct) VALUES (?, ?, ?, ?)";
+                            $stmt = mysqli_prepare($conn, $query);
+
+                            if (!$stmt) {
+                                echo "Error preparing statement for quiz answer: " . mysqli_error($conn);
+                                continue;
+                            }
+
+                            mysqli_stmt_bind_param($stmt, "issi", $question_id, $answer_text, $feedback_text, $is_correct);
+
+                            if (!mysqli_stmt_execute($stmt)) {
+                                echo "Error executing query for quiz answer: " . mysqli_error($conn);
+                            }
+                        }
+                    }
+                } else {
+                    echo "Error inserting quiz question: " . mysqli_error($conn);
+                }
+            }  // <-- Close the foreach loop
+        }  // <-- Close the if for checking 'questions'
+
     
         if (mysqli_stmt_execute($stmt)) {
             $class_id = mysqli_insert_id($conn);
+
     
             // Show SweetAlert confirmation message
 
@@ -190,7 +250,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                         icon: 'success',
                         confirmButtonText: 'OK'
                     }).then(() => {
-                        window.location.href = 'your_redirect_page.php'; // Change this to your desired redirect page
+                        window.location.href = 'classes.php'; // Change this to your desired redirect page
                     });
                   </script>";
         } else {

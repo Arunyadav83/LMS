@@ -172,7 +172,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['course_id']) && isset
             // Check if the current class is unlocked for this user
             $is_unlocked = false;
             if ($is_preview || $is_enrolled) {
-                $progress_query = "SELECT * FROM class_progress WHERE user_id = ? AND class_id = ?";
+                $progress_query = "SELECT is_unlocked FROM class_progress WHERE user_id = ? AND class_id = ?";
                 $progress_stmt = mysqli_prepare($conn, $progress_query);
                 mysqli_stmt_bind_param($progress_stmt, "ii", $_SESSION['user_id'], $class['id']);
                 mysqli_stmt_execute($progress_stmt);
@@ -181,8 +181,18 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['course_id']) && isset
                 // If the user has unlocked this class explicitly, allow access
                 $is_unlocked = $progress_result['is_unlocked'] ?? false;
 
+                // Unlock the second lesson upon enrollment
+                if ($lesson_number === 2 && $is_enrolled && !$is_unlocked) {
+                    $unlock_second_lesson_query = "INSERT INTO class_progress (user_id, class_id, is_unlocked) VALUES (?, ?, 1)
+                                                   ON DUPLICATE KEY UPDATE is_unlocked = 1";
+                    $unlock_second_stmt = mysqli_prepare($conn, $unlock_second_lesson_query);
+                    mysqli_stmt_bind_param($unlock_second_stmt, "ii", $_SESSION['user_id'], $class['id']);
+                    mysqli_stmt_execute($unlock_second_stmt);
+                    $is_unlocked = true;
+                }
+
                 // Check if the quiz for the previous class was completed with at least 70%
-                if ($lesson_number > 1 && !$is_unlocked) {
+                if ($lesson_number > 2 && !$is_unlocked) {
                     $prev_class_id = $class['id'] - 1;
                     $quiz_query = "SELECT percentage FROM quiz_results WHERE user_id = ? AND class_id = ? ORDER BY submitted_at DESC LIMIT 1";
                     $quiz_stmt = mysqli_prepare($conn, $quiz_query);
@@ -238,18 +248,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['course_id']) && isset
                         </p>
                         <?php if (!$is_enrolled): ?>
                             <button class="btn btn-primary enrollButton"
-                                data-course-id="<?php echo htmlspecialchars($class['course_id']); ?>"
-                                data-user-id="<?php echo htmlspecialchars($_SESSION['user_id']); ?>"
-                                data-class-id="<?php echo htmlspecialchars($class['id']); ?>">
+                                data-course-id="<?php echo htmlspecialchars($class['course_id']); ?>">
                                 Enroll to Unlock
                             </button>
-                        <?php else: ?>
-                            <form method="POST" action="unlock_next_class.php">
-                                <input type="hidden" name="class_id" value="<?php echo $class['id']; ?>">
-                                <input type="hidden" name="course_id" value="<?php echo $class['course_id']; ?>">
-                                <input type="hidden" name="user_id" value="<?php echo $_SESSION['user_id']; ?>">
-                                <button type="submit" class="btn btn-warning">Unlock This Lesson</button>
-                            </form>
                         <?php endif; ?>
                     <?php endif; ?>
                 </div>
@@ -263,6 +264,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['course_id']) && isset
 <?php else: ?>
     <p>No classes available for this course.</p>
 <?php endif; ?>
+
 
 </div>
 <script src="https://checkout.razorpay.com/v1/checkout.js"></script>

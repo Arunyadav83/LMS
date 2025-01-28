@@ -9,16 +9,22 @@ if (session_status() === PHP_SESSION_NONE) {
    
     session_start();
 }
-// $cart_count = 0;
-// if (is_logged_in()) {
-//     $cart_query = "SELECT COUNT(*) AS cart_count FROM cart WHERE user_id = ?";
-//     $cart_stmt = mysqli_prepare($conn, $cart_query);
-//     mysqli_stmt_bind_param($cart_stmt, "i", $_SESSION['user_id']);
-//     mysqli_stmt_execute($cart_stmt);
-//     $cart_result = mysqli_fetch_assoc(mysqli_stmt_get_result($cart_stmt));
-//     $cart_count = $cart_result['cart_count'] ?? 0;
-// } 
+$cart_count = 0;
 
+if (is_logged_in()) {
+    $cart_query = "SELECT COUNT(*) AS cart_count FROM cart WHERE user_id = ?";
+    $cart_stmt = mysqli_prepare($conn, $cart_query);
+    mysqli_stmt_bind_param($cart_stmt, "i", $_SESSION['user_id']);
+    mysqli_stmt_execute($cart_stmt);
+    $cart_result = mysqli_fetch_assoc(mysqli_stmt_get_result($cart_stmt));
+    $cart_count = $cart_result['cart_count'] ?? 0;
+}
+
+if ($cart_count > 0) {
+    echo "<span class='cart-count'>$cart_count</span>"; // Display the cart count only if > 0
+} else {
+    echo "<span class='cart-count' style='display: none;'></span>"; // Hide cart count if 0
+}
 
 // Clear any existing output buffers and start fresh
 if (ob_get_length()) ob_clean();
@@ -103,12 +109,12 @@ if (ob_get_length()) ob_clean();
                             </li>
                         </ul>
                     </li>
-                    <!-- <li class="nav-item">
+                    <li class="nav-item">
                         <a class="nav-link" href="fetch_cart.php?reset=true">
                             <i class="fas fa-shopping-cart"></i> Cart 
                             <span class="badge bg-danger"><?php echo $cart_count; ?></span>
                         </a>
-                    </li> -->
+                    </li>
                 <?php else: ?>
                     <li class="nav-item">
                         <a class="nav-link" href="login.php">Login</a>

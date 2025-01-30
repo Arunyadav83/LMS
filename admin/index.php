@@ -258,6 +258,8 @@ if ($stmt && mysqli_num_rows($stmt) > 0) {
     <!-- Include FullCalendar JS -->
     <script src="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.8/index.global.min.js"></script>
 
+    <link rel="icon" type="image/x-icon" href="../assets/images/apple-touch-icon.png">
+
     <style>
         :root {
             --sidebar-width: 250px;

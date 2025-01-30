@@ -157,7 +157,7 @@ if (isset($_POST['add_course'])) {
 
     </style>
 </head>
-
+<link rel="icon" type="image/x-icon" href="assets/images/apple-touch-icon.png">
 <body>
 
 <nav class="navbar navbar-expand-lg custom-navbar">

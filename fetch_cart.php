@@ -1,4 +1,5 @@
 <?php
+include 'header.php';
 session_start();
 header('Content-Type: text/html');
 
@@ -18,10 +19,7 @@ $totalPrice = 0; // Initialize the variable to avoid undefined errors
 
 // Check if delete_course is set
 if (isset($_POST['delete_course']) && isset($_POST['course_id'])) {
-    
     $courseId = intval($_POST['course_id']);
-
-    // Prepare the delete query
     $deleteQuery = "DELETE FROM cart WHERE user_id = ? AND course_id = ?";
     $stmt = $conn->prepare($deleteQuery);
 
@@ -33,11 +31,13 @@ if (isset($_POST['delete_course']) && isset($_POST['course_id'])) {
             echo json_encode(["success" => false, "message" => "Failed to remove course from the cart."]);
         }
         $stmt->close();
+        exit; // Ensure no extra output after JSON response
     } else {
         echo json_encode(["success" => false, "message" => "Failed to prepare delete statement: " . $conn->error]);
         exit;
     }
 }
+
 
 // Fetch cart items and calculate total price
 $query = "SELECT c.id, c.user_id, u.username, c.course_id, c.added_at, courses.title, courses.course_prize
@@ -56,16 +56,22 @@ $razorpayKey = 'rzp_test_Bvq9kiuaq8gkcs';
 $stmt->bind_param('i', $userId); // Correct binding for user_id only
 $stmt->execute();
 $result = $stmt->get_result();
-
-$courses = [];
-while ($row = $result->fetch_assoc()) {
-    $courses[] = $row;
-    $totalPrice += $row['course_prize']; // Sum the prices
+if ($result->num_rows > 0) {
+    // Send a valid JSON response containing the course data
+    $courses = [];
+    while ($row = $result->fetch_assoc()) {
+        $courses[] = $row;
+        $totalPrice += $row['course_prize']; // Sum the prices
+    }
+    // echo json_encode(["success" => true, "courses" => $courses, "totalPrice" => $totalPrice]);
+} else {
+    // Handle case when no courses are found
+    echo json_encode(["success" => false, "message" => "No courses found in your cart"]);
 }
 
 $stmt->close();
 $conn->close();
-echo json_encode(["success" => true, "courses" => $courses, "totalPrice" => $totalPrice]);  // Proper JSON response
+// echo json_encode(["success" => true, "courses" => $courses, "totalPrice" => $totalPrice]);  // Proper JSON response
 
 
 ?>
@@ -203,44 +209,49 @@ echo json_encode(["success" => true, "courses" => $courses, "totalPrice" => $tot
         },
         dataType: 'json',
         success: function(response) {
-            console.log("RAW response:", response); // Log the raw response for debugging
-            if (response.success) {
-                var options = {
-                    key: '<?php echo $razorpayKey; ?>',
-                    amount: response.course_prize * 100, // Convert to paise
-                    currency: 'INR',
-                    name: 'Course Enrollment',
-                    description: 'Enroll in ' + response.title,
-                    image: 'assets/images/logo2.png',
-                    order_id: response.order_id,
-                    handler: function(paymentResponse) {
-                        showBuffering(); // Show buffering before verifying payment
-                        verifyPayment(paymentResponse, response, courseId, userId);
-                    },
-                    modal: {
-                        ondismiss: function() {
-                            console.log("Checkout form closed");
-                        }
-                    },
-                    theme: {
-                        color: '#F37254'
-                    }
-                };
-                var rzp1 = new Razorpay(options);
-                rzp1.on('payment.failed', function(response) {
-                    console.error("Payment failed:", response.error);
-                    showErrorAlert("Payment Failed!", response.error.description);
-                });
-                rzp1.open();
-            } else {
-                showErrorAlert("Order Creation Failed!", response.message);
+    console.log("RAW response:", response); // Log the raw response for debugging
+
+    // Ensure the response is valid before proceeding
+    if (response && response.success) {
+        console.log("Course successfully enrolled.");
+        var options = {
+            key: '<?php echo $razorpayKey; ?>',
+            amount: response.course_prize * 100, // Convert to paise
+            currency: 'INR',
+            name: 'Course Enrollment',
+            description: 'Enroll in ' + response.title,
+            image: 'assets/images/logo2.png',
+            order_id: response.order_id,
+            handler: function(paymentResponse) {
+                showBuffering(); // Show buffering before verifying payment
+                verifyPayment(paymentResponse, response, courseId, userId);
+            },
+            modal: {
+                ondismiss: function() {
+                    console.log("Checkout form closed");
+                }
+            },
+            theme: {
+                color: '#F37254'
             }
-        },
-        error: function(xhr, status, error) {
-            console.error("Order Creation AJAX error:", status, error);
-            console.error("Response:", xhr.responseText); // Log the error response
-            showErrorAlert("Enrollment Failed!", "An unexpected error occurred. Please try again.");
-        }
+        };
+        var rzp1 = new Razorpay(options);
+        rzp1.on('payment.failed', function(response) {
+            console.error("Payment failed:", response.error);
+            showErrorAlert("Payment Failed!", response.error.description);
+        });
+        rzp1.open();
+    } else {
+        showErrorAlert("Order Creation Failed!", response.message);
+    }
+},
+
+error: function(xhr, status, error) {
+    console.error("Order Creation AJAX error:", status, error);
+    console.error("Response:", xhr.responseText); // Log the error response
+    showErrorAlert("Enrollment Failed!", "An unexpected error occurred. Please try again.");
+}
+
     });
 }
 

@@ -1,3 +1,5 @@
+
+<?php  include 'header.php';?>
 <!DOCTYPE html>
 <html lang="en">
 
@@ -190,7 +192,7 @@
 </head>
 
 <body>
-    <?php include 'header.php';
+    <?php
 
     if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         // Handle the form submission (e.g., save to database, send email)

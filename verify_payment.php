@@ -27,6 +27,7 @@ $apiKey = 'rzp_test_Bvq9kiuaq8gkcs';
 $apiSecret = 'qnN6ytUKNw6beVzQUw7OBiJM';
 $api = new Api($apiKey, $apiSecret);
 
+
 $current_user_id = $_SESSION['user_id'] ?? null;
 if (!$current_user_id) {
     echo json_encode(['success' => false, 'message' => 'User not logged in']);
@@ -56,6 +57,8 @@ foreach ($requiredFields as $field) {
         exit;
     }
 }
+
+
 
 $course_id = $_POST['course_id'];
 $payment_id = $_POST['razorpay_payment_id'];

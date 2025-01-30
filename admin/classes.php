@@ -94,6 +94,7 @@ if (!isset($_SESSION['user_id']) || !isset($_SESSION['role']) || $_SESSION['role
                 color: blue
             }
         </style>
+        <link rel="icon" type="image/x-icon" href="assets/images/apple-touch-icon.png">
     </head>
 
     <body>

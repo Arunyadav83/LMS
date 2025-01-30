@@ -2,18 +2,7 @@
 // submit_message.php
 
 // Database connection
-$servername = "localhost"; // Change if necessary
-$username = "root"; // Your database username
-$password = ""; // Your database password
-$dbname = "lms"; // Your database name
-
-$conn = new mysqli($servername, $username, $password, $dbname);
-
-// Check connection
-if ($conn->connect_error) {
-    die("Connection failed: " . $conn->connect_error);
-}
-
+require_once 'config.php';
 // Check if form is submitted
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $name = $_POST['name'];

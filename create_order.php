@@ -2,7 +2,6 @@
 session_start(); // Start the session to fetch logged-in user details
 error_reporting(E_ALL);
 ini_set('display_errors', 1);
-ini_set('display_startup_errors', 1);
 require_once 'config.php';
 
 if (!isset($_SESSION['user_id'])) {
@@ -40,7 +39,7 @@ if (isset($_POST['course_id'])) {
               FROM courses c
               LEFT JOIN tutors t ON c.tutor_id = t.id
               WHERE c.id = ?";
-
+    
     $stmt = $conn->prepare($query);
     if (!$stmt) {
         die(json_encode(['success' => false, 'message' => 'SQL error: ' . $conn->error]));
@@ -52,6 +51,11 @@ if (isset($_POST['course_id'])) {
 
     if ($result->num_rows > 0) {
         $course = $result->fetch_assoc();
+
+        // Check if course_prize exists and is valid
+        if (!isset($course['course_prize']) || empty($course['course_prize'])) {
+            die(json_encode(['success' => false, 'message' => 'Course prize is missing or invalid']));
+        }
 
         $razorpayOrderData = [
             'amount' => $course['course_prize'] * 100, // Razorpay expects amount in paise
@@ -89,12 +93,9 @@ if (isset($_POST['course_id'])) {
                 'enrolled_at' => date('Y-m-d H:i:s'),
                 'email' => $email,       // From logged-in user
                 'username' => $username, // From logged-in user
-
             ]);
         } catch (Exception $e) {
             echo json_encode(['success' => false, 'message' => $e->getMessage()]);
-
-            echo json_encode(["success" => true, "courses" => $courses, "totalPrice" => $totalPrice]);  // Proper JSON response
         }
     } else {
         echo json_encode(['success' => false, 'message' => 'Course not found']);
@@ -102,43 +103,4 @@ if (isset($_POST['course_id'])) {
 } else {
     echo json_encode(['success' => false, 'message' => 'Missing course ID']);
 }
-
-
-// ob_clean();
-// header('Content-Type: application/json');
-// if (isset($_POST['course_id']) && isset($_POST['user_id'])) {
-//     $courseId = intval($_POST['course_id']);
-//     $userId = intval($_POST['user_id']);
-
-//     // Log received data for debugging
-// file_put_contents('debug.log', "Received course_id: $course_id, user_id: $user_id\n", FILE_APPEND);
-
-//     // Fetch course details
-//     $query = "SELECT * FROM courses WHERE id = ?";
-//     $stmt = $conn->prepare($query);
-//     $stmt->bind_param('i', $courseId);
-//     $stmt->execute();
-//     $result = $stmt->get_result();
-//     $course = $result->fetch_assoc();
-
-//     if ($course) {
-//         // Generate Razorpay Order ID
-//         $razorpayOrderId = 'order_' . uniqid();
-
-//         // Success JSON response
-//         echo json_encode([
-//             'success' => true,
-//             'course_prize' => $course['course_prize'],
-//             'title' => $course['title'],
-//             'order_id' => $razorpayOrderId,
-//         ]);
-//     } else {
-//         echo json_encode(['success' => false, 'message' => 'Course not found']);
-//     }
-// } else {
-//     echo json_encode(['success' => false, 'message' => 'Invalid request']);
-// }
-
-
-
-$conn->close();
+?>

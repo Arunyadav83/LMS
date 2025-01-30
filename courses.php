@@ -441,6 +441,20 @@ $razorpayKey = 'rzp_test_Bvq9kiuaq8gkcs'; // Your Razorpay API key
                     // Redirect to fetch_cart.php after the alert
                     window.location.href = 'fetch_cart.php';
                 });
+            } else if (data.message === 'Course already enrolled') {
+                // Show message if the user is already enrolled in the course
+                Swal.fire({
+                    title: 'Already Enrolled!',
+                    text: 'You are already enrolled in this course.',
+                    icon: 'info',
+                    position: 'top-end',
+                    showConfirmButton: false,
+                    timer: 3000,
+                    background: '#fd7e14', // Orange background for info
+                    color: '#fff', // White text color
+                    toast: true,
+                    timerProgressBar: true
+                });
             } else {
                 Swal.fire({
                     title: 'Error!',
@@ -472,6 +486,8 @@ $razorpayKey = 'rzp_test_Bvq9kiuaq8gkcs'; // Your Razorpay API key
             });
         });
 }
+
+
 
     function showBuffering() {
         Swal.fire({

@@ -1,5 +1,7 @@
 
-<?php include 'header.php'; ?>
+<?php include 'header.php';
+require_once 'config.php';
+?>
 
 <!DOCTYPE html>
 <html lang="en">
@@ -631,53 +633,45 @@ class About
 
     private function fetchCoursesFromDatabase()
     {
-        // Database connection parameters
-        $host = 'localhost';
-        $db = 'lms';
-        $user = 'root';
-        $pass = '';
-
-        try {
-            $pdo = new PDO("mysql:host=$host;dbname=$db", $user, $pass);
-            $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
-
-            $stmt = $pdo->prepare("SELECT id, title FROM courses");
-            $stmt->execute();
-
-            return $stmt->fetchAll(PDO::FETCH_ASSOC);
-        } catch (PDOException $e) {
-            echo "Connection failed: " . $e->getMessage();
-            return [];
+        require_once 'config.php'; // Include database connection
+        global $conn; // Use the global MySQLi connection
+    
+        $query = "SELECT id, title FROM courses";
+        $result = mysqli_query($conn, $query);
+    
+        $courses = [];
+        if ($result) {
+            while ($row = mysqli_fetch_assoc($result)) {
+                $courses[] = $row;
+            }
         }
+    
+        return $courses;
     }
+    
 
     private function fetchTutorsFromDatabase()
     {
-        $host = 'localhost';
-        $db = 'lms';
-        $user = 'root';
-        $pass = '';
-
-        try {
-            $pdo = new PDO("mysql:host=$host;dbname=$db", $user, $pass);
-            $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
-
-            $stmt = $pdo->prepare("SELECT id, full_name, email, role, bio, specialization, resume_path, certificate_path, created_at FROM tutors");
-            $stmt->execute();
-
-            $tutors = $stmt->fetchAll(PDO::FETCH_ASSOC);
-
-            foreach ($tutors as &$tutor) {
-                $image_name = strtolower(str_replace(' ', '_', $tutor['full_name'])) . '.jpg';
-                $tutor['image'] = 'assets/images/' . $image_name;
+        require_once 'config.php'; // Include database connection
+        global $conn; // Use the global MySQLi connection
+    
+        $query = "SELECT id, full_name, email, role, bio, specialization, resume_path, certificate_path, created_at FROM tutors";
+        $result = mysqli_query($conn, $query);
+    
+        $tutors = [];
+        if ($result) {
+            while ($row = mysqli_fetch_assoc($result)) {
+                // Generate image path
+                $image_name = strtolower(str_replace(' ', '_', $row['full_name'])) . '.jpg';
+                $row['image'] = 'assets/images/' . $image_name;
+    
+                $tutors[] = $row;
             }
-
-            return $tutors;
-        } catch (PDOException $e) {
-            echo "Connection failed: " . $e->getMessage();
-            return [];
         }
+    
+        return $tutors;
     }
+    
 
 
     public function displayAbout()

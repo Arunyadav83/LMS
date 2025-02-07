@@ -194,6 +194,7 @@ $conn->close();
     </div>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 <script>
+<<<<<<< HEAD
 
 function showBuffering() {
         Swal.fire({
@@ -296,6 +297,95 @@ function showBuffering() {
             return;
         }
 
+=======
+    function enrollCourse(amount, userId) {
+        if (amount <= 0) {
+            Swal.fire("Error!", "Invalid amount for payment.", "error");
+            return;
+        }
+
+        let courseIds = [];
+        document.querySelectorAll('input[name="course_id"]').forEach(input => {
+            courseIds.push(input.value);
+        });
+
+        if (courseIds.length === 0) {
+            Swal.fire("Error!", "No courses selected.", "error");
+            return;
+        }
+
+        console.log("Sending data:", {
+            amount: amount,
+            user_id: userId,
+            course_ids: courseIds
+        });
+
+        $.ajax({
+            type: 'POST',
+            url: 'create_order.php',
+            data: {
+                amount: amount,
+                user_id: userId,
+                course_ids: JSON.stringify(courseIds) // Send as JSON array
+            },
+            dataType: 'json',
+            success: function(response) {
+                console.log("RAW response:", response);
+                if (response && response.success && response.orders && Array.isArray(response.orders)) {
+                    var razorpayKey = "<?php echo isset($razorpayKey) ? $razorpayKey : ''; ?>";
+                    if (!razorpayKey) {
+                        Swal.fire("Configuration Error", "Razorpay key is missing.", "error");
+                        return;
+                    }
+
+                    var options = {
+                        key: razorpayKey,
+                        amount: amount * 100, // Convert to paise
+                        currency: 'INR',
+                        name: 'Course Enrollment',
+                        description: 'Payment for selected courses',
+                        image: 'assets/images/logo2.png',
+                        order_id: response.orders[0].order_id, // Use the first order ID
+                        handler: function(paymentResponse) {
+                            console.log("Payment Response:", paymentResponse);
+                            verifyPayment(paymentResponse, response, courseIds, userId);
+                        },
+                        theme: {
+                            color: '#F37254'
+                        }
+                    };
+
+                    var rzp1 = new Razorpay(options);
+                    rzp1.open();
+                } else {
+                    Swal.fire("Order Creation Failed!", response.message || "Unknown error occurred", "error");
+                }
+            },
+            error: function(xhr) {
+                console.error("Order Creation Error:", xhr.responseText);
+                Swal.fire("Enrollment Failed!", "An unexpected error occurred.", "error");
+            }
+        });
+    }
+
+    function verifyPayment(paymentResponse, orderResponse, courseIds, userId) {
+        const order_id = orderResponse.orders[0]?.order_id;
+
+        if (!order_id || !paymentResponse.razorpay_payment_id || !paymentResponse.razorpay_signature) {
+            console.error("Missing required payment details:", {
+                order_id,
+                razorpay_payment_id: paymentResponse.razorpay_payment_id,
+                razorpay_signature: paymentResponse.razorpay_signature
+            });
+            Swal.fire({
+                icon: 'error',
+                title: "Payment Error",
+                text: "Required payment details are missing!"
+            });
+            return;
+        }
+
+>>>>>>> e6d9cf326cc849502200bc0c07af71e6633905c8
         jQuery.ajax({
             type: 'POST',
             url: 'verify_payment.php',

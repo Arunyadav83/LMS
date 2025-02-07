@@ -35,7 +35,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && $_POST['action'] === 'enrollCourse'
     }
 }
 
-function generateOrderId() {
+function generateOrderId()
+{
     // Your logic to generate an order ID (e.g., using a random number or database)
     return uniqid('order_');
 }
@@ -111,6 +112,7 @@ $razorpayKey = 'rzp_test_Bvq9kiuaq8gkcs'; // Your Razorpay API key
 
 <!-- Include jQuery and Razorpay scripts -->
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
 <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
 
 <!-- Include SweetAlert CSS and JS -->
@@ -340,125 +342,161 @@ $razorpayKey = 'rzp_test_Bvq9kiuaq8gkcs'; // Your Razorpay API key
             document.getElementById('searchError').style.display = 'none';
         }
     }
-
     function enrollCourse(courseId, userId) {
-        $.ajax({
-            type: 'POST',
-            url: 'create_order.php',
-            data: {
-                course_id: courseId,
-                user_id: userId,
-            },
-            dataType: 'json',
-            success: function(response) {
-                console.log("RAW response:", response);
-                if (response.success) {
-                    var options = {
-                        key: '<?php echo $razorpayKey; ?>',
-                        amount: response.course_prize * 100, // Convert to paise
-                        currency: 'INR',
-                        name: 'Course Enrollment',
-                        description: 'Enroll in ' + response.title,
-                        image: 'assets/images/logo2.png',
-                        order_id: response.order_id,
-                        handler: function(paymentResponse) {
-                            showBuffering(); // Show buffering before verifying payment
-                            verifyPayment(paymentResponse, response, courseId, userId);
-                        },
-                        modal: {
-                            ondismiss: function() {
-                                console.log("Checkout form closed");
-                            }
-                        },
-                        theme: {
-                            color: '#F37254'
-                        }
-                    };
-                    var rzp1 = new Razorpay(options);
-                    rzp1.on('payment.failed', function(response) {
-                        console.error("Payment failed:", response.error);
-                        showErrorAlert("Payment Failed!", response.error.description);
-                    });
-                    rzp1.open();
-                } else {
-                    showErrorAlert("Order Creation Failed!", response.message);
+    $.ajax({
+        type: 'POST',
+        url: 'create_order.php',
+        data: {
+            course_id: courseId,
+            user_id: userId,
+        },
+        dataType: 'json',
+        success: function(response) {
+            console.log("RAW response:", response);
+
+            // Ensure response contains required data
+            if (response && response.success && response.orders && Array.isArray(response.orders)) {
+                var razorpayKey = "<?php echo isset($razorpayKey) ? $razorpayKey : ''; ?>";
+
+                if (!razorpayKey) {
+                    Swal.fire("Configuration Error", "Razorpay key is missing.", "error");
+                    return;
                 }
-            },
-            error: function(xhr, status, error) {
-                console.error("Order Creation AJAX error:", status, error);
-                showErrorAlert("Enrollment Failed!", "An unexpected error occurred. Please try again.");
-            }
-        });
-    }
-    function addToCart(courseId) {
-    fetch('add_to_cart.php', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({
-                courseId: courseId
-            }),
-        })
-        .then(response => {
-            if (!response.ok) {
-                throw new Error(`HTTP error! status: ${response.status}`);
-            }
-            return response.json();
-        })
-        .then(data => {
-            if (data.success) {
-                // Show success SweetAlert with a green color
-                Swal.fire({
-                    title: 'Success!',
-                    text: 'Course added to cart successfully!',
-                    icon: 'success',
-                    position: 'top-end',
-                    showConfirmButton: false,
-                    timer: 3000,
-                    background: '#28a745', // Green background color
-                    color: '#fff', // White text color
-                    toast: true,
-                    timerProgressBar: true // Adds a progress bar during the timer
-                }).then(() => {
-                    // Redirect to fetch_cart.php after the alert
-                    window.location.href = 'fetch_cart.php';
+
+                var options = {
+                    key: '<?php echo $razorpayKey; ?>',
+                    amount: response.total_price * 100, // Convert to paise
+                    currency: 'INR',
+                    name: 'Course Enrollment',
+                    description: 'Enroll in ' + response.title,
+                    image: 'assets/images/logo2.png',
+                    order_id: response.orders[0].order_id, // Correct order_id usage
+                    handler: function(paymentResponse) {
+                        console.log("Payment Response:", paymentResponse);
+                        
+                        // Show buffering before verifying payment
+                        showBuffering(); 
+
+                        // Verify the payment
+                        verifyPayment(paymentResponse, response, courseId, userId);
+                    },
+                    modal: {
+                        ondismiss: function() {
+                            console.log("Checkout form closed");
+                        }
+                    },
+                    theme: {
+                        color: '#F37254'
+                    }
+                };
+
+                console.log("Options object:", options);
+
+                var rzp1 = new Razorpay(options);
+                
+                rzp1.on('payment.failed', function(response) {
+                    console.error("Payment failed:", response.error);
+                    Swal.fire("Payment Failed!", response.error.description, "error");
                 });
-            } else if (data.message === 'Course already in cart') {
-                // Show message if the course is already in the cart
-                Swal.fire({
-                    title: 'Already in Cart',
-                    text: 'You have already added this course to your cart.',
-                    icon: 'info',
-                    position: 'top-end',
-                    showConfirmButton: false,
-                    timer: 3000,
-                    background: '#ffc107', // Yellow background for info
-                    color: '#fff',
-                    toast: true,
-                    timerProgressBar: true
-                }).then(() => {
-                    // Redirect to fetch_cart.php after the alert
-                    window.location.href = 'fetch_cart.php';
-                });
-            } else if (data.message === 'Course already enrolled') {
-                // Show message if the user is already enrolled in the course
-                Swal.fire({
-                    title: 'Already Enrolled!',
-                    text: 'You are already enrolled in this course.',
-                    icon: 'info',
-                    position: 'top-end',
-                    showConfirmButton: false,
-                    timer: 3000,
-                    background: '#fd7e14', // Orange background for info
-                    color: '#fff', // White text color
-                    toast: true,
-                    timerProgressBar: true
-                });
+
+                rzp1.open();
             } else {
+                Swal.fire("Order Creation Failed!", response.message, "error");
+            }
+        },
+        error: function(xhr, status, error) {
+            console.error("Order Creation AJAX error:", status, error);
+            Swal.fire("Enrollment Failed!", "An unexpected error occurred. Please try again.", "error");
+        }
+    });
+}
+
+
+    function addToCart(courseId) {
+        fetch('add_to_cart.php', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    courseId: courseId
+                }),
+            })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                return response.json();
+            })
+            .then(data => {
+                if (data.success) {
+                    // Show success SweetAlert with a green color
+                    Swal.fire({
+                        title: 'Success!',
+                        text: 'Course added to cart successfully!',
+                        icon: 'success',
+                        position: 'top-end',
+                        showConfirmButton: false,
+                        timer: 3000,
+                        background: '#28a745', // Green background color
+                        color: '#fff', // White text color
+                        toast: true,
+                        timerProgressBar: true // Adds a progress bar during the timer
+                    }).then(() => {
+                        // Redirect to fetch_cart.php after the alert
+                        window.location.href = 'fetch_cart.php';
+                    });
+                } else if (data.message === 'Course already in cart') {
+                    // Show message if the course is already in the cart
+                    Swal.fire({
+                        title: 'Already in Cart',
+                        text: 'You have already added this course to your cart.',
+                        icon: 'info',
+                        position: 'top-end',
+                        showConfirmButton: false,
+                        timer: 3000,
+                        background: '#ffc107', // Yellow background for info
+                        color: '#fff',
+                        toast: true,
+                        timerProgressBar: true
+                    }).then(() => {
+                        // Redirect to fetch_cart.php after the alert
+                        window.location.href = 'fetch_cart.php';
+                    });
+                } else if (data.message === 'Course already enrolled') {
+                    // Show message if the user is already enrolled in the course
+                    Swal.fire({
+                        title: 'Already Enrolled!',
+                        text: 'You are already enrolled in this course.',
+                        icon: 'info',
+                        position: 'top-end',
+                        showConfirmButton: false,
+                        timer: 3000,
+                        background: '#fd7e14', // Orange background for info
+                        color: '#fff', // White text color
+                        toast: true,
+                        timerProgressBar: true
+                    });
+                } else {
+                    Swal.fire({
+                        title: 'Error!',
+                        text: 'Failed to add course to cart: ' + data.message,
+                        icon: 'error',
+                        position: 'top-end',
+                        showConfirmButton: false,
+                        timer: 3000,
+                        background: '#dc3545', // Red background for error
+                        color: '#fff',
+                        toast: true,
+                        timerProgressBar: true
+                    });
+                }
+            })
+            .catch(error => {
+                console.error('Error adding course to cart:', error);
                 Swal.fire({
                     title: 'Error!',
-                    text: 'Failed to add course to cart: ' + data.message,
+                    text: 'An error occurred. Please try again later.',
                     icon: 'error',
                     position: 'top-end',
                     showConfirmButton: false,
@@ -468,24 +506,8 @@ $razorpayKey = 'rzp_test_Bvq9kiuaq8gkcs'; // Your Razorpay API key
                     toast: true,
                     timerProgressBar: true
                 });
-            }
-        })
-        .catch(error => {
-            console.error('Error adding course to cart:', error);
-            Swal.fire({
-                title: 'Error!',
-                text: 'An error occurred. Please try again later.',
-                icon: 'error',
-                position: 'top-end',
-                showConfirmButton: false,
-                timer: 3000,
-                background: '#dc3545', // Red background for error
-                color: '#fff',
-                toast: true,
-                timerProgressBar: true
             });
-        });
-}
+    }
 
 
 
@@ -503,42 +525,56 @@ $razorpayKey = 'rzp_test_Bvq9kiuaq8gkcs'; // Your Razorpay API key
 
 
     function verifyPayment(paymentResponse, orderResponse, courseId, userId) {
-        $.ajax({
-            type: 'POST',
-            url: 'verify_payment.php',
-            data: {
-                razorpay_payment_id: paymentResponse.razorpay_payment_id,
-                order_id: paymentResponse.razorpay_order_id,
-                razorpay_signature: paymentResponse.razorpay_signature,
-                course_id: courseId,
-                course_prize: orderResponse.course_prize,
-                title: orderResponse.title,
-                tutor_id: orderResponse.tutor_id
-            },
-            dataType: 'json',
-            success: function(response) {
-                // showBuffering();
-                Swal.close(); // Close the buffering alert after payment verification
-                if (response.success) {
-                    showSuccessAlert();
-                } else {
-                    swal({
-                        title: "Failed!",
-                        text: response.message,
-                        icon: "error",
-                        timer: 2000,
-                        button: false,
-                        className: "red-bg"
-                    });
-                }
-            },
-            error: function(xhr, status, error) {
-                Swal.close(); // Close the buffering alert in case of an error
-                console.error("Verification error:", error);
-                swal("Failed!", "An unexpected error occurred while verifying the payment.", "error");
-            }
+    const order_id = orderResponse.orders[0]?.order_id;
+    if (!order_id || !paymentResponse.razorpay_payment_id || !paymentResponse.razorpay_signature) {
+        console.error("Missing required payment details:", {
+            order_id,
+            razorpay_payment_id: paymentResponse.razorpay_payment_id,
+            razorpay_signature: paymentResponse.razorpay_signature
         });
+        Swal.fire({
+            icon: 'error',
+            title: "Payment Error",
+            text: "Required payment details are missing!"
+        });
+        return;
     }
+    $.ajax({
+        type: 'POST',
+        url: 'verify_payment.php',
+        data: {
+            razorpay_payment_id: paymentResponse.razorpay_payment_id,
+            razorpay_order_id: order_id,
+            razorpay_signature: paymentResponse.razorpay_signature,
+            course_id: courseId,
+            user_id: userId,
+            course_prize: orderResponse.course_prize,
+            title: orderResponse.title,
+            tutor_id: orderResponse.tutor_id
+        },
+        dataType: 'json',
+        success: function(response) {
+            Swal.close(); // Close the buffering alert after payment verification
+            if (response.success) {
+                showSuccessAlert();
+            } else {
+                swal({
+                    title: "Failed!",
+                    text: response.message,
+                    icon: "error",
+                    timer: 2000,
+                    button: false,
+                    className: "red-bg"
+                });
+            }
+        },
+        error: function(xhr, status, error) {
+            Swal.close(); // Close the buffering alert in case of an error
+            console.error("Verification error:", error);
+            swal("Failed!", "An unexpected error occurred while verifying the payment.", "error");
+        }
+    });
+}
 
     function showSuccessAlert() {
         Swal.fire({

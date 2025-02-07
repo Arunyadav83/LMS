@@ -98,48 +98,48 @@ require_once 'functions.php';
     </section>
 
     <div id="explore">
-        <section class="course-categories mb-5">
-            <h2 class="text-center mb-4">Explore Our Course Categories</h2>
-            <div class="row">
-                <div class="col-md-3 col-sm-6 mb-4">
-                    <div class="category-card">
-                        <img src="assets/images/programming.jpg" alt="Programming" class="img-fluid">
-                        <div class="category-overlay">
-                            <h3>Programming</h3>
-                            <a href="courses.php?category=programming" class="btn btn-light">Explore</a>
-                        </div>
-                    </div>
-                </div>
-                <div class="col-md-3 col-sm-6 mb-4">
-                    <div class="category-card">
-                        <img src="assets/images/design.jpg" alt="Design" class="img-fluid">
-                        <div class="category-overlay">
-                            <h3>Design</h3>
-                            <a href="courses.php?category=design" class="btn btn-light">Explore</a>
-                        </div>
-                    </div>
-                </div>
-                <div class="col-md-3 col-sm-6 mb-4">
-                    <div class="category-card">
-                        <img src="assets/images/business.jpg" alt="Business" class="img-fluid">
-                        <div class="category-overlay">
-                            <h3>Business</h3>
-                            <a href="courses.php?category=business" class="btn btn-light">Explore</a>
-                        </div>
-                    </div>
-                </div>
-                <div class="col-md-3 col-sm-6 mb-4">
-                    <div class="category-card">
-                        <img src="assets/images/language.jpg" alt="Language" class="img-fluid">
-                        <div class="category-overlay">
-                            <h3>Language</h3>
-                            <a href="courses.php?category=language" class="btn btn-light">Explore</a>
-                        </div>
+    <section class="course-categories mb-5">
+        <h2 class="text-center mb-4">Explore Our Course Categories</h2>
+        <div class="row">
+            <div class="col-md-3 col-sm-6 mb-4">
+                <div class="category-card">
+                    <img src="assets/images/programming.jpg" alt="Programming" class="img-fluid">
+                    <div class="category-overlay">
+                        <h3>Programming</h3>
+                        <a href="courses.php?category=programming" class="btn btn-light explore-btn">Explore</a>
                     </div>
                 </div>
             </div>
-        </section>
-    </div>
+            <div class="col-md-3 col-sm-6 mb-4">
+                <div class="category-card">
+                    <img src="assets/images/design.jpg" alt="Design" class="img-fluid">
+                    <div class="category-overlay">
+                        <h3>Design</h3>
+                        <a href="courses.php?category=design" class="btn btn-light explore-btn">Explore</a>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3 col-sm-6 mb-4">
+                <div class="category-card">
+                    <img src="assets/images/business.jpg" alt="Business" class="img-fluid">
+                    <div class="category-overlay">
+                        <h3>Business</h3>
+                        <a href="courses.php?category=business" class="btn btn-light explore-btn">Explore</a>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3 col-sm-6 mb-4">
+                <div class="category-card">
+                    <img src="assets/images/language.jpg" alt="Language" class="img-fluid">
+                    <div class="category-overlay">
+                        <h3>Language</h3>
+                        <a href="courses.php?category=language" class="btn btn-light explore-btn">Explore</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+</div>
 
     <section class="featured-courses mb-5" style="margin: 43px;">
         <h2 class="text-center mb-4">Featured Courses</h2>
@@ -148,7 +148,7 @@ require_once 'functions.php';
         $query = "SELECT c.id, c.title, c.description, t.full_name AS tutor_name 
                   FROM courses c
                   LEFT JOIN tutors t ON c.tutor_id = t.id
-                  ORDER BY c.created_at DESC LIMIT 3";
+                  ORDER BY c.created_at DESC LIMIT 4";
         $result = mysqli_query($conn, $query);
 
         if (mysqli_num_rows($result) > 0):
@@ -195,7 +195,7 @@ require_once 'functions.php';
         <div class="container">
             <div class="row text-center">
                 <?php
-                // Fetch counts from the database
+                // Fetch counts from the database 
                 $students_count_result = mysqli_query($conn, "SELECT COUNT(DISTINCT user_id) as count FROM enrollments WHERE user_id IS NOT NULL");
                 if (!$students_count_result) {
                     die('Query Error: ' . mysqli_error($conn)); // Error handling
@@ -326,11 +326,11 @@ require_once 'functions.php';
 </div>
 
 <script>
-
-function addToCart(courseId) {
-    window.location.href = `courses.php?addToCart=${courseId}`;
+    function addToCart(courseId) {
+        window.location.href = `courses.php?addToCart=${courseId}`;
 
     }
+
     function animateCounter(element, start, end, duration) {
         let startTimestamp = null;
         const step = (timestamp) => {
@@ -353,6 +353,16 @@ function addToCart(courseId) {
         animateCounter(coursesCountElement, 0, <?php echo $courses_count; ?>, 2000); // Animate from 0 to the actual count
         const tutorsCountElement = document.querySelector('.count[data-count="<?php echo $tutors_count; ?>"]');
         animateCounter(tutorsCountElement, 0, <?php echo $tutors_count; ?>, 2000); // Animate from 0 to the actual count
+    });
+
+
+    document.querySelectorAll(".explore-btn").forEach(button => {
+        button.addEventListener("click", function(event) {
+            event.preventDefault(); // Prevent default navigation for testing
+            let url = this.getAttribute("href");
+            console.log("Navigating to:", url);
+            window.location.href = url; // Uncomment this when debugging is done
+        });
     });
 </script>
 <style>

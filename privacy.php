@@ -175,6 +175,7 @@ session_start();
             width: 70%;
         }
     </style>
+    <link rel="icon" type="image/x-icon" href="assets/images/apple-touch-icon.png">
 </head>
 
 <body>

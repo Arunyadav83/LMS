@@ -10,32 +10,12 @@ if (!isset($_GET['id'])) {
     exit();
 }
 
-
 $razorpayKey = 'rzp_test_Bvq9kiuaq8gkcs';
 
-$course_id = (int)$_GET['id'];
-// Check if the user is already enrolled in the course
-$enrollment_query = "SELECT COUNT(*) AS count FROM enrollments WHERE user_id = ? AND course_id = ?";
-$enrollment_stmt = mysqli_prepare($conn, $enrollment_query);
-
-if ($enrollment_stmt) {
-    mysqli_stmt_bind_param($enrollment_stmt, "ii", $_SESSION['user_id'], $class['course_id']);
-    mysqli_stmt_execute($enrollment_stmt);
-
-    // Fetch the result
-    $enrollment_result = mysqli_stmt_get_result($enrollment_stmt);
-    $enrollment_data = mysqli_fetch_assoc($enrollment_result);
-    $is_enrolled = ($enrollment_data['count'] > 0);
-
-    mysqli_stmt_close($enrollment_stmt);
-} else {
-    // Handle errors in query preparation
-    echo "Failed to prepare the enrollment query.";
-    $is_enrolled = false; // Default to not enrolled if query fails
-}
+$course_id = (int)$_GET['id']; // Get course ID from URL
 
 // Fetch course details
-$course_query = "SELECT c.id, c.title, c.description, t.full_name AS tutor_name 
+$course_query = "SELECT c.id, c.title, c.description, t.full_name AS tutor_name, t.email AS tutor_email, c.tutor_id 
                  FROM courses c
                  LEFT JOIN tutors t ON c.tutor_id = t.id
                  WHERE c.id = ?";
@@ -44,7 +24,7 @@ if (!$course_stmt) {
     die("Database query preparation failed: " . mysqli_error($conn));
 }
 
-// Check if binding parameters is successfull
+// Check if binding parameters is successful
 if (!mysqli_stmt_bind_param($course_stmt, "i", $course_id)) {
     die("Parameter binding failed: " . mysqli_error($conn));
 }
@@ -57,6 +37,39 @@ if (!$course) {
     $_SESSION['error'] = "Invalid course selected.";
     header("Location: index.php");
     exit();
+}
+
+$tutor_id = $course['tutor_id']; // Use tutor_id from the course
+
+// Fetch the average rating for the tutor
+$rating_query = "SELECT AVG(rating) AS avg_rating, COUNT(id) AS num_reviews FROM tutor_reviews WHERE tutor_id = ?";
+$rating_stmt = mysqli_prepare($conn, $rating_query);
+mysqli_stmt_bind_param($rating_stmt, "i", $tutor_id);
+mysqli_stmt_execute($rating_stmt);
+$rating_result = mysqli_stmt_get_result($rating_stmt);
+$rating_data = mysqli_fetch_assoc($rating_result);
+
+$avg_rating = ($rating_data['avg_rating']) ? round($rating_data['avg_rating'], 1) : 0; // Default to 0 if no ratings
+$num_reviews = $rating_data['num_reviews'];
+
+// Check if the user is already enrolled in the course
+$enrollment_query = "SELECT COUNT(*) AS count FROM enrollments WHERE user_id = ? AND course_id = ?";
+$enrollment_stmt = mysqli_prepare($conn, $enrollment_query);
+
+if ($enrollment_stmt) {
+    mysqli_stmt_bind_param($enrollment_stmt, "ii", $_SESSION['user_id'], $course['id']);
+    mysqli_stmt_execute($enrollment_stmt);
+
+    // Fetch the result
+    $enrollment_result = mysqli_stmt_get_result($enrollment_stmt);
+    $enrollment_data = mysqli_fetch_assoc($enrollment_result);
+    $is_enrolled = ($enrollment_data['count'] > 0);
+
+    mysqli_stmt_close($enrollment_stmt);
+} else {
+    // Handle errors in query preparation
+    echo "Failed to prepare the enrollment query.";
+    $is_enrolled = false; // Default to not enrolled if query fails
 }
 
 // Fetch classes (videos) for this course
@@ -116,12 +129,47 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['course_id']) && isset
 }
 
 ?>
+
 <script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
 <script src="/path/to/local/jquery.min.js"></script>
 <!-- SweetAlert2 CSS -->
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
 <!-- SweetAlert2 JS -->
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<style>
+    /* Style the stars for the rating */
+    .stars {
+        display: flex;
+        direction: row;
+    }
+
+    .stars input[type="radio"] {
+        display: none;
+    }
+
+    .stars label {
+        font-size: 24px;
+        color: gray;
+        cursor: pointer;
+    }
+
+    .stars .filled {
+        color: gold;
+    }
+
+    /* Style the review form */
+    .rating-form textarea {
+        width: 100%;
+        padding: 10px;
+        margin-top: 10px;
+        border-radius: 5px;
+        border: 1px solid #ccc;
+    }
+
+    .rating-form button {
+        margin-top: 10px;
+    }
+</style>
 
 
 <div class="container mt-4">
@@ -132,23 +180,45 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['course_id']) && isset
         $tutor_image_path = 'assets/images/' . strtolower(str_replace(' ', '_', $course['title'])) . '.jpg';
         ?>
         <div class="col-md-4">
-            <?php if (file_exists($tutor_image_path)): ?>
+            <?php
+            // Assuming $tutor_image_path and $fullName are defined
+            if (file_exists($tutor_image_path)): ?>
                 <img
                     src="<?php echo $tutor_image_path; ?>"
                     class="img-fluid rounded-square"
-                    style="max-height: 150px; object-fit: cover;margin-top: 26px;"
+                    style="max-height: 150px; object-fit: cover; margin-top: 26px;"
                     alt="<?php echo htmlspecialchars($course['title']); ?>">
             <?php else: ?>
+                <?php
+                // Assume the image file is named based on the tutor's full name (e.g., "John_Doe.jpg")
+                $imagePath = "assets/images/" . str_replace(' ', '_', $tutor_name) . ".jpg";
+
+                // Check if the image file exists
+                // if (!file_exists($imagePath)) {
+                //     $imagePath = "assets/images/default.jpg"; // Use a default image if none found
+                // }
+                ?>
                 <img
-                    src="assets/images/default_tutor.jpg"
+                    src="<?php echo $imagePath; ?>"
                     class="img-fluid rounded-circle"
                     style="max-height: 150px; object-fit: cover;"
                     alt="Default Tutor">
             <?php endif; ?>
         </div>
+
         <div class="col-md-8">
             <p class="lead"><strong>Tutor:</strong> <?php echo htmlspecialchars($course['tutor_name']); ?></p>
+            <p class="lead"><strong>&#9993; :</strong> <?php echo htmlspecialchars($course['tutor_email']); ?></p>
             <p class="text-secondary"><?php echo htmlspecialchars($course['description']); ?></p>
+        </div>
+
+        <div class="rating-container">
+            <h5> Rating: <?php echo $avg_rating; ?> ★ (<?php echo $num_reviews; ?> Reviews)</h5>
+            <div class="stars">
+                <?php for ($i = 1; $i <= 5; $i++): ?>
+                    <span class="star <?php echo ($i <= $avg_rating) ? 'filled' : ''; ?>">&#9733;</span>
+                <?php endfor; ?>
+            </div>
         </div>
     </div>
 
@@ -168,12 +238,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['course_id']) && isset
                 mysqli_stmt_bind_param($enrollment_stmt, "ii", $_SESSION['user_id'], $class['course_id']);
                 mysqli_stmt_execute($enrollment_stmt);
                 $is_enrolled = mysqli_stmt_get_result($enrollment_stmt)->num_rows > 0;
-
-
-
-
-
-
                 // Check if the current class is unlocked for this user
                 $is_unlocked = false;
                 if ($is_preview || $is_enrolled) {
@@ -274,10 +338,36 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['course_id']) && isset
         <p>No classes available for this course.</p>
     <?php endif; ?>
 
+    <!-- Form to Rate Tutor (Display only for logged-in users) -->
+    <?php if (!empty($_SESSION['user_id'])): ?>
+        <div class="rating-form">
+            <h5>Rate Tutor</h5>
+            <form method="POST" action="submit_rating.php">
+                <input type="hidden" name="tutor_id" value="<?php echo $tutor_id; ?>">
+                <input type="hidden" name="user_id" value="<?php echo $_SESSION['user_id']; ?>">
+
+                <!-- Rating Stars -->
+                <div class="stars">
+                    <input type="radio" id="star5" name="rating" value="5" required><label for="star5">&#9733;</label>
+                    <input type="radio" id="star4" name="rating" value="4" required><label for="star4">&#9733;</label>
+                    <input type="radio" id="star3" name="rating" value="3" required><label for="star3">&#9733;</label>
+                    <input type="radio" id="star2" name="rating" value="2" required><label for="star2">&#9733;</label>
+                    <input type="radio" id="star1" name="rating" value="1" required><label for="star1">&#9733;</label>
+                </div>
+
+
+                <textarea name="review" placeholder="Write your review here..." rows="4"></textarea>
+                <button type="submit" class="btn btn-primary">Submit Review</button>
+            </form>
+        </div>
+    <?php endif; ?>
+
+
 
 </div>
 <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
 <script src="https://unpkg.com/sweetalert/dist/sweetalert.min.js"></script>
+<script src="https://checkout.razorpay.com/v1/checkout.js"></script>
 
 
 
@@ -287,16 +377,17 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['course_id']) && isset
             var courseId = event.target.getAttribute('data-course-id');
             var userId = event.target.getAttribute('data-user-id');
             var classId = event.target.getAttribute('data-class-id');
+            var tutorId = event.target.getAttribute('data-tutor-id'); // Retrieve tutor_id
 
             console.log("Course ID:", courseId);
+            console.log("Tutor ID:", tutorId);
 
-            // Fetch the dynamic course prize
             fetchCoursePrize(courseId, function(coursePrize) {
-                console.log("Course Prize:", coursePrize);
-                enrollCourse(courseId, userId, classId, coursePrize);
+                enrollCourse(courseId, userId, classId, coursePrize, tutorId);
             });
         }
     });
+
 
     // Function to fetch the course prize dynamically
     function fetchCoursePrize(courseId, callback) {
@@ -332,56 +423,73 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['course_id']) && isset
 
 
     // Function to enroll the course
-    function enrollCourse(courseId, userId, classId, coursePrize) {
-    console.log("Initiating enrollment with prize:", coursePrize);
-    if (!coursePrize) {
-        console.error("Error: coursePrize is missing!");
-        showErrorAlert("Enrollment Error", "Course prize is missing!");
-        return;
-    }
+    function enrollCourse(courseId, userId, classId, coursePrize, tutorId) {
+        $.ajax({
+            type: 'POST',
+            url: 'create_order.php',
+            data: {
+                course_id: courseId,
+                user_id: userId,
+                tutor_id: tutorId, // Pass tutor_id to backend
+            },
+            dataType: 'json',
+            success: function(response) {
+                console.log("RAW response:", response);
 
-    jQuery.ajax({
-        type: 'POST',
-        url: 'create_order.php',
-        data: {
-            course_id: courseId,
-            user_id: userId,
-            class_id: classId,
-            course_prize: coursePrize
-        },
-        dataType: 'json',
-        success: function(response) {
-            console.log(response);
+                if (response && response.success && response.orders && Array.isArray(response.orders)) {
+                    var razorpayKey = "<?php echo isset($razorpayKey) ? $razorpayKey : ''; ?>";
 
-            if (response.success) {
-                var tutor_id = response.tutor_id; // Ensure tutor_id is obtained
-                var options = {
-                    key: '<?php echo $razorpayKey; ?>',
-                    amount: response.course_prize * 100,
-                    currency: 'INR',
-                    name: 'Course Enrollment',
-                    description: 'Enroll in ' + response.title,
-                    image: 'assets/images/logo2.png',
-                    order_id: response.order_id,
-                    handler: function(paymentResponse) {
-                        verifyPayment(paymentResponse, response, courseId, userId, response.course_prize, response.title, tutor_id);
-                    },
-                    theme: {
-                        color: '#F37254'
+                    if (!razorpayKey) {
+                        Swal.fire("Configuration Error", "Razorpay key is missing.", "error");
+                        return;
                     }
-                };
-                var rzp1 = new Razorpay(options);
-                rzp1.open();
-            } else {
-                showErrorAlert("Order Creation Failed!", response.message);
-            }
-        },
-        error: function(xhr, status, error) {
-            showErrorAlert("Enrollment Failed!", "An unexpected error occurred. Please try again.");
-        }
-    });
-}
 
+                    var options = {
+                        key: '<?php echo $razorpayKey; ?>',
+                        amount: response.total_price * 100,
+                        currency: 'INR',
+                        name: 'Course Enrollment',
+                        description: 'Enroll in ' + response.title,
+                        image: 'assets/images/logo2.png',
+                        order_id: response.orders[0].order_id,
+                        handler: function(paymentResponse) {
+                            console.log("Payment Response:", paymentResponse);
+
+                            showBuffering();
+
+                            // Pass tutor_id properly
+                            verifyPayment(paymentResponse, response, courseId, userId, response.razorpay_order_id, response.title, tutorId, );
+                        },
+                        modal: {
+                            ondismiss: function() {
+                                console.log("Checkout form closed");
+                            }
+                        },
+                        theme: {
+                            color: '#F37254'
+                        }
+                    };
+
+                    console.log("Options object:", options);
+
+                    var rzp1 = new Razorpay(options);
+
+                    rzp1.on('payment.failed', function(response) {
+                        console.error("Payment failed:", response.error);
+                        Swal.fire("Payment Failed!", response.error.description, "error");
+                    });
+
+                    rzp1.open();
+                } else {
+                    Swal.fire("Order Creation Failed!", response.message, "error");
+                }
+            },
+            error: function(xhr, status, error) {
+                console.error("Order Creation AJAX error:", status, error);
+                Swal.fire("Enrollment Failed!", "An unexpected error occurred. Please try again.", "error");
+            }
+        });
+    }
 
     // Show error alert using SweetAlert
     function showErrorAlert(title, message) {
@@ -395,58 +503,78 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['course_id']) && isset
 
 
 
-    // function showBuffering() {
-    //     Swal.fire({
-    //         title: "Processing...",
-    //         text: "Please wait while we verify your payment.",
-    //         allowOutsideClick: false,
-    //         didOpen: () => Swal.showLoading()
-    //     });
-    // }
+    function showBuffering() {
+        Swal.fire({
+            title: "Processing...",
+            text: "Please wait while we verify your payment.",
+            allowOutsideClick: false,
+            // didOpen: () => Swal.showLoading()
+        });
+    }
 
     function verifyPayment(paymentResponse, orderResponse, courseId, userId, course_prize, title, tutor_id) {
-    jQuery.ajax({
-        type: 'POST',
-        url: 'verify_payment.php',
-        data: {
+
+        const order_id = (Array.isArray(orderResponse.orders) && orderResponse.orders.length > 0) ?
+            orderResponse.orders[0].order_id :
+            null;
+        if (!order_id) {
+            console.error("Order ID is missing");
+            return;
+        }
+
+
+
+        if (!order_id || !paymentResponse.razorpay_payment_id || !paymentResponse.razorpay_signature) {
+            console.error("Missing required payment details:", {
+                order_id,
+                razorpay_payment_id: paymentResponse.razorpay_payment_id,
+                razorpay_signature: paymentResponse.razorpay_signature
+            });
+            Swal.fire({
+                icon: 'error',
+                title: "Payment Error",
+                text: "Required payment details are missing!"
+            });
+            return;
+        }
+        jQuery.ajax({
+            type: 'POST',
+            url: 'verify_payment.php',
+            data: {
             razorpay_payment_id: paymentResponse.razorpay_payment_id,
-            order_id: paymentResponse.razorpay_order_id,
+            razorpay_order_id: order_id,
             razorpay_signature: paymentResponse.razorpay_signature,
             course_id: courseId,
             user_id: userId,
-            course_prize: course_prize,
-            title: title,
-            tutor_id: tutor_id
-        },
-        dataType: 'json',
-        success: function(response) {
-            Swal.close();
-            if (response.success) {
-                Swal.fire({
-                    icon: 'success',
-                    title: "Enrollment Successful!",
-                    text: "Payment Verified and Enrollment Successful!"
-                }).then(() => {
-                    window.location.reload();
-                });
-            } else {
+            course_prize: orderResponse.course_prize,
+            title: orderResponse.title,
+            tutor_id: orderResponse.tutor_id// Default to avoid null value
+            },
+            dataType: 'json',
+            success: function(response) {
+                if (response.success) {
+                    Swal.fire({
+                        icon: 'success',
+                        title: "Enrollment Successful!",
+                        text: "Payment Verified and Enrollment Successful!"
+                    });
+                } else {
+                    Swal.fire({
+                        icon: 'error',
+                        title: "Failed!",
+                        text: response.message
+                    });
+                }
+            },
+            error: function(xhr) {
                 Swal.fire({
                     icon: 'error',
-                    title: "Failed!",
-                    text: response.message
+                    title: "Error!",
+                    text: "An error occurred while verifying payment."
                 });
             }
-        },
-        error: function(xhr) {
-            Swal.close();
-            Swal.fire({
-                icon: 'error',
-                title: "Error!",
-                text: "An error occurred while verifying payment."
-            });
-        }
-    });
-}
+        });
 
+    }
 </script>
 <?php include 'footer.php'; ?>

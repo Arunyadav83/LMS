@@ -1,49 +1,54 @@
 <?php
-include 'header.php';
 session_start();
-header('Content-Type: text/html');
-
-// Enable error reporting for debugging
 ini_set('display_errors', 1);
 error_reporting(E_ALL);
+require_once 'config.php';
 
+$razorpayKey = 'rzp_test_Bvq9kiuaq8gkcs';
+
+// Check if the user is logged in
 if (!isset($_SESSION['user_id'])) {
-    echo "<h1>You must be logged in to view the cart.</h1>";
+    echo json_encode(["success" => false, "message" => "User is not logged in"]);
     exit;
 }
 
-include 'config.php'; // Replace with your actual DB connection file
+$userId = intval($_SESSION['user_id']);
 
-$userId = $_SESSION['user_id'];
-$totalPrice = 0; // Initialize the variable to avoid undefined errors
-
-// Check if delete_course is set
-if (isset($_POST['delete_course']) && isset($_POST['course_id'])) {
+// Handle course deletion from cart
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['delete_course'])) {
+    if (empty($_POST['course_id'])) {
+        echo json_encode(["success" => false, "message" => "Missing course ID"]);
+        exit;
+    }
     $courseId = intval($_POST['course_id']);
+
     $deleteQuery = "DELETE FROM cart WHERE user_id = ? AND course_id = ?";
     $stmt = $conn->prepare($deleteQuery);
 
     if ($stmt) {
         $stmt->bind_param('ii', $userId, $courseId);
         if ($stmt->execute()) {
-            echo json_encode(["success" => true, "message" => "Course removed from your cart successfully."]);
+            echo json_encode(["success" => true, "message" => "Course removed from cart"]);
         } else {
-            echo json_encode(["success" => false, "message" => "Failed to remove course from the cart."]);
+            echo json_encode(["success" => false, "message" => "Failed to remove course"]);
         }
         $stmt->close();
-        exit; // Ensure no extra output after JSON response
     } else {
         echo json_encode(["success" => false, "message" => "Failed to prepare delete statement: " . $conn->error]);
-        exit;
     }
+    exit;
+}
+function generateOrderId()
+{
+    // Your logic to generate an order ID (e.g., using a random number or database)
+    return uniqid('order_');
 }
 
-
-// Fetch cart items and calculate total price
-$query = "SELECT c.id, c.user_id, u.username, c.course_id, c.added_at, courses.title, courses.course_prize
-          FROM cart c
+// Fetch cart items
+$query = "SELECT c.id, c.course_id, courses.title, courses.course_prize, c.added_at , u.username
+          FROM cart c 
+          JOIN courses ON c.course_id = courses.id 
           JOIN users u ON c.user_id = u.id
-          JOIN courses ON c.course_id = courses.id
           WHERE c.user_id = ?";
 
 $stmt = $conn->prepare($query);
@@ -52,31 +57,22 @@ if (!$stmt) {
     exit;
 }
 
-$razorpayKey = 'rzp_test_Bvq9kiuaq8gkcs';
-$stmt->bind_param('i', $userId); // Correct binding for user_id only
+$stmt->bind_param('i', $userId);
 $stmt->execute();
 $result = $stmt->get_result();
-if ($result->num_rows > 0) {
-    // Send a valid JSON response containing the course data
-    $courses = [];
-    while ($row = $result->fetch_assoc()) {
-        $courses[] = $row;
-        $totalPrice += $row['course_prize']; // Sum the prices
-    }
-    // echo json_encode(["success" => true, "courses" => $courses, "totalPrice" => $totalPrice]);
-} else {
-    // Handle case when no courses are found
-    echo json_encode(["success" => false, "message" => "No courses found in your cart"]);
+
+$courses = [];
+$totalPrice = 0;
+
+while ($row = $result->fetch_assoc()) {
+    $courses[] = $row;
+    $totalPrice += $row['course_prize'];
 }
 
 $stmt->close();
 $conn->close();
-// echo json_encode(["success" => true, "courses" => $courses, "totalPrice" => $totalPrice]);  // Proper JSON response
-
 
 ?>
-
-
 <!DOCTYPE html>
 <html lang="en">
 
@@ -175,150 +171,185 @@ $conn->close();
         <?php if (count($courses) > 0): ?>
             <?php foreach ($courses as $course): ?>
                 <div class="cart-item">
+
                     <img src="assets/images/<?php echo htmlspecialchars($course['title']); ?>.jpg" alt="<?php echo htmlspecialchars($course['title']); ?>">
                     <div class="cart-details">
                         <h2><?php echo htmlspecialchars($course['title']); ?></h2>
-                        <p>Added by: <span><?php echo htmlspecialchars($course['username']); ?></span></p>
                         <p>Price: ₹<?php echo htmlspecialchars($course['course_prize']); ?></p>
-                        <p class="cart-timestamp">Added on: <?php echo htmlspecialchars($course['added_at']); ?></p>
+                        <form action="" method="POST" style="display: inline;">
+                            <input type="hidden" name="course_id" value="<?php echo htmlspecialchars($course['course_id']); ?>">
+                            <button type="submit" name="delete_course">
+                                <i class="fa fa-trash"></i> Delete
+                            </button>
+                        </form>
                     </div>
-                    <form action="fetch_cart.php" method="POST" style="display: inline;">
-                        <input type="hidden" name="course_id" value="<?php echo htmlspecialchars($course['course_id']); ?>">
-                        <button type="submit" class="btn btn-danger btn-sm" name="delete_course">
-                            <i class="fa fa-trash"></i>
-                        </button>
-                    </form>
                 </div>
             <?php endforeach; ?>
             <h2>Total Price: ₹<?php echo $totalPrice; ?></h2>
-            <button onclick="enrollCourse(<?php echo $totalPrice * 100; ?>, <?php echo $userId; ?>)">Enroll and Pay</button>
+            <button onclick="enrollCourse(<?php echo $totalPrice * 100; ?>, <?php echo $userId; ?>)">Enroll Now </button>
+
         <?php else: ?>
             <h2>Your cart is empty!</h2>
         <?php endif; ?>
     </div>
-
-    <script>
-    function enrollCourse(courseId, userId) {
-    $.ajax({
-        type: 'POST',
-        url: 'create_order.php',
-        data: {
-            course_id: courseId,
-            user_id: userId,
-            
-        },
-        dataType: 'json',
-        success: function(response) {
-    console.log("RAW response:", response); // Log the raw response for debugging
-
-    // Ensure the response is valid before proceeding
-    if (response && response.success) {
-        console.log("Course successfully enrolled.");
-        var options = {
-            key: '<?php echo $razorpayKey; ?>',
-            amount: response.course_prize * 100, // Convert to paise
-            currency: 'INR',
-            name: 'Course Enrollment',
-            description: 'Enroll in ' + response.title,
-            image: 'assets/images/logo2.png',
-            order_id: response.order_id,
-            handler: function(paymentResponse) {
-                showBuffering(); // Show buffering before verifying payment
-                verifyPayment(paymentResponse, response, courseId, userId);
-            },
-            modal: {
-                ondismiss: function() {
-                    console.log("Checkout form closed");
-                }
-            },
-            theme: {
-                color: '#F37254'
-            }
-        };
-        var rzp1 = new Razorpay(options);
-        rzp1.on('payment.failed', function(response) {
-            console.error("Payment failed:", response.error);
-            showErrorAlert("Payment Failed!", response.error.description);
-        });
-        rzp1.open();
-    } else {
-        showErrorAlert("Order Creation Failed!", response.message);
-    }
-},
-
-error: function(xhr, status, error) {
-    console.error("Order Creation AJAX error:", status, error);
-    console.error("Response:", xhr.responseText); // Log the error response
-    showErrorAlert("Enrollment Failed!", "An unexpected error occurred. Please try again.");
-}
-
-    });
-}
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<script>
 
 function showBuffering() {
-    Swal.fire({
-        title: "Processing...",
-        text: "Please wait while we verify your payment.",
-        allowOutsideClick: false, // Prevent clicking outside the alert
-        allowEscapeKey: false, // Disable escape key
-        didOpen: () => {
-            Swal.showLoading(); // Display a spinner or loader
-        }
-    });
-}
+        Swal.fire({
+            title: "Processing...",
+            text: "Please wait while we verify your payment.",
+            allowOutsideClick: false, // Prevent clicking outside the alert
+            allowEscapeKey: false, // Disable escape key
+            didOpen: () => {
+                Swal.showLoading(); // Display a spinner or loader
+            }
+        });
+    }
 
-function verifyPayment(paymentResponse, orderResponse, courseId, userId) {
-    $.ajax({
-        type: 'POST',
-        url: 'verify_payment.php',
-        data: {
-            razorpay_payment_id: paymentResponse.razorpay_payment_id,
-            order_id: paymentResponse.razorpay_order_id,
-            razorpay_signature: paymentResponse.razorpay_signature,
-            course_id: courseId,
-            course_prize: orderResponse.course_prize,
-            title: orderResponse.title,
-            tutor_id: orderResponse.tutor_id
-        },
-        dataType: 'json',
-        success: function(response) {
-            Swal.close(); // Close the buffering alert after payment verification
-            if (response.success) {
-                showSuccessAlert();
-            } else {
+    function enrollCourse(amount, userId) {
+        if (amount <= 0) {
+            Swal.fire("Error!", "Invalid amount for payment.", "error");
+            return;
+        }
+
+        let courseIds = [];
+        document.querySelectorAll('input[name="course_id"]').forEach(input => {
+            courseIds.push(input.value);
+        });
+
+        if (courseIds.length === 0) {
+            Swal.fire("Error!", "No courses selected.", "error");
+            return;
+        }
+
+        console.log("Sending data:", {
+            amount: amount,
+            user_id: userId,
+            course_ids: courseIds
+        });
+
+        $.ajax({
+            type: 'POST',
+            url: 'create_order.php',
+            data: {
+                amount: amount,
+                user_id: userId,
+                course_ids: JSON.stringify(courseIds), // Send as JSON array
+                total_price: amount
+            },
+            dataType: 'json',
+            success: function(response) {
+                console.log("RAW response:", response);
+                if (response && response.success && response.orders && Array.isArray(response.orders)) {
+                    var razorpayKey = "<?php echo isset($razorpayKey) ? $razorpayKey : ''; ?>";
+                    if (!razorpayKey) {
+                        Swal.fire("Configuration Error", "Razorpay key is missing.", "error");
+                        return;
+                    }
+
+                    var options = {
+                        key: razorpayKey,
+                            amount: amount, // Convert to paise
+                            currency: 'INR',
+                            name: 'Course Enrollment',
+                            description: 'Payment for selected courses',
+                            image: 'assets/images/logo2.png',
+                        order_id: response.orders[0].order_id, // Use the first order ID
+                        handler: function(paymentResponse) {
+                            console.log("Payment Response:", paymentResponse);
+                            showBuffering();
+                            verifyPayment(paymentResponse, response, courseIds, userId);
+                        },
+                        theme: {
+                            color: '#F37254'
+                        }
+                    };
+
+                    var rzp1 = new Razorpay(options);
+                    rzp1.open();
+                } else {
+                    Swal.fire("Order Creation Failed!", response.message || "Unknown error occurred", "error");
+                }
+            },
+            error: function(xhr) {
+                console.error("Order Creation Error:", xhr.responseText);
+                Swal.fire("Enrollment Failed!", "An unexpected error occurred.", "error");
+            }
+        });
+    }
+
+    function verifyPayment(paymentResponse, orderResponse, courseIds, userId) {
+        const order_id = orderResponse.orders[0]?.order_id;
+
+        if (!order_id || !paymentResponse.razorpay_payment_id || !paymentResponse.razorpay_signature) {
+            console.error("Missing required payment details:", {
+                order_id,
+                razorpay_payment_id: paymentResponse.razorpay_payment_id,
+                razorpay_signature: paymentResponse.razorpay_signature
+            });
+            Swal.fire({
+                icon: 'error',
+                title: "Payment Error",
+                text: "Required payment details are missing!"
+            });
+            return;
+        }
+
+        jQuery.ajax({
+            type: 'POST',
+            url: 'verify_payment.php',
+            data: {
+                razorpay_payment_id: paymentResponse.razorpay_payment_id,
+                razorpay_order_id: order_id,
+                razorpay_signature: paymentResponse.razorpay_signature,
+                course_ids: JSON.stringify(courseIds),
+                user_id: userId
+            },
+            dataType: 'json',
+            success: function(response) {
+                Swal.close();
+                console.log("Verification Response:", response);
+                if (response.success) {
+                    showSuccessAlert();
+                } else {
+                    Swal.fire({
+                        icon: 'error',
+                        title: "Failed!",
+                        text: response.message
+                    });
+                }
+            },
+            error: function(xhr) {
+                Swal.close();
+                console.error("Verification Error:", xhr);
                 Swal.fire({
-                    title: "Failed to enroll.",
-                    text: "Payment could not be verified. Please try again.",
-                    icon: "error",
+                    icon: 'error',
+                    title: "Error!",
+                    text: "An error occurred while verifying payment."
                 });
             }
-        },
-        error: function(xhr, status, error) {
-            Swal.close();
-            showErrorAlert("Payment Verification Failed!", "There was an issue verifying your payment. Please try again.");
-        }
-    });
-}
+        });
+    }
 
-function showSuccessAlert() {
-    Swal.fire({
-        title: "Success!",
-        text: "Your payment has been successfully processed.",
-        icon: "success",
-        confirmButtonText: "OK"
-    });
-}
+    function showSuccessAlert() {
+        Swal.fire({
+            title: "Enrollment Successful!",
+            text: "Payment Verified and Enrollment Successful!",
+            icon: "success",
+            showConfirmButton: true,
+            confirmButtonText: "OK",
+        });
+    }
 
-function showErrorAlert(title, message) {
-    Swal.fire({
-        title: title,
-        text: message,
-        icon: "error",
-        confirmButtonText: "OK"
-    });
-}
-
-    </script>
+    function showErrorAlert(message) {
+        Swal.fire({
+            icon: 'error',
+            title: 'Error',
+            text: message,
+        });
+    }
+</script>
 </body>
 
 </html>

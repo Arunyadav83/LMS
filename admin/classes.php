@@ -20,12 +20,115 @@ function ensure_directory_exists($path)
     }
 }
 
+// Check if the user is logging out (optional second check, should be handled by first condition)
+if (isset($_GET['logout'])) {
+    session_unset();
+    session_destroy();
+
+    // Redirect to index.php after logging out
+    header("Location: index.php");
+    exit();
+}
+
+if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['login'])) {
+    $email = mysqli_real_escape_string($conn, $_POST['email']);
+    $password = $_POST['password'];
+
+    $query = "SELECT * FROM tutors WHERE email = ?";
+    $stmt = mysqli_prepare($conn, $query);
+    mysqli_stmt_bind_param($stmt, "s", $email);
+    mysqli_stmt_execute($stmt);
+    $result = mysqli_stmt_get_result($stmt);
+
+    if ($tutor = mysqli_fetch_assoc($result)) {
+        if (password_verify($password, $tutor['password'])) {
+            $_SESSION['user_id'] = $tutor['id'];
+            $_SESSION['role'] = $tutor['role'];
+            $_SESSION['full_name'] = $tutor['full_name'];
+
+            // Trigger SweetAlert for successful login
+            echo "<script src='https://cdn.jsdelivr.net/npm/sweetalert2@11'></script>";
+            echo "<script>
+                document.addEventListener('DOMContentLoaded', function() {
+                    Swal.fire({
+                        title: 'Login Successful!',
+                        text: 'Welcome, " . $tutor['full_name'] . "!',
+                        icon: 'success',
+                        confirmButtonText: 'Okay'
+                    }).then(function() {
+                        window.location = '" . $_SERVER['PHP_SELF'] . "';
+                    });
+                });
+            </script>";
+            exit();
+        } else {
+            $error = "Invalid email or password";
+        }
+    } else {
+        $error = "Invalid email or password";
+    }
+}
+
+
 // Check if the user is logged in and is a tutor
 if (!isset($_SESSION['user_id']) || !isset($_SESSION['role']) || $_SESSION['role'] !== 'instructor') {
     // If not logged in, show login form
-    header("Location: login.php");  // Redirect to login page
+?>
+    <!DOCTYPE html>
+    <html lang="en">
+
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Tutor Login - LMS</title>
+        <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
+        <style>
+            .mb-4 {
+                color: #0433c3;
+                font-size: 35px;
+                margin: 20px;
+            }
+
+            .form-label {
+                color: blue
+            }
+        </style>
+        <link rel="icon" type="image/x-icon" href="assets/images/apple-touch-icon.png">
+    </head>
+
+    <body>
+        <div class="container mt-5">
+            <div class="row justify-content-center">
+                <div class="col-md-6" style="max-width: 700px; height: 60vh; background-color: #f8f9fa; border-radius: 2%; text-align: center;">
+                    <h2 class="mb-4">Tutor Login</h2>
+                    <?php if (isset($error)): ?>
+                        <div class="alert alert-danger"><?php echo $error; ?></div>
+                    <?php endif; ?>
+                    <form method="post" action="" style="width: 300px; margin-top: 30px; margin-left: 28%;"> <!-- Adjusted margin -->
+                        <div class="mb-3">
+                            <label for="email" class="form-label">Email address</label>
+                            <input type="email" class="form-control" id="email" name="email" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="password" class="form-label">Password</label>
+                            <input type="password" class="form-control" id="password" name="password" required>
+                        </div>
+                        <button type="submit" name="login" class="btn btn-primary w-60">Login</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+    </body>
+
+    </html>
+<?php
     exit();
 }
+
+
+
 
 $tutor_id = $_SESSION['user_id'];
 $tutor_name = $_SESSION['full_name'];
@@ -552,52 +655,72 @@ $classes = mysqli_fetch_all($result, MYSQLI_ASSOC);
         }
         ?>
 
-        <div id="gridView" class="row row-cols-1 row-cols-sm-2 row-cols-md-3 g-4 d-none">
-            <?php if (empty($classes)): ?>
-                <p>You haven't created any classes yet.</p>
-            <?php else: ?>
-                <?php foreach ($classes as $class): ?>
-                    <div class="col">
-                        <div class="card h-100">
-                            <div class="card-body">
-                                <h5 class="card-title"><?php echo htmlspecialchars($class['class_name']); ?></h5>
-                                <!-- Shortened description -->
-                                <p class="card-text">
-                                    <?php echo htmlspecialchars(substr($class['description'], 0, 100)); ?>
-                                    <?php if (strlen($class['description']) > 100): ?>
-                                        <span>...</span>
-                                        <button
-                                            class="btn btn-link text-primary p-0"
-                                            data-bs-toggle="modal"
-                                            data-bs-target="#descriptionModal<?php echo $class['id']; ?>">
-                                            Read More
-                                        </button>
-                                    <?php endif; ?>
-                                </p>
-                                <p><strong>Course:</strong> <?php echo htmlspecialchars($class['course_title']); ?></p>
-                                <p><strong>Online Class:</strong> <?php echo $class['is_online'] ? 'Yes - ' . htmlspecialchars($class['schedule_time']) : 'No'; ?></p>
-                                <?php if (!empty($class['video_path'])): ?>
-                                    <button
-                                        class="btn btn-info btn-sm mb-2"
-                                        data-bs-toggle="modal"
-                                        data-bs-target="#videoModal"
-                                        onclick="playVideo('<?php echo htmlspecialchars($class['video_path']); ?>')">
-                                        View Video
-                                    </button>
-                                <?php endif; ?>
+<div id="gridView" class="row row-cols-1 row-cols-sm-2 row-cols-md-3 g-4 d-none">
+    <?php if (empty($classes)): ?>
+        <p>You haven't created any classes yet.</p>
+    <?php else: ?>
+        <?php foreach ($classes as $class): ?>
+            <div class="col">
+                <div class="card h-100">
+                    <div class="card-body">
+                        <h5 class="card-title"><?php echo htmlspecialchars($class['class_name']); ?></h5>
+                        <!-- Shortened description -->
+                        <p class="card-text">
+                            <?php echo htmlspecialchars(substr($class['description'], 0, 100)); ?>
+                            <?php if (strlen($class['description']) > 100): ?>
+                                <span>...</span>
+                                <button
+                                    class="btn btn-link text-primary p-0"
+                                    data-bs-toggle="modal"
+                                    data-bs-target="#descriptionModal<?php echo $class['id']; ?>">
+                                    Read More
+                                </button>
+                            <?php endif; ?>
+                        </p>
+                        <p><strong>Course:</strong> <?php echo htmlspecialchars($class['course_title']); ?></p>
+                        <p><strong>Online Class:</strong> <?php echo $class['is_online'] ? 'Yes - ' . htmlspecialchars($class['schedule_time']) : 'No'; ?></p>
+                        <?php if (!empty($class['video_path'])): ?>
+                            <button
+                                class="btn btn-info btn-sm mb-2"
+                                data-bs-toggle="modal"
+                                data-bs-target="#videoModal"
+                                onclick="playVideo('<?php echo htmlspecialchars($class['video_path']); ?>')">
+                                View Video
+                            </button>
+                        <?php endif; ?>
 
-                                <div class="d-flex justify-content-start">
-                                    <a href="edit_class.php?id=<?php echo $class['id']; ?>" class="btn btn-sm btn-primary me-2">Edit</a>
-                                    <a href="view_quiz.php?class_id=<?php echo $class['id']; ?>" class="btn btn-sm btn-info me-2">View Quiz</a>
-                                    <a href="delete_class.php?id=<?php echo $class['id']; ?>" class="btn btn-sm btn-danger" onclick="return confirm('Are you sure you want to delete this class?');">Delete</a>
-                                </div>
-                            </div>
+                        <div class="d-flex justify-content-start">
+                            <a href="edit_class.php?id=<?php echo $class['id']; ?>" class="btn btn-sm btn-primary me-2">Edit</a>
+                            <a href="view_quiz.php?class_id=<?php echo $class['id']; ?>" class="btn btn-sm btn-info me-2">View Quiz</a>
+                            <a href="delete_class.php?id=<?php echo $class['id']; ?>" class="btn btn-sm btn-danger" onclick="return confirm('Are you sure you want to delete this class?');">Delete</a>
                         </div>
                     </div>
-                <?php endforeach; ?>
-            <?php endif; ?>
-        </div>
+                </div>
+            </div>
 
+            <!-- Modal for showing full description -->
+            <div class="modal fade" id="descriptionModal<?php echo $class['id']; ?>" tabindex="-1" aria-labelledby="descriptionModalLabel<?php echo $class['id']; ?>" aria-hidden="true">
+                <div class="modal-dialog">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title" id="descriptionModalLabel<?php echo $class['id']; ?>">Class Description</h5>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                        </div>
+                        <div class="modal-body">
+                            <?php echo htmlspecialchars($class['description']); ?>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        <?php endforeach; ?>
+    <?php endif; ?>
+</div>
+
+
+        
 
 
         <!-- Video Modal -->

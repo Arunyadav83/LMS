@@ -37,145 +37,78 @@ $students = mysqli_fetch_all($result, MYSQLI_ASSOC);
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Students - LMS Admin</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
-    <link rel="icon" type="image/x-icon" href="../assets/images/apple-touch-icon.png">
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
 </head>
-<style>
-    .mb-4{
-        color: #16308b;
-    }
-    .navbar-brand {
-            font-size: 20px;
-            color: white;
-        }
-
-        .nav-link {
-            color: white;
-            padding-inline: 20px;
-            text-decoration: underline;
-        }
-
-        .nav-link:hover {
-            color: white;/* text-decoration: underline; */
-        }
-
-        .navbar {
-            background-color:#1a237e;
-            margin: auto;
-            padding: 0px 5px;
-            /* Adjust top-bottom and left-right padding to reduce height */
-            line-height: 1.2;
-            /* Reduce line height for inner elements */
-            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); /* Optional: Adds a subtle shadow for depth */
-        }
-
-
-        .button {
-            padding-inline: 10px;
-            text-decoration: none;
-            color: #0433c3;
-            padding-block: 10px;
-         }
-        
-
-        .button:hover {
-            background-color: #0433c3;
-            color: white;
-            border-radius: 30px !important;
-        }
-        @media (max-width: 768px) {
-        .table_list{
-        overflow-x: auto;
-        width: 100%;
-
-    }
-}
-</style>
-<body>
-    <!-- Navigation Bar -->
-    <nav class="navbar navbar-expand-lg custom-navbar">
-        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
-            <span class="navbar-toggler-icon"></span>
-        </button>
-        <div class="container-fluid">
-            <a class="navbar-brand text-light fw-bold" href="#">LMS Admin</a>
-            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
-                <span class="navbar-toggler-icon"></span>
-            </button>
-            <div class="collapse navbar-collapse justify-content-end" id="navbarNav">
-                <ul class="navbar-nav align-items-center">
-                    <li class="nav-item">
-                        <a class="nav-link text-light d-flex align-items-center" href="#">
-                            <i class="fas fa-user me-2"></i> Profile
-                        </a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link text-light d-flex align-items-center" href="logout.php">
-                            <i class="fas fa-sign-out-alt me-2"></i> Logout
-                        </a>
-                    </li>
-                </ul>
+<body class="bg-gray-100">
+    <div class="min-h-screen flex flex-col">
+        <!-- Navigation Bar -->
+        <nav class="bg-blue-800 text-white shadow-md">
+            <div class="container mx-auto px-4 py-3 flex justify-between items-center">
+                <h1 class="text-lg font-bold">LMS Admin</h1>
+                <div class="flex space-x-4">
+                    <a href="#" class="text-white hover:underline">Profile</a>
+                    <a href="logout.php" class="text-white hover:underline">Logout</a>
+                </div>
             </div>
-        </div>
-    </nav>
+        </nav>
 
-    <div class="container-fluid">
-        <div class="row">
+        <div class="flex flex-col lg:flex-row">
             <!-- Sidebar -->
-            <?php include 'sidebar.php'; ?>
+            <aside class="bg-gray-800 text-white w-full lg:w-1/5 h-screen p-4">
+                <?php include 'sidebar.php'; ?>
+            </aside>
 
             <!-- Main Content -->
-            <main class="col-md-9 ms-sm-auto col-lg-10 px-md-4">
-                <div class="container mt-4">
-                    <h1 class="mb-4">Registered Students</h1>
+            <main class="flex-1 p-6">
+                <div class="container mx-auto">
+                    <h1 class="text-2xl font-bold text-blue-900 mb-6">Registered Students</h1>
                     <?php if (count($students) > 0): ?>
-                        <div class="table_list">
-                        <table class="table table-striped">
-                            <thead>
-                                <tr>
-                                    <th>ID</th>
-                                    <th>Username</th>
-                                    <th>Email</th>
-                                    <th>Registration Date</th>
-                                    <th>Status</th>
-                                    <th>Action</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <?php foreach ($students as $student): ?>
-                                <tr>
-                                    <td><?php echo htmlspecialchars($student['id']); ?></td>
-                                    <td><?php echo htmlspecialchars($student['username']); ?></td>
-                                    <td><?php echo htmlspecialchars($student['email']); ?></td>
-                                    <td><?php echo htmlspecialchars($student['created_at']); ?></td>
-                                    <td>
-                                        <span class="badge bg-<?php echo $student['is_active'] ? 'success' : 'danger'; ?>">
-                                            <?php echo $student['is_active'] ? 'Active' : 'Inactive'; ?>
-                                        </span>
-                                    </td>
-                                    <td>
-                                        <form action="" method="post">
-                                            <input type="hidden" name="student_id" value="<?php echo $student['id']; ?>">
-                                            <input type="hidden" name="new_status" value="<?php echo $student['is_active'] ? 'inactive' : 'active'; ?>">
-                                            <button type="submit" name="toggle_status" class="btn btn-sm btn-<?php echo $student['is_active'] ? 'danger' : 'success'; ?>">
-                                                <?php echo $student['is_active'] ? 'Deactivate' : 'Activate'; ?>
-                                            </button>
-                                        </form>
-                                    </td>
-                                </tr>
-                                <?php endforeach; ?>
-                            </tbody>
-                        </table>
+                        <div class="overflow-x-auto">
+                            <table class="min-w-full bg-white border border-gray-300 shadow-md">
+                                <thead>
+                                    <tr class="bg-blue-800 text-white">
+                                        <th class="px-4 py-2 text-left">ID</th>
+                                        <th class="px-4 py-2 text-left">Username</th>
+                                        <th class="px-4 py-2 text-left">Email</th>
+                                        <th class="px-4 py-2 text-left">Registration Date</th>
+                                        <th class="px-4 py-2 text-left">Status</th>
+                                        <th class="px-4 py-2 text-left">Action</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <?php foreach ($students as $student): ?>
+                                    <tr class="border-b">
+                                        <td class="px-4 py-2"><?php echo htmlspecialchars($student['id']); ?></td>
+                                        <td class="px-4 py-2"><?php echo htmlspecialchars($student['username']); ?></td>
+                                        <td class="px-4 py-2"><?php echo htmlspecialchars($student['email']); ?></td>
+                                        <td class="px-4 py-2"><?php echo htmlspecialchars($student['created_at']); ?></td>
+                                        <td class="px-4 py-2">
+                                            <span class="px-2 py-1 rounded text-white <?php echo $student['is_active'] ? 'bg-green-500' : 'bg-red-500'; ?>">
+                                                <?php echo $student['is_active'] ? 'Active' : 'Inactive'; ?>
+                                            </span>
+                                        </td>
+                                        <td class="px-4 py-2">
+                                            <form action="" method="post">
+                                                <input type="hidden" name="student_id" value="<?php echo $student['id']; ?>">
+                                                <input type="hidden" name="new_status" value="<?php echo $student['is_active'] ? 'inactive' : 'active'; ?>">
+                                                <button type="submit" name="toggle_status" class="px-4 py-2 text-white rounded <?php echo $student['is_active'] ? 'bg-red-500 hover:bg-red-600' : 'bg-green-500 hover:bg-green-600'; ?>">
+                                                    <?php echo $student['is_active'] ? 'Deactivate' : 'Activate'; ?>
+                                                </button>
+                                            </form>
+                                        </td>
+                                    </tr>
+                                    <?php endforeach; ?>
+                                </tbody>
+                            </table>
                         </div>
                     <?php else: ?>
-                        <p>No students found.</p>
+                        <p class="text-red-600">No students found.</p>
                     <?php endif; ?>
                 </div>
             </main>
         </div>
     </div>
 
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdn.tailwindcss.com"></script>
 </body>
 </html>

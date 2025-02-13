@@ -15,6 +15,7 @@ if (isset($_POST['add_course'])) {
     $description = strip_tags(mysqli_real_escape_string($conn, $_POST['description']));
     $topics = mysqli_real_escape_string($conn, $_POST['topics']);
     $course_prize = (float)$_POST['course_price'];
+    $duration = mysqli_real_escape_string($conn, $_POST['duration']);
 
     // Handle image upload
     $image_path = '';
@@ -50,7 +51,7 @@ if (isset($_POST['add_course'])) {
     }
 
     // Insert the new course into the database
-    $insert_query = "INSERT INTO courses (title, description, course_prize, topics, image_path) VALUES ('$title', '$description', $course_prize, '$topics', '$image_path')";
+    $insert_query = "INSERT INTO courses (title, description, course_prize, topics, image_path,duration) VALUES ('$title', '$description', $course_prize, '$topics', '$image_path','$duration')";
 
     if (mysqli_query($conn, $insert_query)) {
         // Set session variable for successful addition
@@ -67,154 +68,96 @@ if (isset($_POST['add_course'])) {
 
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Add Course</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
-    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-    <script src="https://cdn.tiny.cloud/1/azj9n0neceenohuu03tmpx6oq579m7sfow413lvfsebb2293/tinymce/5/tinymce.min.js" referrerpolicy="origin"></script>
-    <script>
-        tinymce.init({
-            selector: '#modal_description',
-            plugins: 'lists link image table',
-            toolbar: 'undo redo | bold italic | alignleft aligncenter alignright | bullist numlist outdent indent | link image',
-            menubar: false,
-            setup: function(editor) {
-                editor.on('change', function() {
-                    editor.save(); // Ensure the content is saved to the textarea
-                });
-            }
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Add Course</title>
+  <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+
+  <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+  <script src="https://cdn.tiny.cloud/1/azj9n0neceenohuu03tmpx6oq579m7sfow413lvfsebb2293/tinymce/5/tinymce.min.js" referrerpolicy="origin"></script>
+
+  <script>
+    tinymce.init({
+      selector: '#modal_description',
+      plugins: 'lists link image table',
+      toolbar: 'undo redo | bold italic | alignleft aligncenter alignright | bullist numlist outdent indent | link image',
+      menubar: false,
+      setup: function (editor) {
+        editor.on('change', function () {
+          editor.save();
         });
+      }
+    });
 
-        // Display SweetAlert if course added
-        <?php if (isset($_SESSION['course_added']) && $_SESSION['course_added'] === true): ?>
-            document.addEventListener('DOMContentLoaded', function() {
-                Swal.fire({
-                    title: 'Course Added Successfully!',
-                    text: 'The new course has been added.',
-                    icon: 'success',
-                    confirmButtonText: 'OK'
-                }).then(() => {
-                    // Redirect after SweetAlert is closed with a 3-second delay
-                    location.href = "courses.php";
-                     // 3 seconds delay
-                });
-            });
-            <?php unset($_SESSION['course_added']); ?>
-        <?php endif; ?>
-    </script>
-    <style>
-        
-    .navbar {
-        background-color: #1a237e;
-        margin: 0;
-        padding: 24px 5px;
-        /* Adjust padding for comfortable spacing */
-        line-height: 1.2;
-        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-        /* Adds a subtle shadow */
-        /* position: fixed; */
-        /* Makes the navbar fixed */
-        top: 0;
-        /* Sticks to the top of the viewport */
-        left: 0;
-        width: 100%;
-        position: sticky;
-        /* Ensures the navbar spans the full width */
-        z-index: 1000;
-        /* Keeps the navbar above other elements */
-    }
-    h1{
-        color: #1a237e;
-        text-align: center;
-        margin: 34px;
-    }
-    .container{
-        width: 100%;
-        height: auto;
-        margin-top: 23%;
-        margin-bottom: 15%;
-        padding: 54px;
-        background-color:rgb(148, 156, 248);
-    }
-    .button {
-        padding-inline: 30px;
-        font-weight: bolder;
-        text-decoration: none;
-        color: #0433c3;
-        padding-block: 10px;
-        border-radius: 30px;
-        transition: all 0.3s ease;
-    }
-
-    .button:hover {
-        color: white;
-        background-color: #0433c3;
-        border-radius: 30px;
-    }
-
-    </style>
+    <?php if (isset($_SESSION['course_added']) && $_SESSION['course_added'] === true): ?>
+      document.addEventListener('DOMContentLoaded', function () {
+        Swal.fire({
+          title: 'Course Added Successfully!',
+          text: 'The new course has been added.',
+          icon: 'success',
+          confirmButtonText: 'OK'
+        }).then(() => {
+          location.href = "courses.php";
+        });
+      });
+      <?php unset($_SESSION['course_added']); ?>
+    <?php endif; ?>
+  </script>
 </head>
-<link rel="icon" type="image/x-icon" href="assets/images/apple-touch-icon.png">
-<body>
 
-<nav class="navbar navbar-expand-lg custom-navbar">
-        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
-            <span class="navbar-toggler-icon"></span>
-        </button>
-        <div class="container-fluid">
-            <a class="navbar-brand text-light fw-bold" href="index.php">LMS Admin</a>
-            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
-                <!-- <span class="navbar-toggler-icon"></span> -->
-            </button>
-            <div class="collapse navbar-collapse justify-content-end" id="navbarNav">
-                <ul class="navbar-nav align-items-center">
-                    <li class="nav-item">
-                        <a class="nav-link text-light d-flex align-items-center" href="#">
-                            <i class="fas fa-user me-2"></i> Profile
-                        </a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link text-light d-flex align-items-center" href="logout.php">
-                            <i class="fas fa-sign-out-alt me-2"></i> Logout
-                        </a>
-                    </li>
-                </ul>
-            </div>
-        </div>
-    </nav>
-    <h1>Add New Course</h1>
-    
-    <div class="container mt-4">
-   
+<body class="bg-gray-100 min-h-screen">
+  <?php include 'sidebar.php'; ?>
+
+  <div class="flex justify-center items-center min-h-screen">
+    <div class="bg-white shadow-md rounded-lg w-full max-w-3xl p-8">
+      <h1 class="text-3xl font-bold text-center mb-6">Add New Course</h1>
+      <form action="" method="post" enctype="multipart/form-data" class="grid grid-cols-1 gap-6">
         
-        <form action="" method="post">
-            <div class="mb-3">
-                <label for="modal_title" class="form-label">Title</label>
-                <input type="text" class="form-control" id="modal_title" name="title" required>
-            </div>
-            <div class="mb-3">
-                <label for="modal_course_image" class="form-label">Course Image</label>
-                <input type="file" class="form-control" id="modal_course_image" name="course_image" accept=".jpg,.jpeg,.png,.gif" required>
-            </div>
+        <!-- Title -->
+        <div>
+          <label for="modal_title" class="block text-gray-700 font-medium mb-2">Course Title</label>
+          <input type="text" id="modal_title" name="title" class="w-full border border-gray-300 p-3 rounded-lg" placeholder="Enter course title" required>
+        </div>
 
-            <div class="mb-3">
-                <label for="modal_description" class="form-label">Description</label>
-                <textarea class="form-control" id="modal_description" name="description" rows="3" required></textarea>
-            </div>
-            <div class="mb-3">
-                <label for="modal_topics" class="form-label">Topics Covered</label>
-                <input type="text" class="form-control" id="modal_topics" name="topics" required>
-            </div>
-            <div class="mb-3">
-                <label for="modal_course_price" class="form-label">Course Price</label>
-                <input type="number" class="form-control" id="modal_course_price" name="course_price" required>
-            </div>
-            <button type="submit" name="add_course" class="button">Add Course</button>
-        </form>
+        <!-- Course Image -->
+        <div>
+          <label for="modal_course_image" class="block text-gray-700 font-medium mb-2">Course Image</label>
+          <input type="file" id="modal_course_image" name="course_image" class="w-full border border-gray-300 p-3 rounded-lg" accept=".jpg,.jpeg,.png,.gif" required>
+        </div>
+
+        <!-- Description -->
+        <div>
+          <label for="modal_description" class="block text-gray-700 font-medium mb-2">Description</label>
+          <textarea id="modal_description" name="description" class="w-full border border-gray-300 p-3 rounded-lg" rows="3" placeholder="Write a detailed description" required></textarea>
+        </div>
+
+        <!-- Topics Covered -->
+        <div>
+          <label for="modal_topics" class="block text-gray-700 font-medium mb-2">Topics Covered</label>
+          <input type="text" id="modal_topics" name="topics" class="w-full border border-gray-300 p-3 rounded-lg" placeholder="Enter course topics" required>
+        </div>
+
+        <!-- Course Price -->
+        <div>
+          <label for="modal_course_price" class="block text-gray-700 font-medium mb-2">Course Price</label>
+          <input type="number" id="modal_course_price" name="course_price" class="w-full border border-gray-300 p-3 rounded-lg" placeholder="Enter price (e.g., 99.99)" required>
+        </div>
+
+        <!-- Duration -->
+        <div>
+          <label for="modal_duration" class="block text-gray-700 font-medium mb-2">Duration (in hours)</label>
+          <input type="text" id="modal_duration" name="duration" class="w-full border border-gray-300 p-3 rounded-lg" placeholder="Enter course duration" required>
+        </div>
+
+        <!-- Submit Button -->
+        <div class="flex justify-center">
+          <button type="submit" name="add_course" class="bg-blue-600 text-white px-6 py-3 rounded-lg hover:bg-blue-700 transition-all duration-300">Add Course</button>
+        </div>
+      </form>
     </div>
+  </div>
 </body>
-
 </html>
+

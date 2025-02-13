@@ -66,10 +66,6 @@ if (isset($_POST['delete_course'])) {
     }
 }
 
-// Include SweetAlert2 script only once
-echo '<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>';
-
-// Handle update action
 // Handle update action
 if (isset($_POST['update_course'])) {
     $course_id = (int)$_POST['course_id'];
@@ -167,13 +163,8 @@ if (isset($_POST['update_course'])) {
     }
 }
 
-
-
 // Fetch all courses with their topics
-// Fetch all courses
 $query = "SELECT id, title, description, course_prize, topics ,duration  FROM courses";
-
-
 $result = mysqli_query($conn, $query);
 $courses = mysqli_fetch_all($result, MYSQLI_ASSOC);
 if ($result->num_rows > 0) {
@@ -187,630 +178,703 @@ if ($result->num_rows > 0) {
 
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Courses List - LMS Admin</title>
+    <title>Courses List - Ultrakey LMS</title>
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <!-- Bootstrap CSS -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
-    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-
-    <link rel="icon" type="image/x-icon" href="../assets/images/apple-touch-icon.png">
-</head>
-<style>
-    .card {
-        margin-bottom: 20px;
-        /* Adjust this value as needed */
-    }
-
-    /* General grid styling */
-    #enrollmentGrid {
-        display: flex;
-        flex-wrap: wrap;
-        gap: 16px;
-        /* Adjust spacing between cards */
-    }
-
-    /* Default: Three cards per row */
-    #enrollmentGrid .col-md-4 {
-        flex: 1 1 calc(33.333% - 16px);
-        max-width: calc(33.333% - 16px);
-    }
-
-    /* Responsive styling for smaller screens (468px and below) */
-    @media (max-width: 468px) {
-        #enrollmentGrid .col-md-4 {
-            flex: 1 1 100%;
-            /* One card per row */
-            max-width: 120%;
-        }
-
-        main {
-            width: 90%;
-            /* Adjust this value as needed */
-            margin: 0 auto;
-            /* Center the main element */
-        }
-
-        body {
-            width: 100%;
-        }
-
-
-        #enrollmentGrid .card {
-            margin-bottom: 16px;
-            /* Add space between cards */
-        }
-    }
-
-    /* Responsive styling for medium screens (789px and below) */
-    @media (max-width: 789px) {
-        #enrollmentGrid .col-md-4 {
-            flex: 1 1 50%;
-            /* Two cards per row */
-            max-width: 150%;
-        }
-    }
-
-
-    #enrollmentGrid .card {
-        position: relative;
-        /* Make the card a positioned element */
-        height: 100%;
-        /* Ensures cards stretch to the same height */
-        display: flex;
-        background-color: rgb(222, 222, 242);
-        flex-direction: column;
-        justify-content: space-evenly;
-        /* Ensures proper spacing within the card */
-        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-        border: none;
-        /* Optional: Removes default border for cleaner design */
-        border-radius: 8px;
-        /* Optional: Adds rounded corners */
-    }
-
-
-    #enrollmentGrid .dropdown {
-        position: absolute;
-        top: 10px;
-        /* Adjust spacing from the top */
-        right: 10px;
-        /* Adjust spacing from the right */
-        z-index: 1;
-        /* Ensure dropdown menu appears above other elements */
-    }
-
-    h3 {
-        color: #16308b
-    }
-
-    main {
-        background-color: rgb(244, 244, 255);
-    }
-
-    .dropdown-menu {
-        z-index: 2;
-        /* Ensure the dropdown appears above other elements */
-    }
-
-    #enrollmentGrid .card-body {
-        flex: 1;
-        display: flex;
-        flex-direction: column;
-    }
-
-    .card-title {
-        margin-bottom: 10px;
-        font-size: 1.25rem;
-    }
-
-    .card-text {
-        flex-grow: 1;
-        /* Ensures equal spacing between title and topics */
-        font-size: 0.9rem;
-    }
-
-    .navbar {
-        background-color: #1a237e;
-        margin: 0;
-        padding: 0px 5px;
-        /* Adjust padding for comfortable spacing */
-        line-height: 1.2;
-        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-        /* Adds a subtle shadow */
-        /* position: fixed; */
-        /* Makes the navbar fixed */
-        top: 0;
-        /* Sticks to the top of the viewport */
-        left: 0;
-        width: 100%;
-        /* Ensures the navbar spans the full width */
-        z-index: 1000;
-        /* Keeps the navbar above other elements */
-    }
-
-    .a {
-        margin-left: 850px;
-    }
-
-    .navbar-brand {
-        font-size: 23px;
-        color: white;
-    }
-
-    .nav-link {
-        color: white;
-        padding-inline: 20px;
-        text-decoration: underline;
-    }
-
-    .nav-link:hover {
-        color: white;
-    }
-
-    .button {
-        padding-inline: 30px;
-        font-weight: bolder;
-        text-decoration: none;
-        color: #0433c3;
-        padding-block: 10px;
-        border-radius: 30px;
-        transition: all 0.3s ease;
-    }
-
-    .button:hover {
-        color: white;
-        background-color: #0433c3;
-        border-radius: 30px;
-    }
-
-    .description-preview {
-        display: inline;
-    }
-
-    .full-description {
-        display: inline;
-        white-space: normal;
-    }
-
-    .read-more-link {
-        color: #007bff;
-        text-decoration: none;
-        cursor: pointer;
-    }
-
-    .read-more-link:hover {
-        text-decoration: underline;
-    }
-
-    /* Scrollable container for buttons */
-    #buttonContainer {
-        overflow-x: auto;
-        /* Allow horizontal scrolling */
-        display: flex;
-        justify-content: center;
-        /* Center the buttons */
-        margin-bottom: 20px;
-        /* Add space below the buttons */
-    }
-
-    #buttonContainer button {
-        margin: 0 10px;
-        /* Add space between buttons */
-        min-width: 100px;
-        /* Ensure buttons are wide enough to tap on small screens */
-    }
-
-    /* Adjust button styling */
-    @media (max-width: 468px) {
-        #buttonContainer {
-            overflow-x: auto;
-        }
-
-        #buttonContainer button {
-            margin: 0 5px;
-            /* Reduce spacing on smaller screens */
-        }
-
-        main {
-            max-width: 800px;
-        }
-    }
-
-    @media (max-width: 768px) {
-
-        #listView h2 {
-            font-size: 1.5rem;
-            top: 0;
-            /* Reset position */
-        }
-
-        .table td,
-        .table th {
-            font-size: 0.875rem;
-            /* Smaller font for better fit */
-            white-space: normal;
-
-            /* Prevent text overflow */
-        }
-
-        main {
-            max-width: 800px;
-        }
-
-        .badge {
-            font-size: 0.75rem;
-            /* Smaller badge size */
-        }
-
-        .dropdown-menu {
-            font-size: 0.875rem;
-            /* Smaller dropdown text */
-        }
-
-        .a {
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="css/sidebar.css">
+    <style>
+        /* Common Action Button Styles */
+        .action-buttons {
             display: flex;
-            justify-content: center;
             gap: 10px;
-            margin-right: 840px;
-
+            justify-content: center;
+        }
+        
+        .action-btn {
+            padding: 6px 12px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+        
+        .edit-btn {
+            background-color: #ffc107;
+            color: #000;
+        }
+        
+        .delete-btn {
+            background-color: #dc3545;
+            color: #fff;
+        }
+        
+        .action-btn:hover {
+            opacity: 0.8;
+            transform: translateY(-1px);
         }
 
-        .table_list {
-            overflow-x: auto;
+        /* View Toggle Buttons */
+        .view-toggle {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+            margin-top: 20px;
+        }
+
+        .view-btn {
+            padding: 8px 15px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            background: #f8f9fa;
+        }
+
+        .view-btn.active {
+            background: #1a69a5;
+            color: white;
+        }
+
+        /* Grid View Styles */
+        .grid-view {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 20px;
+            padding: 20px 0;
+        }
+
+        .course-card {
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            overflow: hidden;
+            transition: transform 0.3s ease;
+        }
+
+        .course-card:hover {
+            transform: translateY(-5px);
+        }
+
+        .course-image {
             width: 100%;
-
+            height: 150px;
+            object-fit: cover;
+            border-bottom: 1px solid #eee;
         }
-    }
-</style>
 
+        .course-content {
+            padding: 15px;
+        }
+
+        .course-title {
+            font-size: 1.2rem;
+            margin-bottom: 10px;
+            color: #1a69a5;
+        }
+
+        .course-description {
+            font-size: 0.9rem;
+            color: #666;
+            margin-bottom: 10px;
+        }
+
+        .course-topics {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 5px;
+            margin-bottom: 15px;
+        }
+
+        .topic-badge {
+            background: #e9ecef;
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 0.8rem;
+            color: #495057;
+        }
+
+        .card-actions {
+            display: flex;
+            justify-content: flex-end;
+            gap: 10px;
+            padding-top: 10px;
+            border-top: 1px solid #eee;
+        }
+
+        /* Responsive Styles */
+        @media (max-width: 768px) {
+            .grid-view {
+                grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+            }
+        }
+
+        @media (max-width: 576px) {
+            .grid-view {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        /* Table Styles */
+        .table th {
+            background-color: #1a69a5;
+            color: white;
+        }
+
+        .table-responsive {
+            margin-top: 20px;
+        }
+
+        /* Add Course Button */
+        .add-course-btn {
+            background: #2674b7;
+            color: white;
+            padding: 10px 20px;
+            border-radius: 5px;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .add-course-btn:hover {
+            background: #1a5c8f;
+            color: white;
+        }
+
+        /* Hide/Show Views */
+        .view-container {
+            display: none;
+        }
+
+        .view-container.active {
+            display: block;
+        }
+
+        /* Kebab Menu Styles */
+        .kebab-menu {
+            position: relative;
+            display: inline-block;
+        }
+
+        .kebab-button {
+            background: none;
+            border: none;
+            padding: 5px;
+            cursor: pointer;
+            display: flex;
+            flex-direction: column;
+            gap: 3px;
+            align-items: center;
+        }
+
+        .kebab-dot {
+            width: 4px;
+            height: 4px;
+            background-color: #666;
+            border-radius: 50%;
+        }
+
+        .popup-menu {
+            position: absolute;
+            right: 0;
+            background-color: white;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+            border-radius: 4px;
+            display: none;
+            z-index: 1000;
+            min-width: 120px;
+        }
+
+        .popup-menu.show {
+            display: block;
+        }
+
+        .popup-menu a {
+            display: block;
+            padding: 8px 15px;
+            text-decoration: none;
+            color: #333;
+        }
+
+        .popup-menu a:hover {
+            background-color: #f5f5f5;
+        }
+
+        /* Add these new styles */
+        .course-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 10px;
+        }
+
+        .course-title {
+            margin: 0;
+            flex: 1;
+        }
+
+        .course-header .kebab-menu {
+            margin-left: 10px;
+        }
+
+        .course-header .kebab-button {
+            padding: 0 5px;
+        }
+
+        .course-header .popup-menu {
+            right: 0;
+            top: 100%;
+            margin-top: 5px;
+        }
+
+        /* Responsive styles for list view */
+        @media (max-width: 768px) {
+            .table-responsive {
+                overflow-x: auto;
+            }
+
+            .table td, .table th {
+                min-width: 100px;
+                white-space: normal;
+            }
+
+            .table td:first-child,
+            .table th:first-child {
+                position: sticky;
+                left: 0;
+                background: white;
+                z-index: 1;
+            }
+
+            .kebab-menu {
+                position: static;
+            }
+
+            .popup-menu {
+                position: fixed;
+                left: 50%;
+                top: 50%;
+                transform: translate(-50%, -50%);
+                width: 200px;
+                box-shadow: 0 0 15px rgba(0,0,0,0.2);
+            }
+        }
+
+        /* Responsive styles for grid view */
+        .course-card {
+            width: 100%;
+            margin-bottom: 20px;
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+
+        .course-image {
+            width: 100%;
+            height: 200px;
+            object-fit: cover;
+        }
+
+        .course-content {
+            padding: 15px;
+        }
+
+        .course-description {
+            margin: 10px 0;
+            font-size: 14px;
+            color: #666;
+        }
+
+        .course-topics {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 5px;
+            margin: 10px 0;
+        }
+
+        .topic-badge {
+            background: #f0f0f0;
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 12px;
+        }
+
+        .course-duration {
+            font-size: 14px;
+            color: #666;
+        }
+
+        /* Grid view responsive breakpoints */
+        @media (min-width: 576px) {
+            .grid-view {
+                display: grid;
+                grid-template-columns: repeat(2, 1fr);
+                gap: 20px;
+            }
+        }
+
+        @media (min-width: 992px) {
+            .grid-view {
+                grid-template-columns: repeat(3, 1fr);
+            }
+        }
+
+        @media (max-width: 575px) {
+            .grid-view {
+                display: grid;
+                grid-template-columns: 1fr;
+                gap: 15px;
+                padding: 10px;
+            }
+
+            .course-card {
+                margin-bottom: 15px;
+            }
+
+            .course-image {
+                height: 180px;
+            }
+
+            .course-header {
+                flex-direction: row;
+                align-items: center;
+            }
+
+            .course-title {
+                font-size: 18px;
+            }
+
+            .course-description {
+                font-size: 13px;
+            }
+
+            .topic-badge {
+                font-size: 11px;
+            }
+        }
+
+        /* Common responsive styles */
+        .view-toggle {
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+
+        @media (max-width: 480px) {
+            .container {
+                padding: 10px;
+            }
+
+            .popup-menu {
+                min-width: 150px;
+            }
+
+            .popup-menu a {
+                padding: 12px 15px;
+                font-size: 14px;
+            }
+        }
+
+        /* Add these styles for responsive table */
+        @media (max-width: 768px) {
+            .hide-on-mobile {
+                display: none !important;
+            }
+
+            .table td, .table th {
+                min-width: 100px;
+                white-space: normal;
+                font-size: 14px;
+                padding: 10px 8px;
+            }
+
+            .table td:first-child,
+            .table th:first-child {
+                position: static;
+                background: none;
+            }
+        }
+        .grid-view {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); /* Responsive columns */
+    gap: 20px; /* Space between cards */
+    padding: 20px; /* Padding around the grid */
+}
+
+.course-card {
+    background: white;
+    border-radius: 10px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    overflow: hidden;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.course-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 8px 15px rgba(0, 0, 0, 0.2);
+}
+
+.course-image {
+    width: 100%;
+    height: 150px;
+    object-fit: cover; /* Maintain aspect ratio */
+    border-bottom: 2px solid #eee; /* Bottom border for image */
+}
+
+.course-content {
+    padding: 15px; /* Inner padding */
+}
+
+.course-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.course-title {
+    font-size: 1.2rem;
+    margin: 0;
+    color: #333; /* Title color */
+}
+
+.kebab-menu {
+    position: relative;
+}
+
+.kebab-button {
+    background: transparent;
+    border: none;
+    cursor: pointer;
+}
+
+.kebab-dot {
+    width: 5px;
+    height: 5px;
+    border-radius: 50%;
+    background: #333;
+    margin: 2px 0;
+}
+
+.course-description {
+    font-size: 0.9rem;
+    color: #666; /* Description color */
+    margin: 10px 0;
+}
+
+.course-topics {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 5px; /* Space between topic badges */
+    margin-bottom: 10px;
+}
+
+.topic-badge {
+    background: #e9ecef; /* Badge background */
+    padding: 4px 8px; /* Badge padding */
+    border-radius: 4px; /* Rounded corners */
+    font-size: 0.8rem;
+    color: #495057; /* Badge text color */
+}
+
+.course-duration {
+    color: #7f8c8d; /* Duration color */
+    font-size: 0.9rem;
+    display: flex;
+    align-items: center;
+    gap: 5px; /* Space between icon and text */
+}
+        
+    </style>
+</head>
 <body>
-    <!-- Navigation Bar -->
-    <nav class="navbar navbar-expand-lg custom-navbar">
-        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
-            <span class="navbar-toggler-icon"></span>
-        </button>
-        <div class="container-fluid">
-            <a class="navbar-brand text-light fw-bold" href="index.php">LMS Admin</a>
-            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
-                <span class="navbar-toggler-icon"></span>
-            </button>
-            <div class="collapse navbar-collapse justify-content-end" id="navbarNav">
-                <ul class="navbar-nav align-items-center">
-                    <li class="nav-item">
-                        <a class="nav-link text-light d-flex align-items-center" href="#" style="justify-content: space-between; gap:2px;margin-right: 25px;">
-                            <i class="fas fa-user me-2"></i> Profile
-                        </a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link text-light d-flex align-items-center" href="logout.php">
-                            <i class="fas fa-sign-out-alt me-2"></i> Logout
-                        </a>
-                    </li>
-                </ul>
+    <?php include 'sidebar.php'; ?>
+    
+    <div class="main-content">
+        <div class="container mt-4">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <h2>Courses List</h2>
+                <div class="d-flex gap-3 align-items-center">
+                    <div class="view-toggle">
+                        <button class="view-btn active" data-view="list">
+                            <i class="fas fa-list"></i> List
+                        </button>
+                        <button class="view-btn" data-view="grid">
+                            <i class="fas fa-th"></i> Grid
+                        </button>
+                    </div>
+                    <a href="add_course.php" class="add-course-btn">
+                        <i class="fas fa-plus"></i> Add New Course
+                    </a>
+                </div>
             </div>
-        </div>
-    </nav>
 
-    <div class="container-fluid">
-        <div class="row">
-            <!-- Sidebar -->
-            <?php include 'sidebar.php'; ?>
-
-            <!-- Main Content -->
-            <main class="col-md-9 ms-sm-auto col-lg-10 px-md-4">
-                <div class="container mt-4">
-                    <h3 class="mb-4">Courses List</h3>
-                    <!-- Add this just before the table in the main content section -->
-                    <div class="mb-3">
-                        <a href="add_course.php" class="button">Add New Course</a>
-                    </div>
-
-                    <div style=" display: flex; justify-content: center; position:relative;bottom: 34px;margin-left: 185px;">
-                        <div class="a">
-                            <button id="listViewBtn" class="btn btn-primary me" onclick="showListView()">
-                                <i class="fas fa-list"></i>
-                            </button>
-                            <button id="gridViewBtn" class="btn btn-secondary me2" onclick="showGridView()">
-                                <i class="fas fa-th"></i>
-                            </button>
-                        </div>
-                    </div>
-
-
-                    <!-- List View -->
-                    <div id="listView" class="view container mt-5">
-                        <h2 class="mb-4">List View</h2>
-                        <div class="table_list">
-                            <table class="table table-striped table-bordered align-middle">
-                                <thead class="table-dark">
+            <!-- List View -->
+            <div id="listView" class="view-container active">
+                <div class="card">
+                    <div class="card-body">
+                        <div class="table-responsive">
+                            <table class="table table-striped table-hover">
+                                <thead>
                                     <tr>
-                                        <th scope="col">ID</th>
-                                        <th scope="col">Title</th>
-                                        <th scope="col">Description</th>
-                                        <th scope="col">Topics</th>
-                                        <th scope="col">Duration</th>
-                                        <th scope="col" class="text-center">Actions</th>
+                                        <th class="hide-on-mobile">ID</th>
+                                        <th>Title</th>
+                                        <th>Description</th>
+                                        <th>Topics</th>
+                                        <th>Duration</th>
+                                        <th>Actions</th>
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    <?php foreach ($courses as $course): ?>
-                                        <tr>
-                                            <td data-label="ID"><?php echo htmlspecialchars($course['id']); ?></td>
-                                            <td data-label="Title"><?php echo htmlspecialchars($course['title']); ?></td>
-                                            <td data-label="Description"><?php echo htmlspecialchars($course['description']); ?></td>
-
-                                            <td data-label="Topics">
-                                                <?php
-                                                $topics = explode(',', $course['topics']);
-                                                foreach ($topics as $topic): ?>
-                                                    <span class="badge bg-primary me-1"><?php echo htmlspecialchars(trim($topic)); ?></span>
-                                                <?php endforeach; ?>
-                                            </td>
-                                            <td data-label="Duration"><?php echo htmlspecialchars($course['duration'] . " "); ?></td> <!-- Added Duration -->
-                                            <td data-label="Actions" class="text-center">
-                                                <div class="dropdown">
-                                                    <button class="btn btn-light btn-sm" type="button" id="dropdownMenuButton" data-bs-toggle="dropdown" aria-expanded="false">
-                                                        <i class="fas fa-ellipsis-v"></i>
+                                    <?php
+                                    // Fetch courses from database
+                                    $query = "SELECT * FROM courses ORDER BY id DESC";
+                                    $result = mysqli_query($conn, $query);
+                                    
+                                    while ($row = mysqli_fetch_assoc($result)) {
+                                        echo "<tr>";
+                                        echo "<td class='hide-on-mobile'>{$row['id']}</td>";
+                                        echo "<td>{$row['title']}</td>";
+                                        echo "<td>" . substr($row['description'], 0, 100) . "...</td>";
+                                        echo "<td>{$row['topics']}</td>";
+                                        echo "<td>{$row['duration']}</td>";
+                                        echo "<td>
+                                                <div class='kebab-menu'>
+                                                    <button class='kebab-button' onclick='toggleMenu(this)'>
+                                                        <div class='kebab-dot'></div>
+                                                        <div class='kebab-dot'></div>
+                                                        <div class='kebab-dot'></div>
                                                     </button>
-                                                    <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="dropdownMenuButton">
-                                                        <li>
-                                                            <button class="dropdown-item edit-btn" data-bs-toggle="modal" data-bs-target="#editModal"
-                                                                data-id="<?php echo htmlspecialchars($course['id'] ?? ''); ?>"
-                                                                data-title="<?php echo htmlspecialchars($course['title'] ?? ''); ?>"
-                                                                data-description="<?php echo htmlspecialchars(substr($course['description'] ?? '', 0, 100)); ?>..."
-                                                                data-topics="<?php echo htmlspecialchars($course['topics'] ?? ''); ?>"
-                                                                data-prize="<?php echo htmlspecialchars($course['course_prize'] ?? ''); ?>"
-                                                                data-duration="<?php echo htmlspecialchars($course['duration'] ?? ''); ?>">Edit</button>
-                                                        </li>
-
-                                                        <li>
-                                                            <form action="" method="post" class="d-inline" onsubmit="return confirm('Are you sure you want to delete this course?');">
-                                                                <input type="hidden" name="course_id" value="<?php echo $course['id']; ?>">
-                                                                <button type="submit" name="delete_course" class="dropdown-item">Delete</button>
-                                                            </form>
-                                                        </li>
-                                                    </ul>
+                                                    <div class='popup-menu'>
+                                                        <a href='#' onclick='editCourse({$row['id']})'>Edit</a>
+                                                        <a href='#' onclick='deleteCourse({$row['id']})'>Delete</a>
+                                                    </div>
                                                 </div>
-                                            </td>
-                                        </tr>
-                                    <?php endforeach; ?>
+                                              </td>";
+                                        echo "</tr>";
+                                    }
+                                    ?>
                                 </tbody>
                             </table>
                         </div>
                     </div>
+                </div>
+            </div>
 
-
-
-                    <!-- Grid View -->
-                    <div id="gridView" class="view">
-                        <h2>Grid View</h2>
-                        <div class="row g-4" id="enrollmentGrid">
-                            <?php foreach ($courses as $course): ?>
-                                <div class="col-12 col-sm-6 col-md-4 mb-4">
-                                    <div class="card">
-                                        <div class="card-body d-flex">
-                                            <!-- Image on the left -->
-                                            <img
-                                                src="../assets/images/<?php echo htmlspecialchars($course['title']); ?>.jpg"
-                                                alt="<?php echo htmlspecialchars($course['title']); ?>"
-                                                class="rounded"
-                                                style="width: 100px; height: 100px; object-fit: contain; margin-bottom: 10px;" />
-
-                                            <!-- Card content -->
-                                            <div>
-                                                <div class="dropdown float-end">
-                                                    <a class="btn btn-secondary" type="button" id="dropdownMenuButton" data-bs-toggle="dropdown" aria-expanded="false">
-                                                        <i class="fas fa-ellipsis-v"></i>
-                                                    </a>
-                                                    <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="dropdownMenuButton">
-                                                        <li>
-                                                            <button class="dropdown-item edit-btn" data-bs-toggle="modal" data-bs-target="#editModal"
-                                                                data-id="<?php echo $course['id']; ?>"
-                                                                data-title="<?php echo htmlspecialchars($course['title']); ?>"
-                                                                data-description="<?php echo htmlspecialchars(substr($course['description'], 0, 100)); ?>..."
-                                                                data-topics="<?php echo htmlspecialchars($course['topics']); ?>"
-                                                                data-prize="<?php echo isset($course['course_prize']) ? htmlspecialchars($course['course_prize']) : ''; ?>"
-                                                                data-duration="<?php echo htmlspecialchars($course['duration'] ?? ''); ?>"
-                                                                >
-                                                                Edit
-                                                            </button>
-                                                        </li>
-                                                        <li>
-                                                            <form action="" method="post" class="d-inline" onsubmit="return confirm('Are you sure you want to delete this course?');">
-                                                                <input type="hidden" name="course_id" value="<?php echo $course['id']; ?>">
-                                                                <button type="submit" name="delete_course" class="dropdown-item">Delete</button>
-                                                            </form>
-                                                        </li>
-                                                    </ul>
-                                                </div>
-                                                <h5 class="card-title"><?php echo htmlspecialchars($course['title']); ?></h5>
-                                                <p class="card-text">
-                                                    <span class="description-preview" id="desc-<?php echo $course['id']; ?>">
-                                                        <?php echo htmlspecialchars(substr($course['description'], 0, 100)); ?>...
-                                                    </span>
-                                                    <span class="full-description d-none" id="full-desc-<?php echo $course['id']; ?>">
-                                                        <?php echo htmlspecialchars($course['description']); ?>
-                                                    </span>
-
-                                                    <!-- <a href="javascript:void(0);" class="read-more-link" onclick="toggleDescription('<?php echo $course['id']; ?>')">Read More</a> -->
-                                                </p>
-                                                <p class="card-text"><strong>Topics Covered:</strong> <?php echo htmlspecialchars($course['topics']); ?></p>
-                                            </div>
-
-                                        </div>
-                                    </div>
+            <!-- Grid View -->
+            <div id="gridView" class="view-container">
+    <div class="grid-view">
+        <?php
+        // Reset the result pointer
+        mysqli_data_seek($result, 0);
+        
+        while ($row = mysqli_fetch_assoc($result)) {
+            $topics = explode(',', $row['topics']);
+            echo "<div class='course-card' id='course-{$row['id']}'>
+                    <img src='../assets/images/{$row['title']}.jpg' alt='{$row['title']}' class='course-image' onerror=\"this.src='../assets/images/default-course.jpg'\">
+                    <div class='course-content'>
+                        <div class='course-header'>
+                            <h3 class='course-title'>{$row['title']}</h3>
+                            <div class='kebab-menu'>
+                                <button class='kebab-button' onclick='toggleMenu(this)'>
+                                    <div class='kebab-dot'></div>
+                                    <div class='kebab-dot'></div>
+                                    <div class='kebab-dot'></div>
+                                </button>
+                                <div class='popup-menu'>
+                                    <a href='#' onclick='editCourse({$row['id']})'>Edit</a>
+                                    <a href='#' onclick='deleteCourse({$row['id']})'>Delete</a>
                                 </div>
-                            <?php endforeach; ?>
+                            </div>
+                        </div>
+                        <p class='course-description'>" . substr($row['description'], 0, 100) . "...</p>
+                        <div class='course-topics'>";
+                        foreach ($topics as $topic) {
+                            echo "<span class='topic-badge'>" . trim($topic) . "</span>";
+                        }
+            echo    "</div>
+                        <div class='course-duration'>
+                            <i class='fas fa-clock'></i> {$row['duration']}
                         </div>
                     </div>
-
-
-                </div>
-            </main>
+                </div>";
+        }
+        ?>
+    </div>
+</div>
         </div>
     </div>
 
-    <!-- Add Course Modal -->
-    <div class="modal fade" id="addCourseModal" tabindex="-1" aria-labelledby="addCourseModalLabel" aria-hidden="true">
-        <div class="modal-dialog">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title" id="addCourseModalLabel">Add New Course</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                </div>
-                <div class="modal-body">
-                    <form action="" method="post">
-                        <div class="mb-3">
-                            <label for="modal_title" class="form-label">Title</label>
-                            <input type="text" class="form-control" id="modal_title" name="title" required>
-                        </div>
-                        <div class="mb-3">
-                            <label for="modal_topics" class="form-label">Topics Covered</label>
-                            <input type="text" class="form-control" id="modal_topics" name="topics" required>
-                        </div>
-                        <div class="mb-3">
-                            <label for="modal_description" class="form-label">Description</label>
-                            <textarea class="form-control" id="modal_description" name="description" rows="3"></textarea>
-                        </div>
-                        <div class="mb-3">
-                            <label for="modal_course_price" class="form-label">Course Price</label>
-                            <input type="number" class="form-control" id="modal_course_price" name="course_price" required>
-                        </div>
-                        <button type="submit" name="add_course" class="btn btn-primary">Add Course</button>
-                    </form>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- Edit Course Modal -->
-    <!-- Modal for editing course -->
-    <div class="modal fade" id="editModal" tabindex="-1" aria-labelledby="editModalLabel" aria-hidden="true">
-        <div class="modal-dialog">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title" id="editModalLabel">Edit Course</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                </div>
-                <div class="modal-body">
-                    <form id="editCourseForm" method="post" action="">
-                        <input type="hidden" name="course_id" id="course_id" value="<?php echo $course['id']; ?>">
-
-                        <div class="mb-3">
-                            <label for="course_title" class="form-label">Title</label>
-                            <input type="text" class="form-control" id="course_title" name="course_title" value="<?php echo $course['title']; ?>" required>
-                        </div>
-                        <div class="mb-3">
-                            <label for="course_description" class="form-label">Description</label>
-                            <textarea class="form-control" id="course_description" name="course_description" required><?php echo $course['description']; ?></textarea>
-                        </div>
-                        <div class="mb-3">
-                            <label for="course_topics" class="form-label">Topics</label>
-                            <input type="text" class="form-control" id="course_topics" name="course_topics" value="<?php echo $course['topics']; ?>">
-                        </div>
-                        <div class="mb-3">
-                            <label for="course_duration" class="form-label">Course Duration:</label>
-                            <input type="text" class="form-control" id="course_duration" name="course_duration"
-                                value="<?php echo htmlspecialchars($course['duration'] ?? ''); ?>" required>
-                        </div>
-
-                        <div class="mb-3">
-                            <label for="course_prize" class="form-label">Course Price</label>
-                            <input type="number" class="form-control" id="course_prize" name="course_prize" value="<?php echo $course['course_prize']; ?>" required>
-                        </div>
-                        <button type="submit" name="update_course" class="btn btn-primary">Save changes</button>
-                    </form>
-                </div>
-            </div>
-        </div>
-    </div>
-
-
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
-
-    <!-- <script> -->
-    <!-- document.addEventListener('DOMContentLoaded', () => {
-            // Test Swal.fire to ensure it's working
-            Swal.fire('Test', 'SweetAlert2 is loaded and working!', 'success');
-        }); -->
-    </script>
+    <!-- Bootstrap JS and its dependencies -->
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.10.2/dist/umd/popper.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.min.js"></script>
+    <!-- SweetAlert2 -->
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    
     <script>
-        // Show List View
-        function showListView() {
-            document.getElementById('listView').style.display = 'block';
-            document.getElementById('gridView').style.display = 'none';
-            document.getElementById('listViewBtn').classList.add('btn-primary');
-            document.getElementById('listViewBtn').classList.remove('btn-secondary');
-            document.getElementById('gridViewBtn').classList.add('btn-secondary');
-            document.getElementById('gridViewBtn').classList.remove('btn-primary');
+        // View Toggle Functionality
+        const viewButtons = document.querySelectorAll('.view-btn');
+        const viewContainers = document.querySelectorAll('.view-container');
+
+        viewButtons.forEach(button => {
+            button.addEventListener('click', () => {
+                const view = button.dataset.view;
+                
+                // Update buttons
+                viewButtons.forEach(btn => btn.classList.remove('active'));
+                button.classList.add('active');
+                
+                // Update views
+                viewContainers.forEach(container => {
+                    container.classList.remove('active');
+                    if (container.id === view + 'View') {
+                        container.classList.add('active');
+                    }
+                });
+            });
+        });
+
+        function toggleMenu(button) {
+            // Close all other open menus
+            document.querySelectorAll('.popup-menu.show').forEach(menu => {
+                if (menu !== button.nextElementSibling) {
+                    menu.classList.remove('show');
+                }
+            });
+            
+            // Toggle the clicked menu
+            const menu = button.nextElementSibling;
+            menu.classList.toggle('show');
         }
 
-        // Show Grid View
-        function showGridView() {
-            document.getElementById('listView').style.display = 'none';
-            document.getElementById('gridView').style.display = 'block';
-            document.getElementById('gridViewBtn').classList.add('btn-primary');
-            document.getElementById('gridViewBtn').classList.remove('btn-secondary');
-            document.getElementById('listViewBtn').classList.add('btn-secondary');
-            document.getElementById('listViewBtn').classList.remove('btn-primary');
+        // Close menu when clicking outside
+        document.addEventListener('click', function(event) {
+            if (!event.target.closest('.kebab-menu')) {
+                document.querySelectorAll('.popup-menu').forEach(menu => {
+                    menu.classList.remove('show');
+                });
+            }
+        });
+
+        function editCourse(courseId) {
+            // Add your edit course logic here
+            window.location.href = 'edit_course.php?id=' + courseId;
         }
 
-        function toggleDescription(courseId) {
-            const preview = document.getElementById(`desc-${courseId}`);
-            const fullDesc = document.getElementById(`full-desc-${courseId}`);
-            const link = preview.nextElementSibling;
-
-            if (preview.classList.contains('d-none')) {
-                preview.classList.remove('d-none');
-                fullDesc.classList.add('d-none');
-                link.textContent = 'Read More';
-            } else {
-                preview.classList.add('d-none');
-                fullDesc.classList.remove('d-none');
-                link.textContent = 'Show Less';
+        function deleteCourse(courseId) {
+            // Add your delete course logic here
+            if(confirm('Are you sure you want to delete this course?')) {
+                window.location.href = 'delete_course.php?id=' + courseId;
             }
         }
-
-
-        // Populate the edit modal with course data
-        const editModal = document.getElementById('editModal');
-
-        editModal.addEventListener('show.bs.modal', function(event) {
-            const button = event.relatedTarget; // Button that triggered the modal
-            const courseId = button.getAttribute('data-id');
-            const courseTitle = button.getAttribute('data-title');
-            const courseDescription = button.getAttribute('data-description');
-            const courseTopics = button.getAttribute('data-topics');
-            const coursePrize = button.getAttribute('data-prize');
-            const courseDuration = button.getAttribute('data-duration'); // Retrieve the duration
-
-            // Update the modal's content
-            const modalTitle = editModal.querySelector('.modal-title');
-            const courseIdInput = editModal.querySelector('#course_id');
-            const courseTitleInput = editModal.querySelector('#course_title');
-            const courseDescriptionInput = editModal.querySelector('#course_description');
-            const courseTopicsInput = editModal.querySelector('#course_topics');
-            const coursePrizeInput = editModal.querySelector('#course_prize');
-            const courseDurationInput = editModal.querySelector('#course_duration'); // For duration field
-
-            // Populate the modal fields
-            courseIdInput.value = courseId;
-            courseTitleInput.value = courseTitle;
-            courseDescriptionInput.value = courseDescription;
-            courseTopicsInput.value = courseTopics;
-            coursePrizeInput.value = coursePrize;
-            courseDurationInput.value = courseDuration; // Populate the duration field
-        });
-
-
-        // Ensure only one view is visible on load
-        document.addEventListener('DOMContentLoaded', function() {
-            showListView(); // or showGridView() based on your preference
-        });
     </script>
 </body>
-
 </html>

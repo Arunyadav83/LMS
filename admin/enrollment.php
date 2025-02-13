@@ -57,101 +57,211 @@ foreach ($enrollments as $enrollment) {
     <title>Enrollments - LMS Admin</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
+    <style>
+        .navbar-brand {
+            font-size: 20px;
+            /* margin-inline-start: 20px; */
+            color: white;
+        }
+
+        h1 {
+            color: #16308b;
+        }
+
+        .nav-item {
+            color: white;
+            padding-inline: 20px;
+            /* text-decoration: underline; */
+        }
+
+        .nav-link:hover {
+            color: white;
+            /* text-decoration: underline; */
+        }
+
+        .navbar {
+            background-color: #1a237e;
+            margin: auto;
+            padding: 0px 5px;
+            /* Adjust top-bottom and left-right padding to reduce height */
+            line-height: 1.2;
+            /* Reduce line height for inner elements */
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            /* Optional: Adds a subtle shadow for depth */
+        }
+
+        .button {
+            padding-inline: 10px;
+            text-decoration: none;
+            color: #0433c3;
+            padding-block: 10px;
+        }
+
+        .button:hover {
+            background-color: #0433c3;
+            color: white;
+            border-radius: 30px !important;
+        }
+
+        @media (max-width: 768px) {
+            .table_list {
+                overflow-x: auto;
+                width: 100%;
+            }
+
+            .a {
+                margin-left: 120px !important;
+                text-align: center;
+            }
+        }
+
+        /* Grid View Styles */
+        .card {
+            transition: transform 0.2s, box-shadow 0.2s;
+            border: 1px solid rgba(0, 0, 0, 0.125);
+            margin-bottom: 20px;
+        }
+
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1) !important;
+        }
+
+        .card-header {
+            background-color: #1a237e;
+            color: white;
+            padding: 0.75rem 1rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .dropdown-menu {
+            min-width: 120px;
+            padding: 0.5rem 0;
+            margin: 0;
+            border-radius: 4px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+        }
+
+        .dropdown-item {
+            padding: 0.5rem 1rem;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            color: #333;
+        }
+
+        .dropdown-item i {
+            width: 16px;
+        }
+
+        .dropdown-item:hover {
+            background-color: #f8f9fa;
+        }
+
+        .dropdown-item.text-danger:hover {
+            background-color: #fff5f5;
+        }
+
+        .kebab-menu {
+            background: transparent;
+            border: none;
+            color: white;
+            font-size: 20px;
+            padding: 5px 10px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .kebab-menu:hover {
+            opacity: 0.8;
+        }
+
+        .kebab-menu:focus {
+            outline: none;
+            box-shadow: none;
+        }
+
+        .card-body {
+            padding: 1.25rem;
+        }
+
+        .card-body i {
+            width: 20px;
+            color: #1a237e;
+        }
+
+        .enrollment-card {
+            margin-bottom: 1.5rem;
+        }
+
+        @media (max-width: 768px) {
+            .enrollment-card {
+                width: 100%;
+            }
+        }
+
+        /* Kebab Menu Styles */
+        .kebab-menu {
+            position: relative;
+            display: inline-block;
+        }
+
+        .kebab-button {
+            background: none;
+            border: none;
+            padding: 5px;
+            cursor: pointer;
+            display: flex;
+            flex-direction: column;
+            gap: 3px;
+            align-items: center;
+        }
+
+        .kebab-dot {
+            width: 4px;
+            height: 4px;
+            background-color: #666;
+            border-radius: 50%;
+        }
+
+        .popup-menu {
+            position: absolute;
+            right: 0;
+            background-color: white;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+            border-radius: 4px;
+            display: none;
+            z-index: 1000;
+            min-width: 120px;
+        }
+
+        .popup-menu.show {
+            display: block;
+        }
+
+        .popup-menu a {
+            display: block;
+            padding: 8px 15px;
+            text-decoration: none;
+            color: #333;
+        }
+
+        .popup-menu a:hover {
+            background-color: #f5f5f5;
+        }
+    </style>
 </head>
-<style>
-    .navbar-brand {
-        font-size: 20px;
-        /* margin-inline-start: 20px; */
-        color: white;
-
-
-    }
-
-    h1 {
-
-        color: #16308b;
-
-    }
-
-    .nav-item {
-        color: white;
-        padding-inline: 20px;
-        /* text-decoration: underline; */
-
-    }
-
-    .nav-link:hover {
-        color: white;
-        /* text-decoration: underline; */
-    }
-
-    .navbar {
-        background-color:#1a237e;
-        margin: auto;
-        padding: 0px 5px;
-        /* Adjust top-bottom and left-right padding to reduce height */
-        line-height: 1.2;
-        /* Reduce line height for inner elements */
-        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-        /* Optional: Adds a subtle shadow for depth */
-    }
-
-
-    .button {
-        padding-inline: 10px;
-        text-decoration: none;
-        color: #0433c3;
-        padding-block: 10px;
-
-    }
-
-    .button:hover {
-        background-color: #0433c3;
-        color: white;
-        border-radius: 30px !important;
-    }
-    @media (max-width: 768px) {
-        .table_list{
-            overflow-x: auto;
-            width: 100%;
-        }
-        .a{
-            margin-left: 120px !important;
-            text-align: center;
-        
-            
-        }
-    }
-
-</style>
 
 <body>
     <!-- Navigation Bar -->
-    <nav class="navbar navbar-expand-lg custom-navbar">
-        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
-            <span class="navbar-toggler-icon"></span>
-        </button>
-        <div class="container-fluid">
-            <a class="navbar-brand text-light fw-bold" href="#">LMS Admin</a>
-            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
-                <span class="navbar-toggler-icon"></span>
-            </button>
-            <div class="collapse navbar-collapse justify-content-end" id="navbarNav">
-                <ul class="navbar-nav align-items-center">
-                    <li class="nav-item">
-                        <a class="nav-link text-light d-flex align-items-center" href="#"  style="justify-content: space-between; gap:2px;margin-right: 25px;">
-                            <i class="fas fa-user me-2"></i> Profile
-                        </a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link text-light d-flex align-items-center" href="logout.php">
-                            <i class="fas fa-sign-out-alt me-2"></i> Logout
-                        </a>
-                    </li>
-                </ul>
-            </div>
-        </div>
-    </nav>
+
 
     <div class="container-fluid">
         <div class="row">
@@ -161,7 +271,7 @@ foreach ($enrollments as $enrollment) {
             <!-- Main Content -->
             <main class="col-md-9 ms-sm-auto col-lg-10 px-md-4">
                 <div class="container mt-4">
-                    <h1 class="mb-4">Enrollments</h1>
+                    <h1 class="mb-4" style="margin-top:81px">Enrollments</h1>
 
                     <div style="margin-left: 900px;margin-top: -71px;" class="a">
                         <button id="listViewBtn" class="btn btn-primary me-2" onclick="showListView()">
@@ -182,111 +292,169 @@ foreach ($enrollments as $enrollment) {
                             </div>
                             <div class="card-body">
                                 <div class="table_list">
-                                <table class="table table-hover table-striped align-middle">
-                                    <thead class="table-primary">
-                                        <tr>
-                                            <th>ID</th>
-                                            <th>User</th>
-                                            <th>Email</th>
-                                            <th>Course</th>
-                                            <th>Tutor</th>
-                                            <th>Enrolled At</th>
-                                            <th>Actions</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        <?php foreach ($enrollments as $enrollment): ?>
+                                    <table class="table table-hover table-striped align-middle">
+                                        <thead class="table-primary">
                                             <tr>
-                                                <td><?php echo htmlspecialchars($enrollment['id']); ?></td>
-                                                <td><?php echo htmlspecialchars($enrollment['username']); ?></td>
-                                                <td><?php echo htmlspecialchars($enrollment['email']); ?></td>
-                                                <td><?php echo htmlspecialchars($enrollment['course_name']); ?></td>
-                                                <td><?php echo htmlspecialchars($enrollment['tutor_name']); ?></td>
-                                                <td><?php echo htmlspecialchars($enrollment['enrolled_at']); ?></td>
-                                                <td>
-                                                    <div class="dropdown">
-                                                        <button class="btn btn-sm btn-outline-secondary" type="button" id="dropdownMenuButton<?php echo $enrollment['id']; ?>" data-bs-toggle="dropdown" aria-expanded="false">
-                                                            <i class="fas fa-ellipsis-h"></i>
-                                                        </button>
-                                                        <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton<?php echo $enrollment['id']; ?>">
-                                                            <li>
-                                                                <button class="dropdown-item" data-bs-toggle="modal" data-bs-target="#editEnrollment<?php echo $enrollment['id']; ?>">
+                                                <th>ID</th>
+                                                <th>User</th>
+                                                <th>Email</th>
+                                                <th>Course</th>
+                                                <th>Tutor</th>
+                                                <th>Enrolled At</th>
+                                                <th>Actions</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <?php foreach ($enrollments as $enrollment): ?>
+                                                <tr>
+                                                    <td><?php echo htmlspecialchars($enrollment['id']); ?></td>
+                                                    <td><?php echo htmlspecialchars($enrollment['username']); ?></td>
+                                                    <td><?php echo htmlspecialchars($enrollment['email']); ?></td>
+                                                    <td><?php echo htmlspecialchars($enrollment['course_name']); ?></td>
+                                                    <td><?php echo htmlspecialchars($enrollment['tutor_name']); ?></td>
+                                                    <td><?php echo htmlspecialchars($enrollment['enrolled_at']); ?></td>
+                                                    <td>
+                                                        <div class="kebab-menu">
+                                                            <button class="kebab-button" onclick="toggleMenu(this)">
+                                                                <span class="kebab-dot"></span>
+                                                                <span class="kebab-dot"></span>
+                                                                <span class="kebab-dot"></span>
+                                                            </button>
+
+                                                            <!-- Debugging: Show Enrollment ID -->
+                                                            <?php echo "<!-- Enrollment ID: " . htmlspecialchars($enrollment['id']) . " -->"; ?>
+
+                                                            <!-- Popup Menu -->
+                                                            <div class="popup-menu">
+                                                                <a href="#" data-bs-toggle="modal"
+                                                                    data-bs-target="#editEnrollmentModal<?php echo htmlspecialchars($enrollment['id']); ?>">
                                                                     <i class="fas fa-edit text-primary"></i> Edit
-                                                                </button>
-                                                            </li>
-                                                            <li>
-                                                                <form action="" method="post" class="d-inline">
-                                                                    <input type="hidden" name="id" value="<?php echo $enrollment['id']; ?>">
-                                                                    <button type="submit" name="delete_enrollment" class="dropdown-item text-danger" onclick="return confirm('Are you sure you want to delete this enrollment?')">
+                                                                </a>
+                                                                <form method="POST" class="d-inline">
+                                                                    <input type="hidden" name="id" value="<?php echo htmlspecialchars($enrollment['id']); ?>">
+                                                                    <button type="submit" name="delete_enrollment" class="dropdown-item text-danger"
+                                                                        onclick="return confirm('Are you sure you want to delete this enrollment?')">
                                                                         <i class="fas fa-trash"></i> Delete
                                                                     </button>
                                                                 </form>
-                                                            </li>
-                                                        </ul>
-                                                    </div>
-                                                </td>
-                                            </tr>
+                                                            </div>
 
-                                            <!-- Edit Enrollment Modal -->
-                                            <div class="modal fade" id="editEnrollment<?php echo $enrollment['id']; ?>" tabindex="-1" aria-labelledby="editEnrollmentLabel<?php echo $enrollment['id']; ?>" aria-hidden="true">
-                                                <div class="modal-dialog">
-                                                    <div class="modal-content">
-                                                        <div class="modal-header bg-primary text-white">
-                                                            <h5 class="modal-title" id="editEnrollmentLabel<?php echo $enrollment['id']; ?>">Edit Enrollment</h5>
-                                                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                                                         </div>
-                                                        <div class="modal-body">
-                                                            <form action="" method="post">
-                                                                <input type="hidden" name="id" value="<?php echo $enrollment['id']; ?>">
-                                                                <div class="mb-3">
-                                                                    <label for="edit_username<?php echo $enrollment['id']; ?>" class="form-label">Username</label>
-                                                                    <input type="text" class="form-control" id="edit_username<?php echo $enrollment['id']; ?>" name="username" value="<?php echo htmlspecialchars($enrollment['username']); ?>" required>
-                                                                </div>
-                                                                <div class="mb-3">
-                                                                    <label for="edit_email<?php echo $enrollment['id']; ?>" class="form-label">Email</label>
-                                                                    <input type="email" class="form-control" id="edit_email<?php echo $enrollment['id']; ?>" name="email" value="<?php echo htmlspecialchars($enrollment['email']); ?>" required>
-                                                                </div>
-                                                                <button type="submit" name="update_enrollment" class="btn btn-primary">Save changes</button>
-                                                            </form>
+                                                    </td>
+                                                </tr>
+
+                                                <!-- Edit Enrollment Modal -->
+
+                                                <div class="modal fade" id="editEnrollmentModal<?php echo htmlspecialchars($enrollment['id']); ?>"
+                                                    tabindex="-1" aria-labelledby="editEnrollmentModalLabel<?php echo htmlspecialchars($enrollment['id']); ?>"
+                                                    aria-hidden="true">
+                                                    <div class="modal-dialog modal-dialog-centered modal-lg">
+                                                        <div class="modal-content">
+                                                            <div class="modal-header">
+                                                                <h5 class="modal-title" id="editEnrollmentModalLabel<?php echo htmlspecialchars($enrollment['id']); ?>">
+                                                                    Edit Enrollment
+                                                                </h5>
+                                                                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                                            </div>
+                                                            <div class="modal-body">
+                                                                <form action="" method="post">
+                                                                    <input type="hidden" name="id" value="<?php echo htmlspecialchars($enrollment['id']); ?>">
+                                                                    <div class="row">
+                                                                        <div class="col-md-6 mb-3">
+                                                                            <label for="edit_username_<?php echo htmlspecialchars($enrollment['id']); ?>" class="form-label">Username</label>
+                                                                            <input type="text" class="form-control"
+                                                                                id="edit_username_<?php echo htmlspecialchars($enrollment['id']); ?>"
+                                                                                name="username" value="<?php echo htmlspecialchars($enrollment['username']); ?>" required>
+                                                                        </div>
+                                                                        <div class="col-md-6 mb-3">
+                                                                            <label for="edit_email_<?php echo htmlspecialchars($enrollment['id']); ?>" class="form-label">Email</label>
+                                                                            <input type="email" class="form-control"
+                                                                                id="edit_email_<?php echo htmlspecialchars($enrollment['id']); ?>"
+                                                                                name="email" value="<?php echo htmlspecialchars($enrollment['email']); ?>" required>
+                                                                        </div>
+                                                                    </div>
+                                                                    <div class="mb-3">
+                                                                        <label for="edit_course_name_<?php echo htmlspecialchars($enrollment['id']); ?>" class="form-label">Course Name</label>
+                                                                        <input type="text" class="form-control"
+                                                                            id="edit_course_name_<?php echo htmlspecialchars($enrollment['id']); ?>"
+                                                                            name="course_name" value="<?php echo htmlspecialchars($enrollment['course_name']); ?>" required>
+                                                                    </div>
+                                                                    <div class="mb-3">
+                                                                        <label for="edit_enrolled_at_<?php echo htmlspecialchars($enrollment['id']); ?>" class="form-label">Enrolled At</label>
+                                                                        <input type="date" class="form-control"
+                                                                            id="edit_enrolled_at_<?php echo htmlspecialchars($enrollment['id']); ?>"
+                                                                            name="enrolled_at" value="<?php echo htmlspecialchars($enrollment['enrolled_at']); ?>" required>
+                                                                    </div>
+                                                                    <div class="modal-footer">
+                                                                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                                                                        <button type="submit" name="update_enrollment" class="btn btn-primary">Save changes</button>
+                                                                    </div>
+                                                                </form>
+                                                            </div>
                                                         </div>
                                                     </div>
                                                 </div>
-                                            </div>
-                                        <?php endforeach; ?>
-                                    </tbody>
-                                </table>
+
+                                                <!-- Ensure Bootstrap JS is Loaded -->
+                                                <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
+                                            <?php endforeach; ?>
+                                        </tbody>
+                                    </table>
                                 </div>
                             </div>
                         </div>
                     </div>
-
 
                     <!-- Grid View -->
                     <div id="gridView" class="view" style="display: none;">
                         <div class="mb-3">
                             <input type="text" id="searchBar" class="form-control" placeholder="Search by username or email" onkeyup="filterEnrollments()" style="margin-top: 25px;">
                         </div>
-                        <div class="row g-4" id="enrollmentGrid">
-                            <?php foreach ($grouped_enrollments as $username => $enrollments): ?>
-                                <div class="col-md-4 enrollment-card" data-username="<?php echo htmlspecialchars($username); ?>" data-email="<?php echo htmlspecialchars($enrollments[0]['email']); ?>">
-                                    <div class="card">
-                                        <div class="card-body">
-                                            <div class="dropdown float-end">
-                                                <a class="btn btn-secondary" type="button" id="dropdownMenuButton" data-bs-toggle="dropdown" aria-expanded="false">
+                        <div class="row g-4">
+                            <?php foreach ($enrollments as $enrollment): ?>
+                                <div class="col-12 col-md-6 col-lg-4">
+                                    <div class="card h-100">
+                                        <div class="card-header bg-primary d-flex justify-content-between align-items-center">
+                                            <h5 class="card-title mb-0 text-white"><?php echo htmlspecialchars($enrollment['course_name']); ?></h5>
+                                            <div class="dropdown">
+                                                <button type="button" class="btn btn-light btn-sm" data-bs-toggle="dropdown">
                                                     <i class="fas fa-ellipsis-v"></i>
-                                                </a>
-                                                <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="dropdownMenuButton">
-                                                    <li><a class="dropdown-item" href="#" data-bs-toggle="modal" data-bs-target="#editModal">Edit</a></li>
-                                                    <li><a class="dropdown-item" href="#">Delete</a></li>
+                                                </button>
+                                                <ul class="dropdown-menu dropdown-menu-end">
+                                                    <li>
+                                                        <button class="dropdown-item" data-bs-toggle="modal" data-bs-target="#editEnrollment<?php echo $enrollment['id']; ?>">
+                                                            <i class="fas fa-edit text-primary me-2"></i> Edit
+                                                        </button>
+                                                    </li>
+                                                    <li>
+                                                        <form method="POST" onsubmit="return confirm('Are you sure you want to delete this enrollment?');">
+                                                            <input type="hidden" name="id" value="<?php echo $enrollment['id']; ?>">
+                                                            <button type="submit" name="delete_enrollment" class="dropdown-item text-danger">
+                                                                <i class="fas fa-trash-alt me-2"></i> Delete
+                                                            </button>
+                                                        </form>
+                                                    </li>
                                                 </ul>
                                             </div>
-                                            <h5 class="card-title"><?php echo htmlspecialchars($username); ?></h5>
-                                            <p class="card-text"><?php echo htmlspecialchars($enrollments[0]['email']); ?></p>
-                                            <?php if (!empty($enrollments[0]['user_id'])): ?>
-                                                <a href="fetch_enrollments.php?user=<?php echo htmlspecialchars($username); ?>" class="btn btn-primary">View Enrollments</a>
-                                            <?php else: ?>
-                                                <span class="text-danger">No user specified</span>
-                                            <?php endif; ?>
+                                        </div>
+                                        <div class="card-body">
+                                            <div class="mb-3">
+                                                <i class="fas fa-user me-2 text-primary"></i>
+                                                <strong>Student:</strong> <?php echo htmlspecialchars($enrollment['username']); ?>
+                                            </div>
+                                            <div class="mb-3">
+                                                <i class="fas fa-envelope me-2 text-primary"></i>
+                                                <strong>Email:</strong> <?php echo htmlspecialchars($enrollment['email']); ?>
+                                            </div>
+                                            <div class="mb-3">
+                                                <i class="fas fa-chalkboard-teacher me-2 text-primary"></i>
+                                                <strong>Tutor:</strong> <?php echo htmlspecialchars($enrollment['tutor_name']); ?>
+                                            </div>
+                                            <div>
+                                                <i class="fas fa-calendar-alt me-2 text-primary"></i>
+                                                <strong>Enrolled:</strong> <?php echo date('M d, Y', strtotime($enrollment['enrolled_at'])); ?>
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
@@ -296,25 +464,36 @@ foreach ($enrollments as $enrollment) {
 
                     <!-- Edit Modal -->
                     <div class="modal fade" id="editModal" tabindex="-1" aria-labelledby="editModalLabel" aria-hidden="true">
-                        <div class="modal-dialog">
+                        <div class="modal-dialog modal-lg">
                             <div class="modal-content">
                                 <div class="modal-header">
                                     <h5 class="modal-title" id="editModalLabel">Edit Enrollment</h5>
                                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                                 </div>
                                 <div class="modal-body">
-                                    <!-- Form for editing enrollment details -->
                                     <form>
-                                        <div class="mb-3">
-                                            <label for="username" class="form-label">Username</label>
-                                            <input type="text" class="form-control" id="username" value="" required>
+                                        <div class="row">
+                                            <div class="col-md-6 mb-3">
+                                                <label for="username" class="form-label">Username</label>
+                                                <input type="text" class="form-control" id="username" placeholder="Enter username" required>
+                                            </div>
+                                            <div class="col-md-6 mb-3">
+                                                <label for="email" class="form-label">Email</label>
+                                                <input type="email" class="form-control" id="email" placeholder="Enter email" required>
+                                            </div>
                                         </div>
                                         <div class="mb-3">
-                                            <label for="email" class="form-label">Email</label>
-                                            <input type="email" class="form-control" id="email" value="" required>
+                                            <label for="course_name" class="form-label">Course Name</label>
+                                            <input type="text" class="form-control" id="course_name" placeholder="Enter course name" required>
                                         </div>
-                                        <!-- Add other fields as necessary -->
-                                        <button type="submit" class="btn btn-primary">Save changes</button>
+                                        <div class="mb-3">
+                                            <label for="enrolled_at" class="form-label">Enrolled At</label>
+                                            <input type="date" class="form-control" id="enrolled_at" required>
+                                        </div>
+                                        <div class="modal-footer">
+                                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                                            <button type="submit" class="btn btn-primary">Save changes</button>
+                                        </div>
                                     </form>
                                 </div>
                             </div>
@@ -361,6 +540,28 @@ foreach ($enrollments as $enrollment) {
                 }
             });
         }
+
+        function toggleMenu(button) {
+            // Close all other menus
+            document.querySelectorAll('.popup-menu.show').forEach(menu => {
+                if (menu !== button.nextElementSibling) {
+                    menu.classList.remove('show');
+                }
+            });
+
+            // Toggle the clicked menu
+            const menu = button.nextElementSibling;
+            menu.classList.toggle('show');
+        }
+
+        // Close menu when clicking outside
+        document.addEventListener('click', function(event) {
+            if (!event.target.closest('.kebab-menu')) {
+                document.querySelectorAll('.popup-menu.show').forEach(menu => {
+                    menu.classList.remove('show');
+                });
+            }
+        });
     </script>
 </body>
 

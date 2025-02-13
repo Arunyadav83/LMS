@@ -172,7 +172,6 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             </script>";
         }
     }
-    
 }
 
 // Fetch all courses with tutor details
@@ -201,7 +200,6 @@ $course_titles = mysqli_fetch_all($result, MYSQLI_ASSOC);
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css" rel="stylesheet">
-    <link rel="icon" type="image/x-icon" href="../assets/images/apple-touch-icon.png">
 
 
 
@@ -212,6 +210,8 @@ $course_titles = mysqli_fetch_all($result, MYSQLI_ASSOC);
             font-size: 2.5rem;
             margin-bottom: 20px;
         }
+
+        
 
         .add-course-form {
             background-color: #00CED1;
@@ -228,8 +228,11 @@ $course_titles = mysqli_fetch_all($result, MYSQLI_ASSOC);
 
         .card {
             border-radius: 12px;
-            transition: transform 0.2s, box-shadow 0.2s;
             overflow: hidden;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+            transition: transform 0.2s, box-shadow 0.2s;
+            height: 100%;
+            /* Maintain consistent card height */
         }
 
         main {
@@ -237,9 +240,35 @@ $course_titles = mysqli_fetch_all($result, MYSQLI_ASSOC);
         }
 
         .card:hover {
-            transform: scale(1.02);
-            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
+            transform: scale(1.03);
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
         }
+
+
+        .card img {
+            width: 100%;
+            height: 150px;
+            object-fit: cover;
+        }
+
+        .card-body {
+            padding: 1rem;
+            background-color: white;
+        }
+
+
+        .card-title {
+            font-size: 1rem;
+            font-weight: bold;
+            color: #333;
+            margin-bottom: 8px;
+        }
+
+        .card-text {
+            font-size: 0.9rem;
+            color: #666;
+        }
+
 
         .card-body {
             padding: 1.2rem;
@@ -310,7 +339,7 @@ $course_titles = mysqli_fetch_all($result, MYSQLI_ASSOC);
         }
 
         .navbar {
-            background-color:#1a237e;
+            background-color: #1a237e;
             margin: auto;
             padding: 0px 5px;
             /* Adjust top-bottom and left-right padding to reduce height */
@@ -334,16 +363,85 @@ $course_titles = mysqli_fetch_all($result, MYSQLI_ASSOC);
             color: white;
             border-radius: 30px !important;
         }
-     h2{
-        color: #16308b;
-     }
-     @media (max-width: 768px) {
-        .table_list{
-        overflow-x: auto;
-        width: 100%;
 
-    }
-     }
+        h2 {
+            color: #16308b;
+        }
+
+        @media (max-width: 768px) {
+            .table_list {
+                overflow-x: auto;
+                width: 100%;
+
+            }
+        }
+
+        /* Kebab Menu Styles */
+        .kebab-menu {
+            position: relative;
+            z-index: 1000;
+        }
+
+        .kebab-button {
+            background: none;
+            border: none;
+            cursor: pointer;
+            padding: 5px;
+        }
+
+        .kebab-dot {
+            width: 4px;
+            height: 4px;
+            background-color: #333;
+            border-radius: 50%;
+            margin: 2px 0;
+        }
+
+        .popup-menu {
+            display: none;
+            /* Hide by default */
+            position: absolute;
+            right: 0;
+            background-color: white;
+            border: 1px solid #ccc;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+            z-index: 1001;
+            /* Ensure it's above other elements */
+        }
+
+        .kebab-menu.active .popup-menu {
+            display: block;
+            /* Show when active */
+        }
+
+        .popup-menu a {
+            display: block;
+            padding: 8px 16px;
+            text-decoration: none;
+            color: #333;
+        }
+
+        /* .table_list {
+            position: relative;
+           
+            overflow: visible;
+            
+        } */
+
+        .popup-menu a:hover {
+            background-color: #f5f5f5;
+        }
+
+        .popup-menu a {
+            display: block;
+            padding: 8px 16px;
+            text-decoration: none;
+            color: #333;
+        }
+
+        .popup-menu a:hover {
+            background-color: #f5f5f5;
+        }
     </style>
 </head>
 
@@ -361,7 +459,7 @@ $course_titles = mysqli_fetch_all($result, MYSQLI_ASSOC);
             <div class="collapse navbar-collapse justify-content-end" id="navbarNav">
                 <ul class="navbar-nav align-items-center">
                     <li class="nav-item">
-                        <a class="nav-link text-light d-flex align-items-center" href="#"  style="justify-content: space-between; gap:2px;margin-right: 25px;">
+                        <a class="nav-link text-light d-flex align-items-center" href="#">
                             <i class="fas fa-user me-2"></i> Profile
                         </a>
                     </li>
@@ -415,90 +513,94 @@ $course_titles = mysqli_fetch_all($result, MYSQLI_ASSOC);
                     </form> -->
 
                     <!-- Courses List -->
-                    <h2>Courses</h2>
-                    <div class="view-toggle text-end mb-3" style="position: relative; bottom:34px;">
+                    <h2 style="color: #16308b; margin:34px; margin-top: 45px;">Courses</h2>
+                    <div class="view-toggle text-end mb-3" style="position: relative; bottom:34px; margin:23px">
                         <button class="btn btn-outline-primary" id="grid-view-btn"><i class="fas fa-th"></i></button>
                         <button class="btn btn-primary" id="list-view-btn"><i class="fas fa-list"></i> </button>
                     </div>
 
                     <div id="list-view">
                         <div class="table_list">
-                        <table class="table table-striped courses-list">
-                            <thead>
-                                <tr>
-                                    <th>ID</th>
-                                    <th>Title</th>
-                                    <th>Description</th>
-                                    <th>Tutor</th>
-                                    <th>Actions</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <?php foreach ($courses as $course): ?>
+                            <table class="table table-striped courses-list">
+                                <thead>
                                     <tr>
-                                        <td><?php echo htmlspecialchars($course['id']); ?></td>
-                                        <td><?php echo htmlspecialchars($course['title']); ?></td>
-                                        <td><?php echo htmlspecialchars(truncateText($course['description'], 50)); ?></td>
-                                        <td><?php echo htmlspecialchars($course['tutor_name']); ?></td>
-                                        <td>
-                                            <div class="d-flex">
-                                                <!-- Edit Button with Icon -->
-                                                <button type="button" class="btn btn-sm btn-primary me-2" data-bs-toggle="modal" data-bs-target="#editCourse<?php echo $course['id']; ?>">
-                                                    <i class="bi bi-pencil"></i> <!-- Pencil icon -->
-                                                </button>
-
-                                                <!-- Delete Button with Icon -->
-                                                <form action="" method="POST" onsubmit="return confirm('Are you sure you want to delete this course?');">
-                                                    <input type="hidden" name="id" value="<?php echo $course['id']; ?>">
-                                                    <button type="submit" name="delete_course" class="btn btn-danger btn-sm">
-                                                        <i class="bi bi-trash"></i> <!-- Trash icon -->
-                                                    </button>
-                                                </form>
-                                            </div>
-                                        </td>
+                                        <th>ID</th>
+                                        <th>Title</th>
+                                        <th>Description</th> 
+                                        <th>Tutor</th>
+                                        <th>Actions</th>
                                     </tr>
-                                <?php endforeach; ?>
-                            </tbody>
-                        </table>
+                                </thead>
+                                <tbody>
+                                    <?php foreach ($courses as $course): ?>
+                                        <tr>
+                                            <td><?php echo htmlspecialchars($course['id']); ?></td>
+                                            <td><?php echo htmlspecialchars($course['title']); ?></td>
+                                            <td><?php echo htmlspecialchars(truncateText($course['description'], 50)); ?></td>
+                                            <td><?php echo htmlspecialchars($course['tutor_name']); ?></td>
+                                            <td>
+                                                <div class="card-body">
+                                                    <!-- Kebab Menu (Three Vertical Dots) -->
+                                                    <div class="kebab-menu">
+                                                        <button class="kebab-button" onclick="toggleMenu(this)">
+                                                            <div class="kebab-dot"></div>
+                                                            <div class="kebab-dot"></div>
+                                                            <div class="kebab-dot"></div>
+                                                        </button>
+                                                        <div class="popup-menu">
+                                                            <a href="#" onclick="editCourse(<?php echo $course['id']; ?>)">Edit</a>
+                                                            <a href="#" onclick="deleteCourse(<?php echo $course['id']; ?>)">Delete</a>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                    <?php endforeach; ?>
+                                </tbody>
+                            </table>
                         </div>
                     </div>
 
-     <!-- Grid View -->
-     <div id="grid-view" class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4" style="display: none;">
-    <?php foreach ($courses as $course): ?>
-        <div class="col" id="course-card-<?php echo $course['id']; ?>">
-            <div class="card h-100 shadow-sm">
-                <div class="card-body">
-                    <!-- Image on the top -->
-                    <img
-                        src="../assets/images/<?php echo htmlspecialchars($course['title']); ?>.jpg"
-                        alt="<?php echo htmlspecialchars($course['title']); ?>"
-                        class="rounded"
-                        style="width: 100px; height: 100px; object-fit: contain; margin-bottom: 10px;" />
-                    
-                    <!-- Title with Buttons on Same Line -->
-                    <div class="d-flex justify-content-between align-items-center mb-3">
-                        <h5 class="card-title" style="color: black; margin: 0;">Title: <?php echo htmlspecialchars($course['title']); ?></h5>
-                        <div class="d-flex gap-2">
-                            <!-- Edit Button -->
-                            <button type="button" class="btn btn-sm edit-btn" data-bs-toggle="modal" data-bs-target="#editCourse<?php echo $course['id']; ?>">
-                                <i class="bi bi-pencil"></i>
-                            </button>
-                            <!-- Delete Button -->
-                            <button type="button" class="btn btn-sm delete-btn" onclick="confirmDelete(event, <?php echo $course['id']; ?>)">
-                                <i class="bi bi-trash"></i>
-                            </button>
-                        </div>
-                    </div>
 
-                    <!-- Description and Tutor -->
-                    <p class="card-text text-muted">Description: <?php echo htmlspecialchars(truncateText($course['description'], 50)); ?></p>
-                    <p class="card-text" style="color: black;">Tutor: <?php echo htmlspecialchars($course['tutor_name']); ?></p>
-                </div>
-            </div>
-        </div>
-    <?php endforeach; ?>
-</div>
+                    <!-- Grid View -->
+                    <div id="grid-view" class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4" style="display: none;">
+                        <?php foreach ($courses as $course): ?>
+                            <div class="col" id="course-card-<?php echo $course['id']; ?>">
+                                <div class="card h-100 shadow-sm">
+                                    <div class="card-body">
+                                        <!-- Kebab Menu (Three Vertical Dots) -->
+                                        <div class="kebab-menu" style="position: absolute; top: 10px; right: 10px;">
+                                            <button class="kebab-button" onclick="toggleMenu(this)">
+                                                <div class="kebab-dot"></div>
+                                                <div class="kebab-dot"></div>
+                                                <div class="kebab-dot"></div>
+                                            </button>
+                                            <div class="popup-menu">
+                                                <a href="#" onclick="editCourse(<?php echo $course['id']; ?>)">Edit</a>
+                                                <a href="#" onclick="deleteCourse(<?php echo $course['id']; ?>)">Delete</a>
+                                            </div>
+                                        </div>
+
+                                        <!-- Image on the top -->
+                                        <img
+                                            src="../assets/images/<?php echo htmlspecialchars($course['title']); ?>.jpg"
+                                            alt="<?php echo htmlspecialchars($course['title']); ?>"
+                                            class="rounded"
+                                            style="width: 100px; height: 100px; object-fit: contain; margin-bottom: 10px;" />
+
+                                        <!-- Title with Buttons on Same Line -->
+                                        <div class="d-flex justify-content-between align-items-center mb-3" style="margin-top: 34px;">
+                                            <h5 class="card-title" style="color: black; margin: 0;">Title: <?php echo htmlspecialchars($course['title']); ?></h5>
+                                        </div>
+
+                                        <!-- Description and Tutor -->
+                                        <p class="card-text text-muted">Description: <?php echo htmlspecialchars(truncateText($course['description'], 50)); ?></p>
+                                        <p class="card-text" style="color: black;">Tutor: <?php echo htmlspecialchars($course['tutor_name']); ?></p>
+                                    </div>
+                                </div>
+                            </div>
+                        <?php endforeach; ?>
+                    </div>
 
 
 
@@ -582,33 +684,57 @@ $course_titles = mysqli_fetch_all($result, MYSQLI_ASSOC);
             });
         });
 
-        function confirmDelete(id) {
-    Swal.fire({
-        title: "Are you sure?",
-        text: "You won't be able to revert this!",
-        icon: "warning",
-        showCancelButton: true,
-        confirmButtonColor: "#3085d6",
-        cancelButtonColor: "#d33",
-        confirmButtonText: "Yes, delete it!"
-    }).then((result) => {
-        if (result.isConfirmed) {
-            // Submit the form using JavaScript
-            const form = document.createElement("form");
-            form.method = "POST";
-            form.action = ""; // Current page
-
-            const input = document.createElement("input");
-            input.type = "hidden";
-            input.name = "delete_course";
-            input.value = id;
-
-            form.appendChild(input);
-            document.body.appendChild(form);
-            form.submit();
+        // Function to handle edit action
+        function editCourse(courseId) {
+            // Open the edit modal for the specific course
+            const editModal = new bootstrap.Modal(document.getElementById(`editCourse${courseId}`));
+            editModal.show();
         }
-    });
-}
+
+        // Function to handle delete action
+        function deleteCourse(courseId) {
+            Swal.fire({
+                title: 'Are you sure?',
+                text: "You won't be able to revert this!",
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#3085d6',
+                cancelButtonColor: '#d33',
+                confirmButtonText: 'Yes, delete it!'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    // Submit the delete form
+                    const form = document.createElement('form');
+                    form.method = 'POST';
+                    form.action = '';
+                    const input = document.createElement('input');
+                    input.type = 'hidden';
+                    input.name = 'id';
+                    input.value = courseId;
+                    form.appendChild(input);
+                    document.body.appendChild(form);
+                    form.submit();
+                }
+            });
+        }
+
+        function confirmDelete(event) {
+            event.preventDefault();
+            Swal.fire({
+                title: 'Are you sure?',
+                text: "You won't be able to revert this!",
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#3085d6',
+                cancelButtonColor: '#d33',
+                confirmButtonText: 'Yes, delete it!'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    event.target.closest('form').submit();
+                }
+            });
+            return false;
+        }
 
         // Ensure SweetAlert is properly initialized
         document.addEventListener('DOMContentLoaded', function() {
@@ -616,7 +742,30 @@ $course_titles = mysqli_fetch_all($result, MYSQLI_ASSOC);
                 console.error('SweetAlert2 is not loaded!');
             }
         });
+        // Function to toggle the kebab menu
+        function toggleMenu(button) {
+            const menu = button.nextElementSibling;
+            if (menu.style.display === 'block') {
+                menu.style.display = 'none';
+            } else {
+                menu.style.display = 'block';
+            }
+        }
+
+        // Close the menu when clicking outside
+        document.addEventListener('click', function(event) {
+            const menus = document.querySelectorAll('.popup-menu');
+            menus.forEach(menu => {
+                if (!menu.parentElement.contains(event.target)) {
+                    menu.style.display = 'none';
+                }
+            });
+        });
     </script>
+</body>
+
+</html>
+
 </body>
 
 </html>

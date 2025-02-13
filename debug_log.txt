@@ -795,3 +795,1026 @@ Razorpay Order Data: {"amount":250000,"currency":"INR","receipt":"order_65","not
 Course Details (Title, Tutor ID): {"id":65,"title":"Physics","course_prize":"2500.00","tutor_id":10}
 Final Response Data: [{"success":true,"order_id":"order_PspHyo3aVNcb30","course_id":"65","user_id":"21","course_prize":"2500.00","title":"Physics","tutor_id":10,"enrolled_at":"2025-02-07 13:49:13","email":"kodimyalasrivani@gmail.com","username":"Kodimyala Srivani"}]
 Total Price: 2500
+Raw POST Data: Array
+(
+    [course_id] => 66
+    [user_id] => 10
+)
+
+Course IDs: Array
+(
+    [0] => 66
+)
+
+Fetched Course Details for ID 66: Array
+(
+    [id] => 66
+    [title] => HIndi
+    [course_prize] => 2500.00
+    [tutor_id] => 10
+)
+
+Course Prize for ID 66: 2500.00
+Razorpay Order Data: {"amount":250000,"currency":"INR","receipt":"order_66","notes":{"course_id":"66","tutor_id":10,"course_name":"HIndi","course_prize":"2500.00","title":"HIndi","username":"Neha","email":"nehakumari2002muriyari@gmail.com"}}
+Course Details (Title, Tutor ID): {"id":66,"title":"HIndi","course_prize":"2500.00","tutor_id":10}
+Final Response Data: [{"success":true,"order_id":"order_Pt7it7w8dRYuIe","course_id":"66","user_id":"10","course_prize":"2500.00","title":"HIndi","tutor_id":10,"enrolled_at":"2025-02-08 07:51:10","email":"nehakumari2002muriyari@gmail.com","username":"Neha"}]
+Total Price: 2500
+Raw POST Data: Array
+(
+    [course_id] => 67
+    [user_id] => 10
+)
+
+Course IDs: Array
+(
+    [0] => 67
+)
+
+Fetched Course Details for ID 67: Array
+(
+    [id] => 67
+    [title] => Devops
+    [course_prize] => 2500.00
+    [tutor_id] => 8
+)
+
+Course Prize for ID 67: 2500.00
+Razorpay Order Data: {"amount":250000,"currency":"INR","receipt":"order_67","notes":{"course_id":"67","tutor_id":8,"course_name":"Devops","course_prize":"2500.00","title":"Devops","username":"Neha","email":"nehakumari2002muriyari@gmail.com"}}
+Course Details (Title, Tutor ID): {"id":67,"title":"Devops","course_prize":"2500.00","tutor_id":8}
+Final Response Data: [{"success":true,"order_id":"order_Pt8FHK8itZuzBo","course_id":"67","user_id":"10","course_prize":"2500.00","title":"Devops","tutor_id":8,"enrolled_at":"2025-02-08 08:21:50","email":"nehakumari2002muriyari@gmail.com","username":"Neha"}]
+Total Price: 2500
+Raw POST Data: Array
+(
+    [course_id] => 64
+    [user_id] => 10
+)
+
+Course IDs: Array
+(
+    [0] => 64
+)
+
+Fetched Course Details for ID 64: Array
+(
+    [id] => 64
+    [title] => React
+    [course_prize] => 2999.00
+    [tutor_id] => 18
+)
+
+Course Prize for ID 64: 2999.00
+Razorpay Order Data: {"amount":299900,"currency":"INR","receipt":"order_64","notes":{"course_id":"64","tutor_id":18,"course_name":"React","course_prize":"2999.00","title":"React","username":"Neha","email":"nehakumari2002muriyari@gmail.com"}}
+Course Details (Title, Tutor ID): {"id":64,"title":"React","course_prize":"2999.00","tutor_id":18}
+Final Response Data: [{"success":true,"order_id":"order_Pt8i4aW0KPptiL","course_id":"64","user_id":"10","course_prize":"2999.00","title":"React","tutor_id":18,"enrolled_at":"2025-02-08 08:49:05","email":"nehakumari2002muriyari@gmail.com","username":"Neha"}]
+Total Price: 2999
+Raw POST Data: Array
+(
+    [course_id] => 67
+    [user_id] => 10
+)
+
+Course IDs: Array
+(
+    [0] => 67
+)
+
+Fetched Course Details for ID 67: Array
+(
+    [id] => 67
+    [title] => Devops
+    [course_prize] => 2500.00
+    [tutor_id] => 8
+)
+
+Course Prize for ID 67: 2500.00
+Razorpay Order Data: {"amount":250000,"currency":"INR","receipt":"order_67","notes":{"course_id":"67","tutor_id":8,"course_name":"Devops","course_prize":"2500.00","title":"Devops","username":"Neha","email":"nehakumari2002muriyari@gmail.com"}}
+Course Details (Title, Tutor ID): {"id":67,"title":"Devops","course_prize":"2500.00","tutor_id":8}
+Final Response Data: [{"success":true,"order_id":"order_Pt8iZvPkKbBNn9","course_id":"67","user_id":"10","course_prize":"2500.00","title":"Devops","tutor_id":8,"enrolled_at":"2025-02-08 08:49:34","email":"nehakumari2002muriyari@gmail.com","username":"Neha"}]
+Total Price: 2500
+Raw POST Data: Array
+(
+    [course_id] => 38
+    [user_id] => 13
+    [course_prize] => 2000.00
+)
+
+Course IDs: Array
+(
+    [0] => 38
+)
+
+Fetched Course Details for ID 38: Array
+(
+    [id] => 38
+    [title] => Python
+    [course_prize] => 2000.00
+    [tutor_id] => 9
+)
+
+Course Prize for ID 38: 2000.00
+Razorpay Order Data: {"amount":200000,"currency":"INR","receipt":"order_38","notes":{"course_id":"38","tutor_id":9,"course_name":"Python","course_prize":"2000.00","title":"Python","username":"Saikumar","email":"arunbhairi669@gmail.com"}}
+Course Details (Title, Tutor ID): {"id":38,"title":"Python","course_prize":"2000.00","tutor_id":9}
+Final Response Data: [{"success":true,"order_id":"order_Pt8uVr0o4OK17Z","course_id":"38","user_id":"13","course_prize":"2000.00","title":"Python","tutor_id":9,"enrolled_at":"2025-02-08 09:00:52","email":"arunbhairi669@gmail.com","username":"Saikumar"}]
+Total Price: 2000
+Raw POST Data: Array
+(
+    [course_id] => 38
+    [user_id] => 13
+)
+
+Course IDs: Array
+(
+    [0] => 38
+)
+
+Fetched Course Details for ID 38: Array
+(
+    [id] => 38
+    [title] => Python
+    [course_prize] => 2000.00
+    [tutor_id] => 9
+)
+
+Course Prize for ID 38: 2000.00
+Razorpay Order Data: {"amount":200000,"currency":"INR","receipt":"order_38","notes":{"course_id":"38","tutor_id":9,"course_name":"Python","course_prize":"2000.00","title":"Python","username":"Saikumar","email":"arunbhairi669@gmail.com"}}
+Course Details (Title, Tutor ID): {"id":38,"title":"Python","course_prize":"2000.00","tutor_id":9}
+Final Response Data: [{"success":true,"order_id":"order_Pt8wLk0Ay0mXyy","course_id":"38","user_id":"13","course_prize":"2000.00","title":"Python","tutor_id":9,"enrolled_at":"2025-02-08 09:02:36","email":"arunbhairi669@gmail.com","username":"Saikumar"}]
+Total Price: 2000
+Raw POST Data: Array
+(
+    [course_id] => 54
+    [user_id] => 13
+)
+
+Course IDs: Array
+(
+    [0] => 54
+)
+
+Fetched Course Details for ID 54: Array
+(
+    [id] => 54
+    [title] => JavaScript
+    [course_prize] => 2400.00
+    [tutor_id] => 17
+)
+
+Course Prize for ID 54: 2400.00
+Razorpay Order Data: {"amount":240000,"currency":"INR","receipt":"order_54","notes":{"course_id":"54","tutor_id":17,"course_name":"JavaScript","course_prize":"2400.00","title":"JavaScript","username":"Saikumar","email":"arunbhairi669@gmail.com"}}
+Course Details (Title, Tutor ID): {"id":54,"title":"JavaScript","course_prize":"2400.00","tutor_id":17}
+Final Response Data: [{"success":true,"order_id":"order_PtAZN2vQqu9tik","course_id":"54","user_id":"13","course_prize":"2400.00","title":"JavaScript","tutor_id":17,"enrolled_at":"2025-02-08 10:38:14","email":"arunbhairi669@gmail.com","username":"Saikumar"}]
+Total Price: 2400
+Raw POST Data: Array
+(
+    [course_id] => 38
+    [user_id] => 11
+)
+
+Course IDs: Array
+(
+    [0] => 38
+)
+
+Fetched Course Details for ID 38: Array
+(
+    [id] => 38
+    [title] => Python
+    [course_prize] => 2000.00
+    [tutor_id] => 9
+)
+
+Course Prize for ID 38: 2000.00
+Razorpay Order Data: {"amount":200000,"currency":"INR","receipt":"order_38","notes":{"course_id":"38","tutor_id":9,"course_name":"Python","course_prize":"2000.00","title":"Python","username":"Arun Pittala","email":"arunk19395@gmail.com"}}
+Course Details (Title, Tutor ID): {"id":38,"title":"Python","course_prize":"2000.00","tutor_id":9}
+Final Response Data: [{"success":true,"order_id":"order_PtB6NiKsOTh1ks","course_id":"38","user_id":"11","course_prize":"2000.00","title":"Python","tutor_id":9,"enrolled_at":"2025-02-08 11:09:29","email":"arunk19395@gmail.com","username":"Arun Pittala"}]
+Total Price: 2000
+Raw POST Data: Array
+(
+    [course_id] => 38
+    [user_id] => 11
+)
+
+Course IDs: Array
+(
+    [0] => 38
+)
+
+Fetched Course Details for ID 38: Array
+(
+    [id] => 38
+    [title] => Python
+    [course_prize] => 2000.00
+    [tutor_id] => 9
+)
+
+Course Prize for ID 38: 2000.00
+Razorpay Order Data: {"amount":200000,"currency":"INR","receipt":"order_38","notes":{"course_id":"38","tutor_id":9,"course_name":"Python","course_prize":"2000.00","title":"Python","username":"Arun Pittala","email":"arunk19395@gmail.com"}}
+Course Details (Title, Tutor ID): {"id":38,"title":"Python","course_prize":"2000.00","tutor_id":9}
+Final Response Data: [{"success":true,"order_id":"order_PtBAvLS1PZrFrr","course_id":"38","user_id":"11","course_prize":"2000.00","title":"Python","tutor_id":9,"enrolled_at":"2025-02-08 11:13:47","email":"arunk19395@gmail.com","username":"Arun Pittala"}]
+Total Price: 2000
+Raw POST Data: Array
+(
+    [course_id] => 61
+    [user_id] => 15
+)
+
+Course IDs: Array
+(
+    [0] => 61
+)
+
+Fetched Course Details for ID 61: Array
+(
+    [id] => 61
+    [title] => Springboot
+    [course_prize] => 3000.00
+    [tutor_id] => 9
+)
+
+Course Prize for ID 61: 3000.00
+Razorpay Order Data: {"amount":300000,"currency":"INR","receipt":"order_61","notes":{"course_id":"61","tutor_id":9,"course_name":"Springboot","course_prize":"3000.00","title":"Springboot","username":"Bhimeshwar","email":"bheemnri1161621@gmail.com"}}
+Course Details (Title, Tutor ID): {"id":61,"title":"Springboot","course_prize":"3000.00","tutor_id":9}
+Final Response Data: [{"success":true,"order_id":"order_PtBBReMdYISnVQ","course_id":"61","user_id":"15","course_prize":"3000.00","title":"Springboot","tutor_id":9,"enrolled_at":"2025-02-08 11:14:16","email":"bheemnri1161621@gmail.com","username":"Bhimeshwar"}]
+Total Price: 3000
+Raw POST Data: Array
+(
+    [course_id] => 61
+    [user_id] => 15
+)
+
+Course IDs: Array
+(
+    [0] => 61
+)
+
+Fetched Course Details for ID 61: Array
+(
+    [id] => 61
+    [title] => Springboot
+    [course_prize] => 3000.00
+    [tutor_id] => 9
+)
+
+Course Prize for ID 61: 3000.00
+Razorpay Order Data: {"amount":300000,"currency":"INR","receipt":"order_61","notes":{"course_id":"61","tutor_id":9,"course_name":"Springboot","course_prize":"3000.00","title":"Springboot","username":"Bhimeshwar","email":"bheemnri1161621@gmail.com"}}
+Course Details (Title, Tutor ID): {"id":61,"title":"Springboot","course_prize":"3000.00","tutor_id":9}
+Final Response Data: [{"success":true,"order_id":"order_PtBBny70cb0bnj","course_id":"61","user_id":"15","course_prize":"3000.00","title":"Springboot","tutor_id":9,"enrolled_at":"2025-02-08 11:14:37","email":"bheemnri1161621@gmail.com","username":"Bhimeshwar"}]
+Total Price: 3000
+Raw POST Data: Array
+(
+    [course_id] => 66
+    [user_id] => 15
+)
+
+Course IDs: Array
+(
+    [0] => 66
+)
+
+Fetched Course Details for ID 66: Array
+(
+    [id] => 66
+    [title] => HIndi
+    [course_prize] => 2500.00
+    [tutor_id] => 10
+)
+
+Course Prize for ID 66: 2500.00
+Razorpay Order Data: {"amount":250000,"currency":"INR","receipt":"order_66","notes":{"course_id":"66","tutor_id":10,"course_name":"HIndi","course_prize":"2500.00","title":"HIndi","username":"Bhimeshwar","email":"bheemnri1161621@gmail.com"}}
+Course Details (Title, Tutor ID): {"id":66,"title":"HIndi","course_prize":"2500.00","tutor_id":10}
+Final Response Data: [{"success":true,"order_id":"order_PtCDtW4X77ZvXT","course_id":"66","user_id":"15","course_prize":"2500.00","title":"HIndi","tutor_id":10,"enrolled_at":"2025-02-08 12:15:17","email":"bheemnri1161621@gmail.com","username":"Bhimeshwar"}]
+Total Price: 2500
+Raw POST Data: Array
+(
+    [course_id] => 64
+    [user_id] => 9
+)
+
+Course IDs: Array
+(
+    [0] => 64
+)
+
+Fetched Course Details for ID 64: Array
+(
+    [id] => 64
+    [title] => React
+    [course_prize] => 2999.00
+    [tutor_id] => 18
+)
+
+Course Prize for ID 64: 2999.00
+Razorpay Order Data: {"amount":299900,"currency":"INR","receipt":"order_64","notes":{"course_id":"64","tutor_id":18,"course_name":"React","course_prize":"2999.00","title":"React","username":"Srivani","email":"srivanikodimyala9@gmail.com"}}
+Course Details (Title, Tutor ID): {"id":64,"title":"React","course_prize":"2999.00","tutor_id":18}
+Final Response Data: [{"success":true,"order_id":"order_Pts2486Md7EPXJ","course_id":"64","user_id":"9","course_prize":"2999.00","title":"React","tutor_id":18,"enrolled_at":"2025-02-10 05:09:14","email":"srivanikodimyala9@gmail.com","username":"Srivani"}]
+Total Price: 2999
+Raw POST Data: Array
+(
+    [course_id] => 64
+    [user_id] => 9
+)
+
+Course IDs: Array
+(
+    [0] => 64
+)
+
+Fetched Course Details for ID 64: Array
+(
+    [id] => 64
+    [title] => React
+    [course_prize] => 2999.00
+    [tutor_id] => 18
+)
+
+Course Prize for ID 64: 2999.00
+Razorpay Order Data: {"amount":299900,"currency":"INR","receipt":"order_64","notes":{"course_id":"64","tutor_id":18,"course_name":"React","course_prize":"2999.00","title":"React","username":"Srivani","email":"srivanikodimyala9@gmail.com"}}
+Course Details (Title, Tutor ID): {"id":64,"title":"React","course_prize":"2999.00","tutor_id":18}
+Final Response Data: [{"success":true,"order_id":"order_Pts24inXSLKmOD","course_id":"64","user_id":"9","course_prize":"2999.00","title":"React","tutor_id":18,"enrolled_at":"2025-02-10 05:09:15","email":"srivanikodimyala9@gmail.com","username":"Srivani"}]
+Total Price: 2999
+Raw POST Data: Array
+(
+    [course_id] => 64
+    [user_id] => 9
+)
+
+Course IDs: Array
+(
+    [0] => 64
+)
+
+Fetched Course Details for ID 64: Array
+(
+    [id] => 64
+    [title] => React
+    [course_prize] => 2999.00
+    [tutor_id] => 18
+)
+
+Course Prize for ID 64: 2999.00
+Razorpay Order Data: {"amount":299900,"currency":"INR","receipt":"order_64","notes":{"course_id":"64","tutor_id":18,"course_name":"React","course_prize":"2999.00","title":"React","username":"Srivani","email":"srivanikodimyala9@gmail.com"}}
+Course Details (Title, Tutor ID): {"id":64,"title":"React","course_prize":"2999.00","tutor_id":18}
+Final Response Data: [{"success":true,"order_id":"order_Pts252GWqPyg9g","course_id":"64","user_id":"9","course_prize":"2999.00","title":"React","tutor_id":18,"enrolled_at":"2025-02-10 05:09:15","email":"srivanikodimyala9@gmail.com","username":"Srivani"}]
+Total Price: 2999
+Raw POST Data: Array
+(
+    [course_id] => 64
+    [user_id] => 9
+)
+
+Course IDs: Array
+(
+    [0] => 64
+)
+
+Fetched Course Details for ID 64: Array
+(
+    [id] => 64
+    [title] => React
+    [course_prize] => 2999.00
+    [tutor_id] => 18
+)
+
+Course Prize for ID 64: 2999.00
+Razorpay Order Data: {"amount":299900,"currency":"INR","receipt":"order_64","notes":{"course_id":"64","tutor_id":18,"course_name":"React","course_prize":"2999.00","title":"React","username":"Srivani","email":"srivanikodimyala9@gmail.com"}}
+Course Details (Title, Tutor ID): {"id":64,"title":"React","course_prize":"2999.00","tutor_id":18}
+Final Response Data: [{"success":true,"order_id":"order_Pts25MTJAuOwFR","course_id":"64","user_id":"9","course_prize":"2999.00","title":"React","tutor_id":18,"enrolled_at":"2025-02-10 05:09:15","email":"srivanikodimyala9@gmail.com","username":"Srivani"}]
+Total Price: 2999
+Raw POST Data: Array
+(
+    [course_id] => 64
+    [user_id] => 9
+)
+
+Course IDs: Array
+(
+    [0] => 64
+)
+
+Fetched Course Details for ID 64: Array
+(
+    [id] => 64
+    [title] => React
+    [course_prize] => 2999.00
+    [tutor_id] => 18
+)
+
+Course Prize for ID 64: 2999.00
+Razorpay Order Data: {"amount":299900,"currency":"INR","receipt":"order_64","notes":{"course_id":"64","tutor_id":18,"course_name":"React","course_prize":"2999.00","title":"React","username":"Srivani","email":"srivanikodimyala9@gmail.com"}}
+Course Details (Title, Tutor ID): {"id":64,"title":"React","course_prize":"2999.00","tutor_id":18}
+Final Response Data: [{"success":true,"order_id":"order_Pts25c91oqX1xC","course_id":"64","user_id":"9","course_prize":"2999.00","title":"React","tutor_id":18,"enrolled_at":"2025-02-10 05:09:15","email":"srivanikodimyala9@gmail.com","username":"Srivani"}]
+Total Price: 2999
+Raw POST Data: Array
+(
+    [course_id] => 64
+    [user_id] => 9
+)
+
+Course IDs: Array
+(
+    [0] => 64
+)
+
+Fetched Course Details for ID 64: Array
+(
+    [id] => 64
+    [title] => React
+    [course_prize] => 2999.00
+    [tutor_id] => 18
+)
+
+Course Prize for ID 64: 2999.00
+Razorpay Order Data: {"amount":299900,"currency":"INR","receipt":"order_64","notes":{"course_id":"64","tutor_id":18,"course_name":"React","course_prize":"2999.00","title":"React","username":"Srivani","email":"srivanikodimyala9@gmail.com"}}
+Course Details (Title, Tutor ID): {"id":64,"title":"React","course_prize":"2999.00","tutor_id":18}
+Final Response Data: [{"success":true,"order_id":"order_Pts25sjGCTXvXw","course_id":"64","user_id":"9","course_prize":"2999.00","title":"React","tutor_id":18,"enrolled_at":"2025-02-10 05:09:16","email":"srivanikodimyala9@gmail.com","username":"Srivani"}]
+Total Price: 2999
+Raw POST Data: Array
+(
+    [course_id] => 64
+    [user_id] => 9
+)
+
+Course IDs: Array
+(
+    [0] => 64
+)
+
+Fetched Course Details for ID 64: Array
+(
+    [id] => 64
+    [title] => React
+    [course_prize] => 2999.00
+    [tutor_id] => 18
+)
+
+Course Prize for ID 64: 2999.00
+Razorpay Order Data: {"amount":299900,"currency":"INR","receipt":"order_64","notes":{"course_id":"64","tutor_id":18,"course_name":"React","course_prize":"2999.00","title":"React","username":"Srivani","email":"srivanikodimyala9@gmail.com"}}
+Course Details (Title, Tutor ID): {"id":64,"title":"React","course_prize":"2999.00","tutor_id":18}
+Final Response Data: [{"success":true,"order_id":"order_Pts267yx8mDPRj","course_id":"64","user_id":"9","course_prize":"2999.00","title":"React","tutor_id":18,"enrolled_at":"2025-02-10 05:09:16","email":"srivanikodimyala9@gmail.com","username":"Srivani"}]
+Total Price: 2999
+Raw POST Data: Array
+(
+    [course_id] => 64
+    [user_id] => 9
+)
+
+Course IDs: Array
+(
+    [0] => 64
+)
+
+Fetched Course Details for ID 64: Array
+(
+    [id] => 64
+    [title] => React
+    [course_prize] => 2999.00
+    [tutor_id] => 18
+)
+
+Course Prize for ID 64: 2999.00
+Razorpay Order Data: {"amount":299900,"currency":"INR","receipt":"order_64","notes":{"course_id":"64","tutor_id":18,"course_name":"React","course_prize":"2999.00","title":"React","username":"Srivani","email":"srivanikodimyala9@gmail.com"}}
+Course Details (Title, Tutor ID): {"id":64,"title":"React","course_prize":"2999.00","tutor_id":18}
+Final Response Data: [{"success":true,"order_id":"order_Pts26OFJOzGvUq","course_id":"64","user_id":"9","course_prize":"2999.00","title":"React","tutor_id":18,"enrolled_at":"2025-02-10 05:09:16","email":"srivanikodimyala9@gmail.com","username":"Srivani"}]
+Total Price: 2999
+Raw POST Data: Array
+(
+    [course_id] => 67
+    [user_id] => 12
+)
+
+Course IDs: Array
+(
+    [0] => 67
+)
+
+Fetched Course Details for ID 67: Array
+(
+    [id] => 67
+    [title] => Devops
+    [course_prize] => 2500.00
+    [tutor_id] => 8
+)
+
+Course Prize for ID 67: 2500.00
+Razorpay Order Data: {"amount":250000,"currency":"INR","receipt":"order_67","notes":{"course_id":"67","tutor_id":8,"course_name":"Devops","course_prize":"2500.00","title":"Devops","username":"ShivaMani","email":"shivamani7907@gmail.com"}}
+Course Details (Title, Tutor ID): {"id":67,"title":"Devops","course_prize":"2500.00","tutor_id":8}
+Final Response Data: [{"success":true,"order_id":"order_PtsihVJayEDIM3","course_id":"67","user_id":"12","course_prize":"2500.00","title":"Devops","tutor_id":8,"enrolled_at":"2025-02-10 05:49:37","email":"shivamani7907@gmail.com","username":"ShivaMani"}]
+Total Price: 2500
+Raw POST Data: Array
+(
+    [course_id] => 67
+    [user_id] => 12
+)
+
+Course IDs: Array
+(
+    [0] => 67
+)
+
+Fetched Course Details for ID 67: Array
+(
+    [id] => 67
+    [title] => Devops
+    [course_prize] => 2500.00
+    [tutor_id] => 8
+)
+
+Course Prize for ID 67: 2500.00
+Razorpay Order Data: {"amount":250000,"currency":"INR","receipt":"order_67","notes":{"course_id":"67","tutor_id":8,"course_name":"Devops","course_prize":"2500.00","title":"Devops","username":"ShivaMani","email":"shivamani7907@gmail.com"}}
+Course Details (Title, Tutor ID): {"id":67,"title":"Devops","course_prize":"2500.00","tutor_id":8}
+Final Response Data: [{"success":true,"order_id":"order_Ptsimsnvd1Rqyo","course_id":"67","user_id":"12","course_prize":"2500.00","title":"Devops","tutor_id":8,"enrolled_at":"2025-02-10 05:49:41","email":"shivamani7907@gmail.com","username":"ShivaMani"}]
+Total Price: 2500
+Raw POST Data: Array
+(
+    [course_id] => 58
+    [user_id] => 9
+)
+
+Course IDs: Array
+(
+    [0] => 58
+)
+
+Fetched Course Details for ID 58: Array
+(
+    [id] => 58
+    [title] => Microsoft Azure
+    [course_prize] => 2300.00
+    [tutor_id] => 6
+)
+
+Course Prize for ID 58: 2300.00
+Razorpay Order Data: {"amount":230000,"currency":"INR","receipt":"order_58","notes":{"course_id":"58","tutor_id":6,"course_name":"Microsoft Azure","course_prize":"2300.00","title":"Microsoft Azure","username":"Srivani","email":"srivanikodimyala9@gmail.com"}}
+Course Details (Title, Tutor ID): {"id":58,"title":"Microsoft Azure","course_prize":"2300.00","tutor_id":6}
+Final Response Data: [{"success":true,"order_id":"order_Pu0PSxg2qgSBDB","course_id":"58","user_id":"9","course_prize":"2300.00","title":"Microsoft Azure","tutor_id":6,"enrolled_at":"2025-02-10 13:20:55","email":"srivanikodimyala9@gmail.com","username":"Srivani"}]
+Total Price: 2300
+Raw POST Data: Array
+(
+    [amount] => 549900
+    [user_id] => 20
+    [course_ids] => ["65","64"]
+    [total_price] => 549900
+)
+
+Course IDs: Array
+(
+    [0] => 65
+    [1] => 64
+)
+
+Fetched Course Details for ID 65: Array
+(
+    [id] => 65
+    [title] => Physics
+    [course_prize] => 2500.00
+    [tutor_id] => 10
+)
+
+Course Prize for ID 65: 2500.00
+Razorpay Order Data: {"amount":250000,"currency":"INR","receipt":"order_65","notes":{"course_id":"65","tutor_id":10,"course_name":"Physics","course_prize":"2500.00","title":"Physics","username":"Rohith","email":"rohithuiuxdesigner@gmail.com"}}
+Course Details (Title, Tutor ID): {"id":65,"title":"Physics","course_prize":"2500.00","tutor_id":10}
+Fetched Course Details for ID 64: Array
+(
+    [id] => 64
+    [title] => React
+    [course_prize] => 2999.00
+    [tutor_id] => 18
+)
+
+Course Prize for ID 64: 2999.00
+Razorpay Order Data: {"amount":299900,"currency":"INR","receipt":"order_64","notes":{"course_id":"64","tutor_id":18,"course_name":"React","course_prize":"2999.00","title":"React","username":"Rohith","email":"rohithuiuxdesigner@gmail.com"}}
+Course Details (Title, Tutor ID): {"id":64,"title":"React","course_prize":"2999.00","tutor_id":18}
+Final Response Data: [{"success":true,"order_id":"order_PuSJc4e5jljVf3","course_id":"65","user_id":"20","course_prize":"2500.00","title":"Physics","tutor_id":10,"enrolled_at":"2025-02-11 16:38:48","email":"rohithuiuxdesigner@gmail.com","username":"Rohith"},{"success":true,"order_id":"order_PuSJcUiAOc8Rpx","course_id":"64","user_id":"20","course_prize":"2999.00","title":"React","tutor_id":18,"enrolled_at":"2025-02-11 16:38:48","email":"rohithuiuxdesigner@gmail.com","username":"Rohith"}]
+Total Price: 5499
+Raw POST Data: Array
+(
+    [amount] => 549900
+    [user_id] => 20
+    [course_ids] => ["65","64"]
+    [total_price] => 549900
+)
+
+Course IDs: Array
+(
+    [0] => 65
+    [1] => 64
+)
+
+Fetched Course Details for ID 65: Array
+(
+    [id] => 65
+    [title] => Physics
+    [course_prize] => 2500.00
+    [tutor_id] => 10
+)
+
+Course Prize for ID 65: 2500.00
+Razorpay Order Data: {"amount":250000,"currency":"INR","receipt":"order_65","notes":{"course_id":"65","tutor_id":10,"course_name":"Physics","course_prize":"2500.00","title":"Physics","username":"Rohith","email":"rohithuiuxdesigner@gmail.com"}}
+Course Details (Title, Tutor ID): {"id":65,"title":"Physics","course_prize":"2500.00","tutor_id":10}
+Fetched Course Details for ID 64: Array
+(
+    [id] => 64
+    [title] => React
+    [course_prize] => 2999.00
+    [tutor_id] => 18
+)
+
+Course Prize for ID 64: 2999.00
+Razorpay Order Data: {"amount":299900,"currency":"INR","receipt":"order_64","notes":{"course_id":"64","tutor_id":18,"course_name":"React","course_prize":"2999.00","title":"React","username":"Rohith","email":"rohithuiuxdesigner@gmail.com"}}
+Course Details (Title, Tutor ID): {"id":64,"title":"React","course_prize":"2999.00","tutor_id":18}
+Final Response Data: [{"success":true,"order_id":"order_PuScZkztzyt8qo","course_id":"65","user_id":"20","course_prize":"2500.00","title":"Physics","tutor_id":10,"enrolled_at":"2025-02-11 16:56:45","email":"rohithuiuxdesigner@gmail.com","username":"Rohith"},{"success":true,"order_id":"order_PuScZvpSlOL0YT","course_id":"64","user_id":"20","course_prize":"2999.00","title":"React","tutor_id":18,"enrolled_at":"2025-02-11 16:56:45","email":"rohithuiuxdesigner@gmail.com","username":"Rohith"}]
+Total Price: 5499
+Raw POST Data: Array
+(
+)
+
+Raw POST Data: Array
+(
+    [amount] => 499800
+    [user_id] => 8
+    [course_ids] => ["64","44"]
+    [total_price] => 499800
+)
+
+Course IDs: Array
+(
+    [0] => 64
+    [1] => 44
+)
+
+Fetched Course Details for ID 64: Array
+(
+    [id] => 64
+    [title] => React
+    [course_prize] => 2999.00
+    [tutor_id] => 18
+)
+
+Course Prize for ID 64: 2999.00
+Razorpay Order Data: {"amount":299900,"currency":"INR","receipt":"order_64","notes":{"course_id":"64","tutor_id":18,"course_name":"React","course_prize":"2999.00","title":"React","username":"Arun","email":"arunyadavbhairi123@gmail.com"}}
+Course Details (Title, Tutor ID): {"id":64,"title":"React","course_prize":"2999.00","tutor_id":18}
+Fetched Course Details for ID 44: Array
+(
+    [id] => 44
+    [title] => Machine Learning
+    [course_prize] => 1999.00
+    [tutor_id] => 8
+)
+
+Course Prize for ID 44: 1999.00
+Razorpay Order Data: {"amount":199900,"currency":"INR","receipt":"order_44","notes":{"course_id":"44","tutor_id":8,"course_name":"Machine Learning","course_prize":"1999.00","title":"Machine Learning","username":"Arun","email":"arunyadavbhairi123@gmail.com"}}
+Course Details (Title, Tutor ID): {"id":44,"title":"Machine Learning","course_prize":"1999.00","tutor_id":8}
+Final Response Data: [{"success":true,"order_id":"order_PumevnKa63dkJ4","course_id":"64","user_id":"8","course_prize":"2999.00","title":"React","tutor_id":18,"enrolled_at":"2025-02-12 12:32:52","email":"arunyadavbhairi123@gmail.com","username":"Arun"},{"success":true,"order_id":"order_PumexRovXCmnix","course_id":"44","user_id":"8","course_prize":"1999.00","title":"Machine Learning","tutor_id":8,"enrolled_at":"2025-02-12 12:32:53","email":"arunyadavbhairi123@gmail.com","username":"Arun"}]
+Total Price: 4998
+Raw POST Data: Array
+(
+    [amount] => 499800
+    [user_id] => 8
+    [course_ids] => ["64","44"]
+    [total_price] => 499800
+)
+
+Course IDs: Array
+(
+    [0] => 64
+    [1] => 44
+)
+
+Fetched Course Details for ID 64: Array
+(
+    [id] => 64
+    [title] => React
+    [course_prize] => 2999.00
+    [tutor_id] => 18
+)
+
+Course Prize for ID 64: 2999.00
+Razorpay Order Data: {"amount":299900,"currency":"INR","receipt":"order_64","notes":{"course_id":"64","tutor_id":18,"course_name":"React","course_prize":"2999.00","title":"React","username":"Arun","email":"arunyadavbhairi123@gmail.com"}}
+Course Details (Title, Tutor ID): {"id":64,"title":"React","course_prize":"2999.00","tutor_id":18}
+Fetched Course Details for ID 44: Array
+(
+    [id] => 44
+    [title] => Machine Learning
+    [course_prize] => 1999.00
+    [tutor_id] => 8
+)
+
+Course Prize for ID 44: 1999.00
+Razorpay Order Data: {"amount":199900,"currency":"INR","receipt":"order_44","notes":{"course_id":"44","tutor_id":8,"course_name":"Machine Learning","course_prize":"1999.00","title":"Machine Learning","username":"Arun","email":"arunyadavbhairi123@gmail.com"}}
+Course Details (Title, Tutor ID): {"id":44,"title":"Machine Learning","course_prize":"1999.00","tutor_id":8}
+Final Response Data: [{"success":true,"order_id":"order_Pumiq5hG5ydewS","course_id":"64","user_id":"8","course_prize":"2999.00","title":"React","tutor_id":18,"enrolled_at":"2025-02-12 12:36:34","email":"arunyadavbhairi123@gmail.com","username":"Arun"},{"success":true,"order_id":"order_PumiqFfjmj7pz0","course_id":"44","user_id":"8","course_prize":"1999.00","title":"Machine Learning","tutor_id":8,"enrolled_at":"2025-02-12 12:36:34","email":"arunyadavbhairi123@gmail.com","username":"Arun"}]
+Total Price: 4998
+Raw POST Data: Array
+(
+    [amount] => 499800
+    [user_id] => 8
+    [course_ids] => ["64","44"]
+    [total_price] => 499800
+)
+
+Course IDs: Array
+(
+    [0] => 64
+    [1] => 44
+)
+
+Fetched Course Details for ID 64: Array
+(
+    [id] => 64
+    [title] => React
+    [course_prize] => 2999.00
+    [tutor_id] => 18
+)
+
+Course Prize for ID 64: 2999.00
+Razorpay Order Data: {"amount":299900,"currency":"INR","receipt":"order_64","notes":{"course_id":"64","tutor_id":18,"course_name":"React","course_prize":"2999.00","title":"React","username":"Arun","email":"arunyadavbhairi123@gmail.com"}}
+Course Details (Title, Tutor ID): {"id":64,"title":"React","course_prize":"2999.00","tutor_id":18}
+Fetched Course Details for ID 44: Array
+(
+    [id] => 44
+    [title] => Machine Learning
+    [course_prize] => 1999.00
+    [tutor_id] => 8
+)
+
+Course Prize for ID 44: 1999.00
+Razorpay Order Data: {"amount":199900,"currency":"INR","receipt":"order_44","notes":{"course_id":"44","tutor_id":8,"course_name":"Machine Learning","course_prize":"1999.00","title":"Machine Learning","username":"Arun","email":"arunyadavbhairi123@gmail.com"}}
+Course Details (Title, Tutor ID): {"id":44,"title":"Machine Learning","course_prize":"1999.00","tutor_id":8}
+Final Response Data: [{"success":true,"order_id":"order_Pumu30ktJLny9K","course_id":"64","user_id":"8","course_prize":"2999.00","title":"React","tutor_id":18,"enrolled_at":"2025-02-12 12:47:10","email":"arunyadavbhairi123@gmail.com","username":"Arun"},{"success":true,"order_id":"order_Pumu3DlQEEmkXA","course_id":"44","user_id":"8","course_prize":"1999.00","title":"Machine Learning","tutor_id":8,"enrolled_at":"2025-02-12 12:47:10","email":"arunyadavbhairi123@gmail.com","username":"Arun"}]
+Total Price: 4998
+Raw POST Data: Array
+(
+    [amount] => 199900
+    [user_id] => 8
+    [course_ids] => ["44"]
+    [total_price] => 199900
+)
+
+Course IDs: Array
+(
+    [0] => 44
+)
+
+Fetched Course Details for ID 44: Array
+(
+    [id] => 44
+    [title] => Machine Learning
+    [course_prize] => 1999.00
+    [tutor_id] => 8
+)
+
+Course Prize for ID 44: 1999.00
+Razorpay Order Data: {"amount":199900,"currency":"INR","receipt":"order_44","notes":{"course_id":"44","tutor_id":8,"course_name":"Machine Learning","course_prize":"1999.00","title":"Machine Learning","username":"Arun","email":"arunyadavbhairi123@gmail.com"}}
+Course Details (Title, Tutor ID): {"id":44,"title":"Machine Learning","course_prize":"1999.00","tutor_id":8}
+Final Response Data: [{"success":true,"order_id":"order_Pun5jnDHti0AhV","course_id":"44","user_id":"8","course_prize":"1999.00","title":"Machine Learning","tutor_id":8,"enrolled_at":"2025-02-12 12:58:14","email":"arunyadavbhairi123@gmail.com","username":"Arun"}]
+Total Price: 1999
+Raw POST Data: Array
+(
+    [amount] => 429900
+    [user_id] => 8
+    [course_ids] => ["44","46"]
+    [total_price] => 429900
+)
+
+Course IDs: Array
+(
+    [0] => 44
+    [1] => 46
+)
+
+Fetched Course Details for ID 44: Array
+(
+    [id] => 44
+    [title] => Machine Learning
+    [course_prize] => 1999.00
+    [tutor_id] => 8
+)
+
+Course Prize for ID 44: 1999.00
+Razorpay Order Data: {"amount":199900,"currency":"INR","receipt":"order_44","notes":{"course_id":"44","tutor_id":8,"course_name":"Machine Learning","course_prize":"1999.00","title":"Machine Learning","username":"Arun","email":"arunyadavbhairi123@gmail.com"}}
+Course Details (Title, Tutor ID): {"id":44,"title":"Machine Learning","course_prize":"1999.00","tutor_id":8}
+Fetched Course Details for ID 46: Array
+(
+    [id] => 46
+    [title] => AI
+    [course_prize] => 2300.00
+    [tutor_id] => 9
+)
+
+Course Prize for ID 46: 2300.00
+Razorpay Order Data: {"amount":230000,"currency":"INR","receipt":"order_46","notes":{"course_id":"46","tutor_id":9,"course_name":"AI","course_prize":"2300.00","title":"AI","username":"Arun","email":"arunyadavbhairi123@gmail.com"}}
+Course Details (Title, Tutor ID): {"id":46,"title":"AI","course_prize":"2300.00","tutor_id":9}
+Final Response Data: [{"success":true,"order_id":"order_PunPiq96KXPxlC","course_id":"44","user_id":"8","course_prize":"1999.00","title":"Machine Learning","tutor_id":8,"enrolled_at":"2025-02-12 13:17:09","email":"arunyadavbhairi123@gmail.com","username":"Arun"},{"success":true,"order_id":"order_PunPj9fQtNcaOO","course_id":"46","user_id":"8","course_prize":"2300.00","title":"AI","tutor_id":9,"enrolled_at":"2025-02-12 13:17:10","email":"arunyadavbhairi123@gmail.com","username":"Arun"}]
+Total Price: 4299
+Raw POST Data: Array
+(
+    [amount] => 429900
+    [user_id] => 8
+    [course_ids] => ["44","46"]
+    [total_price] => 429900
+)
+
+Course IDs: Array
+(
+    [0] => 44
+    [1] => 46
+)
+
+Fetched Course Details for ID 44: Array
+(
+    [id] => 44
+    [title] => Machine Learning
+    [course_prize] => 1999.00
+    [tutor_id] => 8
+)
+
+Course Prize for ID 44: 1999.00
+Razorpay Order Data: {"amount":199900,"currency":"INR","receipt":"order_44","notes":{"course_id":"44","tutor_id":8,"course_name":"Machine Learning","course_prize":"1999.00","title":"Machine Learning","username":"Arun","email":"arunyadavbhairi123@gmail.com"}}
+Course Details (Title, Tutor ID): {"id":44,"title":"Machine Learning","course_prize":"1999.00","tutor_id":8}
+Fetched Course Details for ID 46: Array
+(
+    [id] => 46
+    [title] => AI
+    [course_prize] => 2300.00
+    [tutor_id] => 9
+)
+
+Course Prize for ID 46: 2300.00
+Razorpay Order Data: {"amount":230000,"currency":"INR","receipt":"order_46","notes":{"course_id":"46","tutor_id":9,"course_name":"AI","course_prize":"2300.00","title":"AI","username":"Arun","email":"arunyadavbhairi123@gmail.com"}}
+Course Details (Title, Tutor ID): {"id":46,"title":"AI","course_prize":"2300.00","tutor_id":9}
+Final Response Data: [{"success":true,"order_id":"order_PunZXksK8V6UnL","course_id":"44","user_id":"8","course_prize":"1999.00","title":"Machine Learning","tutor_id":8,"enrolled_at":"2025-02-12 13:26:27","email":"arunyadavbhairi123@gmail.com","username":"Arun"},{"success":true,"order_id":"order_PunZY2qrR2i5TB","course_id":"46","user_id":"8","course_prize":"2300.00","title":"AI","tutor_id":9,"enrolled_at":"2025-02-12 13:26:27","email":"arunyadavbhairi123@gmail.com","username":"Arun"}]
+Total Price: 4299
+Raw POST Data: Array
+(
+    [course_id] => 54
+    [user_id] => 15
+    [class_id] => 
+    [course_prize] => 2400.00
+)
+
+Course IDs: Array
+(
+    [0] => 54
+)
+
+Fetched Course Details for ID 54: Array
+(
+    [id] => 54
+    [title] => JavaScript
+    [course_prize] => 2400.00
+    [tutor_id] => 17
+)
+
+Course Prize for ID 54: 2400.00
+Razorpay Order Data: {"amount":240000,"currency":"INR","receipt":"order_54","notes":{"course_id":"54","tutor_id":17,"course_name":"JavaScript","course_prize":"2400.00","title":"JavaScript","username":"Bhimeshwar","email":"bheemnri1161621@gmail.com"}}
+Course Details (Title, Tutor ID): {"id":54,"title":"JavaScript","course_prize":"2400.00","tutor_id":17}
+Final Response Data: [{"success":true,"order_id":"order_Puojke5mBJEKvS","course_id":"54","user_id":"15","course_prize":"2400.00","title":"JavaScript","tutor_id":17,"enrolled_at":"2025-02-12 14:34:49","email":"bheemnri1161621@gmail.com","username":"Bhimeshwar"}]
+Total Price: 2400
+Raw POST Data: Array
+(
+    [course_id] => 54
+    [user_id] => 15
+    [class_id] => 
+    [course_prize] => 2400.00
+)
+
+Course IDs: Array
+(
+    [0] => 54
+)
+
+Fetched Course Details for ID 54: Array
+(
+    [id] => 54
+    [title] => JavaScript
+    [course_prize] => 2400.00
+    [tutor_id] => 17
+)
+
+Course Prize for ID 54: 2400.00
+Razorpay Order Data: {"amount":240000,"currency":"INR","receipt":"order_54","notes":{"course_id":"54","tutor_id":17,"course_name":"JavaScript","course_prize":"2400.00","title":"JavaScript","username":"Bhimeshwar","email":"bheemnri1161621@gmail.com"}}
+Course Details (Title, Tutor ID): {"id":54,"title":"JavaScript","course_prize":"2400.00","tutor_id":17}
+Final Response Data: [{"success":true,"order_id":"order_Puoka25OLe1BSR","course_id":"54","user_id":"15","course_prize":"2400.00","title":"JavaScript","tutor_id":17,"enrolled_at":"2025-02-12 14:35:36","email":"bheemnri1161621@gmail.com","username":"Bhimeshwar"}]
+Total Price: 2400
+Raw POST Data: Array
+(
+    [course_id] => 54
+    [user_id] => 15
+    [class_id] => 
+    [course_prize] => 2400.00
+)
+
+Course IDs: Array
+(
+    [0] => 54
+)
+
+Fetched Course Details for ID 54: Array
+(
+    [id] => 54
+    [title] => JavaScript
+    [course_prize] => 2400.00
+    [tutor_id] => 17
+)
+
+Course Prize for ID 54: 2400.00
+Razorpay Order Data: {"amount":240000,"currency":"INR","receipt":"order_54","notes":{"course_id":"54","tutor_id":17,"course_name":"JavaScript","course_prize":"2400.00","title":"JavaScript","username":"Bhimeshwar","email":"bheemnri1161621@gmail.com"}}
+Course Details (Title, Tutor ID): {"id":54,"title":"JavaScript","course_prize":"2400.00","tutor_id":17}
+Final Response Data: [{"success":true,"order_id":"order_Puomaxp9RLhLbU","course_id":"54","user_id":"15","course_prize":"2400.00","title":"JavaScript","tutor_id":17,"enrolled_at":"2025-02-12 14:37:30","email":"bheemnri1161621@gmail.com","username":"Bhimeshwar"}]
+Total Price: 2400
+Raw POST Data: Array
+(
+    [course_id] => 60
+    [user_id] => 18
+)
+
+Course IDs: Array
+(
+    [0] => 60
+)
+
+Fetched Course Details for ID 60: Array
+(
+    [id] => 60
+    [title] => MYSQL
+    [course_prize] => 2499.00
+    [tutor_id] => 18
+)
+
+Course Prize for ID 60: 2499.00
+Razorpay Order Data: {"amount":249900,"currency":"INR","receipt":"order_60","notes":{"course_id":"60","tutor_id":18,"course_name":"MYSQL","course_prize":"2499.00","title":"MYSQL","username":"Thotla Anjali","email":"Kodimyalaanjali98@gmail.com"}}
+Course Details (Title, Tutor ID): {"id":60,"title":"MYSQL","course_prize":"2499.00","tutor_id":18}
+Final Response Data: [{"success":true,"order_id":"order_Pur4T2lrbD5bzm","course_id":"60","user_id":"18","course_prize":"2499.00","title":"MYSQL","tutor_id":18,"enrolled_at":"2025-02-12 16:51:48","email":"Kodimyalaanjali98@gmail.com","username":"Thotla Anjali"}]
+Total Price: 2499
+Raw POST Data: Array
+(
+    [course_id] => 60
+    [user_id] => 18
+)
+
+Course IDs: Array
+(
+    [0] => 60
+)
+
+Fetched Course Details for ID 60: Array
+(
+    [id] => 60
+    [title] => MYSQL
+    [course_prize] => 2499.00
+    [tutor_id] => 18
+)
+
+Course Prize for ID 60: 2499.00
+Razorpay Order Data: {"amount":249900,"currency":"INR","receipt":"order_60","notes":{"course_id":"60","tutor_id":18,"course_name":"MYSQL","course_prize":"2499.00","title":"MYSQL","username":"Thotla Anjali","email":"Kodimyalaanjali98@gmail.com"}}
+Course Details (Title, Tutor ID): {"id":60,"title":"MYSQL","course_prize":"2499.00","tutor_id":18}
+Final Response Data: [{"success":true,"order_id":"order_Pur5WjKgoWMdTf","course_id":"60","user_id":"18","course_prize":"2499.00","title":"MYSQL","tutor_id":18,"enrolled_at":"2025-02-12 16:52:48","email":"Kodimyalaanjali98@gmail.com","username":"Thotla Anjali"}]
+Total Price: 2499
+Raw POST Data: Array
+(
+    [course_id] => 61
+    [user_id] => 18
+)
+
+Course IDs: Array
+(
+    [0] => 61
+)
+
+Fetched Course Details for ID 61: Array
+(
+    [id] => 61
+    [title] => Springboot
+    [course_prize] => 3000.00
+    [tutor_id] => 9
+)
+
+Course Prize for ID 61: 3000.00
+Razorpay Order Data: {"amount":300000,"currency":"INR","receipt":"order_61","notes":{"course_id":"61","tutor_id":9,"course_name":"Springboot","course_prize":"3000.00","title":"Springboot","username":"Thotla Anjali","email":"Kodimyalaanjali98@gmail.com"}}
+Course Details (Title, Tutor ID): {"id":61,"title":"Springboot","course_prize":"3000.00","tutor_id":9}
+Final Response Data: [{"success":true,"order_id":"order_PusDXUFYsX1qNQ","course_id":"61","user_id":"18","course_prize":"3000.00","title":"Springboot","tutor_id":9,"enrolled_at":"2025-02-12 17:59:05","email":"Kodimyalaanjali98@gmail.com","username":"Thotla Anjali"}]
+Total Price: 3000
+Raw POST Data: Array
+(
+    [course_id] => 55
+    [user_id] => 15
+)
+
+Course IDs: Array
+(
+    [0] => 55
+)
+
+Fetched Course Details for ID 55: Array
+(
+    [id] => 55
+    [title] => Java
+    [course_prize] => 2000.00
+    [tutor_id] => 9
+)
+
+Course Prize for ID 55: 2000.00
+Razorpay Order Data: {"amount":200000,"currency":"INR","receipt":"order_55","notes":{"course_id":"55","tutor_id":9,"course_name":"Java","course_prize":"2000.00","title":"Java","username":"Bhimeshwar","email":"bheemnri1161621@gmail.com"}}
+Course Details (Title, Tutor ID): {"id":55,"title":"Java","course_prize":"2000.00","tutor_id":9}
+Final Response Data: [{"success":true,"order_id":"order_PvARMpvxUWhdqR","course_id":"55","user_id":"15","course_prize":"2000.00","title":"Java","tutor_id":9,"enrolled_at":"2025-02-13 11:48:39","email":"bheemnri1161621@gmail.com","username":"Bhimeshwar"}]
+Total Price: 2000

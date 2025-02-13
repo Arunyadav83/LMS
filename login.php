@@ -55,325 +55,284 @@ $query = "SELECT c.id, c.title, c.description, t.full_name AS tutor_name
 $result = mysqli_query($conn, $query);
 ?>
 
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login to Your Account</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        :root {
+            --primary-color: #40C9B5;
+            --secondary-color: #34A597;
+            --background-color: #367c76;
+        }
 
+        body {
+            background-color: var(--background-color);
+            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+            overflow: hidden;
+        }
 
-<!-- Display SweetAlert2 based on success or error -->
-<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-
-<?php if ($success): ?>
-    <script>
-        Swal.fire({
-            title: 'Success!',
-            text: '<?php echo $success; ?>',
-            icon: 'success',
-            confirmButtonText: 'Ok',
-            timer: 2000, // Set a timer of 2 seconds before redirect
-            timerProgressBar: true, // Optionally show a progress bar
-        }).then((result) => {
-
-            window.location.href = 'index.php'; // Redirect to the homepage after timer
-        });
-    </script>
-<?php elseif ($error): ?>
-    <script>
-        Swal.fire({
-            title: 'Error!',
-            text: '<?php echo $error; ?>',
-            icon: 'error',
-            confirmButtonText: 'Try Again'
-        });
-    </script>
-<?php endif; ?>
-<!-- Bootstrap 5 -->
-<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
-<style>
-    /* Overall container styling */
-    .login-container {
-        display: flex;
-        align-items: center;
-        margin: 30px;
-        justify-content: center;
-        height: 80vh;
-        padding: 20px;
-        background-color: #f9f9f9;
-        border: 1px solid #ddd;
-        border-radius: 8px;
-        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-        max-width: 850px;
-        margin: 100px auto;
-    }
-
-    /* User login image */
-    .user-login-image {
-        width: 400px;
-        /* Adjust width as needed */
-        height: auto;
-        border-radius: 10px;
-        margin-right: 80px;
-        margin-top: -34px;
-        /* margin-left: -4px; */
-        /* Space between image and form */
-        box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.2);
-    }
-
-    /* Form container */
-    .form-container {
-        display: flex;
-        flex-direction: column;
-        justify-content: center;
-        align-items: flex-start;
-        max-width: 400px;
-        
-    }
-
-    /* Logo and heading styling */
-    .logo-image {
-        width: 160px;
-        height: auto;
-        margin-bottom: 10px;
-        margin-left: -57px;
-    }
-
-    .form-container h2 {
-        display: flex;
-        align-items: center;
-        font-size: 24px;
-        margin-bottom: 20px;
-        color: #333;
-    }
-
-    .form-container h2 img {
-        margin-right: 10px;
-    }
-
-    /* Form styling */
-    .form-control {
-        width: 100%;
-        padding: 10px;
-        margin: 10px 0;
-        box-shadow: 0px 3px 40px 0.1;
-        border: 1px solid #ccc;
-        border-radius: 4px;
-        font-size: 16px;
-    }
-
-    /* Button styling */
-    .btn-container {
-        display: flex;
-        flex-direction: row;
-        justify-content: space-between;
-        gap: 10px;
-        width: 100%;
-    }
-
-    .btn-primary {
-        width: 35%;
-        height: 20%;
-        padding: 10px;
-        font-size: 16px;
-        /* margin-left: 60px; */
-        /* margin-right: -23px; */
-        background-color: #007bff;
-        color: white;
-        border: none;
-        border-radius: 5px;
-        cursor: pointer;
-    }
-
-    .btn-primary:hover {
-        background-color: #0056b3;
-    }
-
-    .btn-link {
-        font-size: 14px;
-        color: #007bff;
-        text-decoration: none;
-        margin-bottom: 23px;
-        text-align: center;
-    }
-
-    .btn-link:hover {
-        text-decoration: underline;
-    }
-
-    /* Register link styling */
-    .register-link {
-        text-align: center;
-        margin-top: 15px;
-        font-size: 14px;
-    }
-
-
-    /* For small screens, switch layout to column */
-    @media (max-width: 768px) {
         .login-container {
-            flex-direction: column;
-            padding: 10px;
-            width: 90%;
+            display: flex;
+            min-height: 100vh;
+            padding: 5rem;
+            max-width: 1200px;
+            margin: 0 auto;
+            /* overflow: hidden; Prevent scrollbar */
+        }
+
+        .login-card {
+            display: flex;
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.05);
+            overflow: hidden;
+            width: 100%;
+        }
+
+        .illustration-section {
+            flex: 1;
+            background-color: #f5fffd;
+            padding: 3rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .login-image {
+            width: 100%;
+            max-width: 500px;
             height: auto;
         }
 
+        .form-section {
+            
+    flex: 1;
+    padding: 50px;
+    display: flex
+;
+    flex-direction: column;
+    justify-content: center;
+    max-width: 500px;
+}
+        
 
-        .user-login-image {
+        .logo {
+            width: 200px;
+            margin-bottom: 2rem;
+        }
+
+        .login-heading {
+            font-size: 2rem;
+            color: #333;
+            margin-bottom: 2rem;
+            font-weight: 600;
+        }
+
+        .form-group {
+            margin-bottom: 1.5rem;
+            position: relative;
+        }
+
+        .form-group i {
+            position: absolute;
+            left: 15px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #666;
+        }
+
+        .form-control {
+            padding: 0.8rem 1rem 0.8rem 2.5rem;
+            border: 1px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 1rem;
             width: 100%;
-            max-width: 300px;
-            margin: 0 auto 20px auto;
+            transition: all 0.3s;
         }
 
-        .form-container {
+        .form-control:focus {
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 2px rgba(64, 201, 181, 0.1);
+            outline: none;
+        }
+
+        .remember-forgot {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+        }
+
+        .remember-me {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .forgot-link {
+            color: var(--primary-color);
+            text-decoration: none;
+            font-size: 0.9rem;
+        }
+
+        .btn-login {
+            background-color: var(--primary-color);
+            color: white;
+            border: none;
+            padding: 0.8rem;
+            border-radius: 8px;
+            font-weight: 500;
             width: 100%;
-            /* height: 90%; */
-            margin-right: 100px;
-        }
-    }
-
-    /* User login image */
-    .user-login-image {
-        width: 400px;
-        height: auto;
-        border-radius: 10px;
-        margin-right: -20px;
-        box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.2);
-    }
-
-    /* Form container */
-    .form-container {
-        display: flex;
-        flex-direction: column;
-        justify-content: center;
-        max-width: 800px;
-        width: 100%;
-    }
-
-    /* Logo and heading styling */
-    .logo-image {
-        width: 160px;
-        height: auto;
-        margin-bottom: 10px;
-        margin-left: auto;
-        /* margin-left: auto; */
-    }
-
-    .form-container h2 {
-        display: flex;
-        align-items: center;
-        font-size: 24px;
-        margin-bottom: 20px;
-        color: #333;
-        margin-left: 63px;
-        margin-top: 23px;
-    }
-
-    /* Form styling */
-    .form-control {
-        width: 100%;
-        padding: 10px;
-        margin: 10px 0;
-        border: 1px solid #ccc;
-        border-radius: 4px;
-        font-size: 16px;
-    }
-
-    /* Button container */
-    .btn-container {
-        display: flex;
-        flex-direction: row;
-        justify-content: space-between;
-        gap: 10px;
-        width: 100%;
-    }
-
-    /* Buttons */
-    .btn-primary {
-        width: 48%;
-        padding: 10px;
-        font-size: 16px;
-        background-color: #007bff;
-        color: white;
-        border: none;
-        border-radius: 5px;
-        cursor: pointer;
-    }
-
-    .btn-primary:hover {
-        background-color: #0056b3;
-    }
-
-    .btn-link {
-        font-size: 14px;
-        color: #007bff;
-        text-decoration: none;
-        margin-bottom: 10px;
-        text-align: center;
-    }
-
-    .btn-link:hover {
-        text-decoration: underline;
-    }
-
-    /* Register link styling */
-    .register-link {
-        text-align: center;
-        margin-top: 15px;
-        font-size: 14px;
-    }
-
-    /* Mobile adjustments */
-    @media (max-width: 576px) {
-        .btn-container {
-            flex-direction: column;
+            margin-bottom: 1.5rem;
+            transition: background-color 0.3s;
         }
 
-        .btn-primary {
-            width: 100%;
+        .btn-login:hover {
+            background-color: var(--secondary-color);
         }
 
-        .user-login-image {
-            max-width: 260px;
-            /* margin-top: 333px; */
-            margin-right: 23px;
-
-        }
-
-        .form-container h2 {
-            font-size: 20px;
+        .social-login {
             text-align: center;
-            height: auto;
         }
-    }
-</style>
 
+        .social-text {
+            color: #666;
+            margin-bottom: 1rem;
+        }
 
-<div class="login-container">
-    <!-- Left side image -->
-    <img src="assets/images/userlogin.png" alt="User Login" class="user-login-image">
+        .social-buttons {
+            display: flex;
+            gap: 1rem;
+            justify-content: center;
+        }
 
-    <!-- Right side login form -->
-    <div class="form-container">
-        <h2>
-            <img src="assets/images/logo2.png" alt="Logo" class="logo-image">
-            Student Login
-        </h2>
-        <form action="login.php" method="post" style="margin-left: 121px;">
-            <div class="mb-3">
-                <!-- <label for="username" class="form-label">Username</label> -->
-                <input type="text" placeholder=" username"class="form-control" id="username" name="username" required>
+        .social-btn {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border: none;
+            transition: transform 0.3s;
+        }
+
+        .social-btn:hover {
+            transform: translateY(-2px);
+        }
+
+        .facebook { background-color: #1877F2; }
+        .google { background-color: #DB4437; }
+        .twitter { background-color: #1DA1F2; }
+
+        .social-btn i {
+            color: white;
+            font-size: 1.2rem;
+        }
+
+        @media (max-width: 768px) {
+            .login-card {
+                flex-direction: column;
+            }
+
+            .illustration-section {
+                padding: 2rem;
+            }
+
+            .form-section {
+                padding: 2rem;
+            }
+
+            .login-image {
+                max-width: 300px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="login-container">
+        <div class="login-card">
+            <div class="illustration-section">
+                <img src="assets/images/userlogin.png" alt="Login Illustration" class="login-image">
             </div>
-            <div class="mb-3">
-                <!-- <label for="password" class="form-label">Password</label> -->
-                <input type="password" class="form-control" id="password" name="password"  placeholder=" password" required>
+            <div class="form-section">
+                <img src="assets/images/logo2.png" alt="Logo" class="logo">
+                <h1 class="login-heading">Login to Your Account</h1>
+                <form method="post" action="login.php">
+                    <div class="form-group">
+                        <i class="fas fa-user"></i>
+                        <input type="text" 
+                               class="form-control" 
+                               name="username" 
+                               placeholder="Username"
+                               required>
+                    </div>
+                    <div class="form-group">
+                        <i class="fas fa-lock"></i>
+                        <input type="password" 
+                               class="form-control" 
+                               name="password" 
+                               placeholder="Password"
+                               required>
+                    </div>
+                    <div class="remember-forgot">
+                        <label class="remember-me">
+                            <input type="checkbox" name="remember"> Remember me
+                        </label>
+                        <a href="forgot_password.php" class="forgot-link">Forgot Password?</a>
+                    </div>
+                    <button type="submit" class="btn-login">Login</button>
+                    <div class="social-login">
+                        <p class="social-text">Or login with</p>
+                        <div class="social-buttons">
+                            <button type="button" class="social-btn facebook">
+                                <i class="fab fa-facebook-f"></i>
+                            </button>
+                            <button type="button" class="social-btn google">
+                                <i class="fab fa-google"></i>
+                            </button>
+                            <button type="button" class="social-btn twitter">
+                                <i class="fab fa-twitter"></i>
+                            </button>
+                        </div>
+                    </div>
+                </form>
             </div>
-            <div class="btn-container">
-                <button type="submit" class="btn btn-primary">Login</button>
-                <button type="button" class="btn btn-link" onclick="window.location.href='forgot_password.php';">Forgot Password</button>
-            </div>
-            <p class="register-link">
-                Don't have an account? <a href="register.php">Register here</a>
-            </p>
-        </form>
+        </div>
     </div>
-</div>
 
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <?php if ($success): ?>
+        <script>
+            Swal.fire({
+                title: 'Success!',
+                text: '<?php echo $success; ?>',
+                icon: 'success',
+                confirmButtonText: 'Ok',
+                timer: 2000,
+                timerProgressBar: true,
+            }).then((result) => {
+                window.location.href = 'index.php';
+            });
+        </script>
+    <?php elseif ($error): ?>
+        <script>
+            Swal.fire({
+                title: 'Error!',
+                text: '<?php echo $error; ?>',
+                icon: 'error',
+                confirmButtonText: 'Try Again'
+            });
+        </script>
+    <?php endif; ?>
+</body>
+</html>
 
 
 

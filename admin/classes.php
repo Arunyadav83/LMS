@@ -1,6 +1,5 @@
 <?php
 session_start();
-
 require_once '../config.php';
 require_once '../functions.php';
 
@@ -8,7 +7,6 @@ if (isset($_GET['logout']) && $_GET['logout'] == 1) {
     // Destroy the session
     session_unset();
     session_destroy();
-
     // Redirect to index.php after logout
     header("Location: index.php");
     exit();
@@ -71,6 +69,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['login'])) {
     }
 }
 
+
 // Check if the user is logged in and is a tutor
 if (!isset($_SESSION['user_id']) || !isset($_SESSION['role']) || $_SESSION['role'] !== 'instructor') {
     // If not logged in, show login form
@@ -127,61 +126,65 @@ if (!isset($_SESSION['user_id']) || !isset($_SESSION['role']) || $_SESSION['role
 <?php
     exit();
 }
+
+
+
+
 $tutor_id = $_SESSION['user_id'];
 $tutor_name = $_SESSION['full_name'];
 
 // Handle form submissions for adding classes
-if ($_SERVER['REQUEST_METHOD'] == 'POST') {
-    if (isset($_POST['add_class'])) {
-        $course_id = (int)$_POST['course_id'];
-        $class_name = mysqli_real_escape_string($conn, $_POST['class_name']);
-        $description = mysqli_real_escape_string($conn, $_POST['description']);
+if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['add_class'])) {
+    $course_id = (int)$_POST['course_id'];
+    $class_name = mysqli_real_escape_string($conn, $_POST['class_name']);
+    $description = mysqli_real_escape_string($conn, $_POST['description']);
     
-        // Handle video upload
-        $video_path = '';
-        if (isset($_FILES['class_video']) && $_FILES['class_video']['error'] == 0) {
-            $upload_dir = '../uploads/class_videos/';
-            ensure_directory_exists($upload_dir);
-            $video_path = $upload_dir . time() . '_' . $_FILES['class_video']['name'];
-            if (move_uploaded_file($_FILES['class_video']['tmp_name'], $video_path)) {
-                $video_path = str_replace('../', '', $video_path); // Remove the '../' for database storage
-            } else {
-                $error = "Failed to upload video. Error: " . $_FILES['class_video']['error'];
-            }
+    // Handle video upload
+    $video_path = '';
+    if (isset($_FILES['class_video']) && $_FILES['class_video']['error'] == 0) {
+        $upload_dir = '../uploads/class_videos/';
+        ensure_directory_exists($upload_dir);
+        $video_path = $upload_dir . time() . '_' . $_FILES['class_video']['name'];
+        if (!move_uploaded_file($_FILES['class_video']['tmp_name'], $video_path)) {
+            $error = "Failed to upload video. Error: " . $_FILES['class_video']['error'];
+        } else {
+            $video_path = str_replace('../', '', $video_path);  // Adjust path for database storage
         }
-    
-        // Handle class thumbnail image upload
-        $thumbnail_path = '';
-        if (isset($_FILES['class_thumbnail']) && $_FILES['class_thumbnail']['error'] == 0) {
-            $target_dir = "../assets/images/";
-    
-            // Create a safe file name based on class name
-            $file_name = str_replace(' ', '', $class_name) . '.jpg';
-    
-            $target_file = $target_dir . $file_name;
-    
-            if (move_uploaded_file($_FILES['class_thumbnail']['tmp_name'], $target_file)) {
-                $thumbnail_path = $file_name; // Save the filename to insert into the database
-            } else {
-                $error = "Sorry, there was an error uploading your thumbnail.";
-            }
+    }
+
+    // Handle class thumbnail image upload
+    $thumbnail_path = '';
+    if (isset($_FILES['class_thumbnail']) && $_FILES['class_thumbnail']['error'] == 0) {
+        $target_dir = "../assets/images/";
+        $file_name = str_replace(' ', '', $class_name) . '.jpg';
+        $target_file = $target_dir . $file_name;
+        
+        if (move_uploaded_file($_FILES['class_thumbnail']['tmp_name'], $target_file)) {
+            $thumbnail_path = $file_name;  // Save filename to insert into the database
+        } else {
+            $error = "Failed to upload thumbnail.";
         }
-    
-        // Handle online class scheduling
-        $is_online = isset($_POST['is_online']) ? 1 : 0;
-        $online_link = mysqli_real_escape_string($conn, $_POST['online_link'] ?? '');
-        $schedule_time = mysqli_real_escape_string($conn, $_POST['schedule_time'] ?? '');
-    
-        // Insert class data into the database
-        $query = "INSERT INTO classes (course_id, tutor_id, class_name, description, video_path, is_online, online_link, schedule_time) 
-                  VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
-        $stmt = mysqli_prepare($conn, $query);
-        mysqli_stmt_bind_param($stmt, "iisssiis", $course_id, $tutor_id, $class_name, $description, $video_path, $is_online, $online_link, $schedule_time);
+    }
+
+    // Handle online class scheduling
+    $is_online = isset($_POST['is_online']) ? 1 : 0;
+    $online_link = mysqli_real_escape_string($conn, $_POST['online_link'] ?? '');
+    $schedule_time = mysqli_real_escape_string($conn, $_POST['schedule_time'] ?? '');
+
+    // Insert class data into the database
+    $query = "INSERT INTO classes (course_id, tutor_id, class_name, description, video_path, is_online, online_link, schedule_time) 
+              VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
+    $stmt = mysqli_prepare($conn, $query);
+    mysqli_stmt_bind_param($stmt, "iisssiis", $course_id, $tutor_id, $class_name, $description, $video_path, $is_online, $online_link, $schedule_time);
+
+    if (mysqli_stmt_execute($stmt)) {
+        $class_id = mysqli_insert_id($conn);  // Get the inserted class ID
+
+        // Handle quiz questions and answers if provided
         if (isset($_POST['questions'])) {
             foreach ($_POST['questions'] as $index => $question) {
                 $question_text = trim($question);
                 $correct_answer = trim($_POST['correct_answers'][$index] ?? '');
-                $video_id = isset($_POST['video_id'][$index]) ? mysqli_real_escape_string($conn, $_POST['video_id'][$index]) : null;
 
                 // Validate required fields
                 if (empty($question_text) || empty($correct_answer)) {
@@ -189,19 +192,15 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                     continue;
                 }
 
-                $query = "INSERT INTO quiz_questions (class_id, question_text, correct_answer, video_id) VALUES (?, ?, ?, ?)";
+                // Insert quiz question
+                $query = "INSERT INTO quiz_questions (class_id, question_text, correct_answer) VALUES (?, ?, ?)";
                 $stmt = mysqli_prepare($conn, $query);
-
-                if (!$stmt) {
-                    echo "Error preparing statement for quiz question: " . mysqli_error($conn);
-                    continue;
-                }
-
-                mysqli_stmt_bind_param($stmt, "isss", $class_id, $question_text, $correct_answer, $video_id);
+                mysqli_stmt_bind_param($stmt, "iss", $class_id, $question_text, $correct_answer);
 
                 if (mysqli_stmt_execute($stmt)) {
-                    $question_id = mysqli_insert_id($conn);
-
+                    $question_id = mysqli_insert_id($conn);  // Get the inserted question ID
+                    
+                    // Insert answers if provided
                     if (isset($_POST['answers'][$index]) && isset($_POST['feedback'][$index])) {
                         foreach ($_POST['answers'][$index] as $answer_index => $answer) {
                             $answer_text = mysqli_real_escape_string($conn, $answer);
@@ -212,17 +211,11 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                                 continue;
                             }
 
-                            // Set 'is_correct' dynamically based on the selected correct answer
+                            // Insert quiz answer
                             $is_correct = ($_POST['correct_answers'][$index] == $answer_index) ? 1 : 0;
-
-                            $query = "INSERT INTO quiz_answers (question_id, answer_text, feedback, is_correct) VALUES (?, ?, ?, ?)";
+                            $query = "INSERT INTO quiz_answers (question_id, answer_text, feedback, is_correct) 
+                                      VALUES (?, ?, ?, ?)";
                             $stmt = mysqli_prepare($conn, $query);
-
-                            if (!$stmt) {
-                                echo "Error preparing statement for quiz answer: " . mysqli_error($conn);
-                                continue;
-                            }
-
                             mysqli_stmt_bind_param($stmt, "issi", $question_id, $answer_text, $feedback_text, $is_correct);
 
                             if (!mysqli_stmt_execute($stmt)) {
@@ -233,40 +226,33 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                 } else {
                     echo "Error inserting quiz question: " . mysqli_error($conn);
                 }
-            }  // <-- Close the foreach loop
-        }  // <-- Close the if for checking 'questions'
-
-    
-        if (mysqli_stmt_execute($stmt)) {
-            $class_id = mysqli_insert_id($conn);
-
-    
-            // Show SweetAlert confirmation message
-
-            // echo "<script src='https://cdn.jsdelivr.net/npm/sweetalert2@11'></script>";
-            echo "<script>
-                    Swal.fire({
-                        title: 'Class Added Successfully!',
-                        text: 'The class \"$class_name\" has been added.',
-                        icon: 'success',
-                        confirmButtonText: 'OK'
-                    }).then(() => {
-                        window.location.href = 'classes.php'; // Change this to your desired redirect page
-                    });
-                  </script>";
-        } else {
-            echo "<script>
-                    Swal.fire({
-                        title: 'Error!',
-                        text: 'There was a problem adding the class. Please try again.',
-                        icon: 'error',
-                        confirmButtonText: 'OK'
-                    });
-                  </script>";
+            }
         }
-    } // <-- Close the if for 'add_class'
-}  // <-- Close the if for checking POST request
 
+        // Show SweetAlert confirmation message
+        echo "<script>
+                Swal.fire({
+                    title: 'Class Added Successfully!',
+                    text: 'The class \"$class_name\" has been added.',
+                    icon: 'success',
+                    confirmButtonText: 'OK',
+                    target: 'body'
+                }).then(() => {
+                    window.location.href = 'classes.php';  // Redirect to classes page
+                });
+              </script>";
+    } else {
+        // Show error message if class insertion fails
+        echo "<script>
+                Swal.fire({
+                    title: 'Error!',
+                    text: 'There was a problem adding the class. Please try again.',
+                    icon: 'error',
+                    confirmButtonText: 'OK'
+                });
+              </script>";
+    }
+}
 
 // Fetch courses assigned to the logged-in tutor
 $query = "SELECT * FROM courses WHERE tutor_id = ?";
@@ -280,7 +266,7 @@ $courses = mysqli_fetch_all($result, MYSQLI_ASSOC);
 $query = "SELECT c.*, co.title as course_title 
           FROM classes c 
           JOIN courses co ON c.course_id = co.id 
-          WHERE c.tutor_id = ?
+          WHERE c.tutor_id = ? 
           ORDER BY c.created_at DESC";
 $stmt = mysqli_prepare($conn, $query);
 mysqli_stmt_bind_param($stmt, "i", $tutor_id);
@@ -288,6 +274,7 @@ mysqli_stmt_execute($stmt);
 $result = mysqli_stmt_get_result($stmt);
 $classes = mysqli_fetch_all($result, MYSQLI_ASSOC);
 ?>
+
 
 
 <!DOCTYPE html>
@@ -318,6 +305,14 @@ $classes = mysqli_fetch_all($result, MYSQLI_ASSOC);
         width: 700px;
         /* Set your desired width */
     }
+
+    @media (max-width: 768px) {
+            .table_list {
+                overflow-x: auto;
+                width: 100%;
+
+            }
+        }
 
     .btn-primary {
         margin-right: 36%;
@@ -562,6 +557,7 @@ $classes = mysqli_fetch_all($result, MYSQLI_ASSOC);
                 </div>
             <?php else: ?>
 
+                <div class="table_list">
                 <table class="table table-striped table-hover custom-table">
                     <thead>
                         <tr>
@@ -607,6 +603,7 @@ $classes = mysqli_fetch_all($result, MYSQLI_ASSOC);
                         <?php endforeach; ?>
                     </tbody>
                 </table>
+                </div>
             <?php endif; ?>
         </div>
 
@@ -668,52 +665,72 @@ $classes = mysqli_fetch_all($result, MYSQLI_ASSOC);
         }
         ?>
 
-        <div id="gridView" class="row row-cols-1 row-cols-sm-2 row-cols-md-3 g-4 d-none">
-            <?php if (empty($classes)): ?>
-                <p>You haven't created any classes yet.</p>
-            <?php else: ?>
-                <?php foreach ($classes as $class): ?>
-                    <div class="col">
-                        <div class="card h-100">
-                            <div class="card-body">
-                                <h5 class="card-title"><?php echo htmlspecialchars($class['class_name']); ?></h5>
-                                <!-- Shortened description -->
-                                <p class="card-text">
-                                    <?php echo htmlspecialchars(substr($class['description'], 0, 100)); ?>
-                                    <?php if (strlen($class['description']) > 100): ?>
-                                        <span>...</span>
-                                        <button
-                                            class="btn btn-link text-primary p-0"
-                                            data-bs-toggle="modal"
-                                            data-bs-target="#descriptionModal<?php echo $class['id']; ?>">
-                                            Read More
-                                        </button>
-                                    <?php endif; ?>
-                                </p>
-                                <p><strong>Course:</strong> <?php echo htmlspecialchars($class['course_title']); ?></p>
-                                <p><strong>Online Class:</strong> <?php echo $class['is_online'] ? 'Yes - ' . htmlspecialchars($class['schedule_time']) : 'No'; ?></p>
-                                <?php if (!empty($class['video_path'])): ?>
-                                    <button
-                                        class="btn btn-info btn-sm mb-2"
-                                        data-bs-toggle="modal"
-                                        data-bs-target="#videoModal"
-                                        onclick="playVideo('<?php echo htmlspecialchars($class['video_path']); ?>')">
-                                        View Video
-                                    </button>
-                                <?php endif; ?>
+<div id="gridView" class="row row-cols-1 row-cols-sm-2 row-cols-md-3 g-4 d-none">
+    <?php if (empty($classes)): ?>
+        <p>You haven't created any classes yet.</p>
+    <?php else: ?>
+        <?php foreach ($classes as $class): ?>
+            <div class="col">
+                <div class="card h-100">
+                    <div class="card-body">
+                        <h5 class="card-title"><?php echo htmlspecialchars($class['class_name']); ?></h5>
+                        <!-- Shortened description -->
+                        <p class="card-text">
+                            <?php echo htmlspecialchars(substr($class['description'], 0, 100)); ?>
+                            <?php if (strlen($class['description']) > 100): ?>
+                                <span>...</span>
+                                <button
+                                    class="btn btn-link text-primary p-0"
+                                    data-bs-toggle="modal"
+                                    data-bs-target="#descriptionModal<?php echo $class['id']; ?>">
+                                    Read More
+                                </button>
+                            <?php endif; ?>
+                        </p>
+                        <p><strong>Course:</strong> <?php echo htmlspecialchars($class['course_title']); ?></p>
+                        <p><strong>Online Class:</strong> <?php echo $class['is_online'] ? 'Yes - ' . htmlspecialchars($class['schedule_time']) : 'No'; ?></p>
+                        <?php if (!empty($class['video_path'])): ?>
+                            <button
+                                class="btn btn-info btn-sm mb-2"
+                                data-bs-toggle="modal"
+                                data-bs-target="#videoModal"
+                                onclick="playVideo('<?php echo htmlspecialchars($class['video_path']); ?>')">
+                                View Video
+                            </button>
+                        <?php endif; ?>
 
-                                <div class="d-flex justify-content-start">
-                                    <a href="edit_class.php?id=<?php echo $class['id']; ?>" class="btn btn-sm btn-primary me-2">Edit</a>
-                                    <a href="view_quiz.php?class_id=<?php echo $class['id']; ?>" class="btn btn-sm btn-info me-2">View Quiz</a>
-                                    <a href="delete_class.php?id=<?php echo $class['id']; ?>" class="btn btn-sm btn-danger" onclick="return confirm('Are you sure you want to delete this class?');">Delete</a>
-                                </div>
-                            </div>
+                        <div class="d-flex justify-content-start">
+                            <a href="edit_class.php?id=<?php echo $class['id']; ?>" class="btn btn-sm btn-primary me-2">Edit</a>
+                            <a href="view_quiz.php?class_id=<?php echo $class['id']; ?>" class="btn btn-sm btn-info me-2">View Quiz</a>
+                            <a href="delete_class.php?id=<?php echo $class['id']; ?>" class="btn btn-sm btn-danger" onclick="return confirm('Are you sure you want to delete this class?');">Delete</a>
                         </div>
                     </div>
-                <?php endforeach; ?>
-            <?php endif; ?>
-        </div>
+                </div>
+            </div>
 
+            <!-- Modal for showing full description -->
+            <div class="modal fade" id="descriptionModal<?php echo $class['id']; ?>" tabindex="-1" aria-labelledby="descriptionModalLabel<?php echo $class['id']; ?>" aria-hidden="true">
+                <div class="modal-dialog">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title" id="descriptionModalLabel<?php echo $class['id']; ?>">Class Description</h5>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                        </div>
+                        <div class="modal-body">
+                            <?php echo htmlspecialchars($class['description']); ?>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        <?php endforeach; ?>
+    <?php endif; ?>
+</div>
+
+
+        
 
 
         <!-- Video Modal -->

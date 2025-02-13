@@ -623,7 +623,7 @@ if ($stmt && mysqli_num_rows($stmt) > 0) {
             <!-- Main Content -->
             <main class="col main-content">
                 <div class="container-fluid">
-                    <h3 class=" fw-bold" style="color:#16308b; margin-bottom:45px">Admin Dashboard</h3>
+                    <h3 class=" fw-bold" style="color:#16308b; margin-bottom:45px; margin:34px">Admin Dashboard</h3>
 
                     <!-- Statistics Cards Row -->
                     <div class="row g-4 mb-4">
@@ -839,7 +839,7 @@ if ($stmt && mysqli_num_rows($stmt) > 0) {
                             </table>
                         </div>
                     </div>
-                    <div class="dashboard">
+                    <!-- <div class="dashboard">
                         <div class="title">
                             <h2>Top Instructors</h2>
                             <a href="#">View all</a>
@@ -863,7 +863,7 @@ if ($stmt && mysqli_num_rows($stmt) > 0) {
                                 <p>No instructors found.</p>
                             <?php endif; ?>
                         </div>
-                    </div>
+                    </div> -->
 
 
 

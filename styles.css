@@ -6,8 +6,10 @@
   --secondary-color: #50c878;
   --background-color: #f8f9fa;
   --text-color: #333;
-  --navbar-bg-start: #3498db;
-  --navbar-bg-end: #2ecc71;
+  --navbar-bg-start: #113a93;
+ 
+  --navbar-bg-end: #113a93;
+  /* --navbar-bg-end: #2ecc71; */
   --hover-color: rgba(255, 255, 255, 0.1);
   --transition-speed: 0.3s;
 }
@@ -21,6 +23,7 @@ body {
 .navbar {
   background: linear-gradient(135deg, var(--navbar-bg-start), var(--navbar-bg-end));
   background-size: 400% 400%;
+  /* background: #3498db; */
   animation: gradientBG 15s ease infinite;
   box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
   transition: all var(--transition-speed) ease;

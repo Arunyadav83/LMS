@@ -294,7 +294,7 @@
         .main-content {
             margin-left: 250px;
             /* margin-top: 70px; */
-            padding: 20px;
+            padding: 0px;
             /* min-height: calc(0vh - 70px); */
         }
 
@@ -373,30 +373,28 @@
     </style>
 </head>
 <body>
-    <header class="header">
-        <button class="toggle-btn">
-            <i class="fas fa-bars"></i>
+<header class="header">
+    <button class="toggle-btn">
+        <i class="fas fa-bars"></i>
+    </button>
+    <div class="logo">
+        <img src="../assets/images/logo.png" alt="Logo">
+    </div>
+    <div class="search-container">
+        <input type="text" class="search-box" placeholder="Search...">
+        <button class="search-btn">
+            <i class="fas fa-search"></i>
         </button>
-        <div class="logo">
-            <img src="../assets/images/logo.png" alt="Ultrakey">
+    </div>
+    <div class="user-profile">
+        <div class="profile-circle">AD</div>
+        <div class="dropdown">
+            <a href="profile.php"><i class="fas fa-user"></i>Profile</a>
+            <a href="settings.php"><i class="fas fa-cog"></i>Settings</a>
+            <a href="logout.php" class="logout"><i class="fas fa-sign-out-alt"></i>Logout</a>
         </div>
-        
-        <div class="search-container">
-            <input type="text" class="search-box" placeholder="Search for courses, books...">
-            <button class="search-btn">
-                <i class="fas fa-search"></i>
-            </button>
-        </div>
-
-        <div class="user-profile">
-            <div class="profile-circle">AD</div>
-            <div class="dropdown">
-                <a href="profile.php"><i class="fas fa-user"></i>Profile</a>
-                <a href="settings.php"><i class="fas fa-cog"></i>Settings</a>
-                <a href="logout.php" class="logout"><i class="fas fa-sign-out-alt"></i>Logout</a>
-            </div>
-        </div>
-    </header>
+    </div>
+</header>
 
     <div class="sidebar-overlay"></div>
 

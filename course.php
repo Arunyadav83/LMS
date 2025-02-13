@@ -10,6 +10,7 @@ if (!isset($_GET['id'])) {
     exit();
 }
 
+$razorpayKey = 'rzp_test_Bvq9kiuaq8gkcs';
 $course_id = (int)$_GET['id']; // Get course ID from URL
 
 // Fetch course details
@@ -48,8 +49,9 @@ mysqli_stmt_execute($rating_stmt);
 $rating_result = mysqli_stmt_get_result($rating_stmt);
 $rating_data = mysqli_fetch_assoc($rating_result);
 
-$avg_rating = ($rating_data['avg_rating']) ? round($rating_data['avg_rating'], 1) : 0; // Default to 0 if no ratings
-$num_reviews = $rating_data['num_reviews'];
+$avg_rating = isset($rating_data['avg_rating']) ? round($rating_data['avg_rating'], 1) : 0;
+$num_reviews = isset($rating_data['num_reviews']) ? $rating_data['num_reviews'] : 0;
+
 
 // Check if the user is already enrolled in the course
 $enrollment_query = "SELECT COUNT(*) AS count FROM enrollments WHERE user_id = ? AND course_id = ?";
@@ -59,12 +61,13 @@ if ($enrollment_stmt) {
     mysqli_stmt_bind_param($enrollment_stmt, "ii", $_SESSION['user_id'], $course['id']);
     mysqli_stmt_execute($enrollment_stmt);
 
-    // Fetch the result
     $enrollment_result = mysqli_stmt_get_result($enrollment_stmt);
     $enrollment_data = mysqli_fetch_assoc($enrollment_result);
-    $is_enrolled = ($enrollment_data['count'] > 0);
-
-    mysqli_stmt_close($enrollment_stmt);
+    if ($enrollment_data) {
+        $is_enrolled = ($enrollment_data['count'] > 0);
+    } else {
+        $is_enrolled = false;
+    }
 } else {
     // Handle errors in query preparation
     echo "Failed to prepare the enrollment query.";
@@ -101,6 +104,46 @@ function isPreviousQuizCompletedAndTimeElapsed($conn, $class_id, $user_id)
         return ($current_time - $completed_time) >= 60; // 60 seconds = 1 minute
     }
     return false;
+}
+
+
+// Debugging: Check if course ID exists
+if (!isset($course['tutor_id']) || empty($course['tutor_id'])) {
+    die("Error: Tutor ID is missing.");
+}
+
+$tutor_id = (int) $course['tutor_id']; // Ensure it's an integer
+
+// Use prepared statements to prevent SQL injection
+$tutor_query = "SELECT full_name FROM tutors WHERE id = ?";
+$stmt = mysqli_prepare($conn, $tutor_query);
+
+if (!$stmt) {
+    die("SQL Prepare Failed: " . mysqli_error($conn));
+}
+
+// Bind parameters and execute
+mysqli_stmt_bind_param($stmt, "i", $tutor_id);
+mysqli_stmt_execute($stmt);
+$tutor_result = mysqli_stmt_get_result($stmt);
+
+// Check if query execution was successful
+if (!$tutor_result) {
+    die("Query Failed: " . mysqli_error($conn));
+}
+
+// Fetch tutor details safely
+$tutor = mysqli_fetch_assoc($tutor_result);
+if (!$tutor) {
+    die("Error: No tutor found with ID $tutor_id");
+}
+
+$tutor_name = $tutor['full_name'];
+$image_path = "assets/images/" . strtolower(str_replace(' ', '_', $tutor_name)) . ".jpg";
+
+// Check if image file exists, else use a default image
+if (!file_exists($image_path)) {
+    $image_path = "assets/images/default.jpg"; // Fallback image
 }
 
 ?>
@@ -176,57 +219,69 @@ function isPreviousQuizCompletedAndTimeElapsed($conn, $class_id, $user_id)
 
 <body class="bg-gray-50">
     <!-- Course Header -->
-    <div class="course-header text-white py-16 px-4 mb-8">
-        <div class="max-w-6xl mx-auto">
-            <div class="flex flex-col md:flex-row items-center gap-8">
-                <div class="w-full md:w-2/3">
-                <h1 class="text-4xl font-bold mb-4" style="font-family: 'Nunito', sans-serif;"><?php echo htmlspecialchars($course['title']); ?></h1>
+    <div class="course-header bg-gradient-to-r from-gray-100 to-gray-200 py-16 px-4 mb-8">
 
-                    <p class="text-lg text-blue-100 mb-6"><?php echo htmlspecialchars($course['description']); ?></p>
-                    <div class="flex items-center gap-4">
-                        <div class="flex items-center">
-                            <span class="text-yellow-400 text-xl"><?php echo str_repeat('★', $avg_rating); ?></span>
-                            <span class="ml-2 text-blue-100"><?php echo $avg_rating; ?> (<?php echo $num_reviews; ?> reviews)</span>
-                        </div>
-                        <?php if (!$is_enrolled): ?>
-                            <button class="enrollButton bg-white text-blue-600 px-6 py-2 rounded-full font-semibold hover:bg-blue-50 transition-colors"
-                                data-course-id="<?php echo $course_id; ?>"
-                                data-user-id="<?php echo $_SESSION['user_id']; ?>"
-                                data-course-prize="<?php echo isset($course['course_prize']) ? $course['course_prize'] : '0'; ?>">
-                                Enroll Now
-                            </button>
-                        <?php endif; ?>
-                    </div>
+    <div class="max-w-6xl mx-auto bg-blue-100 rounded-lg shadow-md p-8 mb-8">
+    <div class="flex flex-col md:flex-row items-center gap-8">
+        <div class="w-full md:w-2/3">
+            <h1 class="text-4xl font-bold mb-4 text-indigo-900" style="font-family: 'Nunito', sans-serif;">
+                <?php echo htmlspecialchars($course['title']); ?>
+            </h1>
+            <p class="text-lg text-indigo-700 mb-6">
+                <?php echo htmlspecialchars($course['description']); ?>
+            </p>
+            <div class="flex items-center gap-4">
+                <div class="flex items-center">
+                    <span class="text-yellow-500 text-xl">
+                        <?php echo str_repeat('★', $avg_rating); ?>
+                    </span>
+                    <span class="ml-2 text-indigo-700">
+                        <?php echo $avg_rating; ?> (<?php echo $num_reviews; ?> reviews)
+                    </span>
                 </div>
-                <div class="w-full md:w-1/3">
-                    <div class="bg-white/10 backdrop-blur-lg rounded-2xl p-6">
-                        <div class="flex items-center gap-4 mb-4">
-                            <img src="assets/images/tutor.jpg" alt="<?php echo htmlspecialchars($course['tutor_name']); ?>"
-                                class="w-16 h-16 rounded-full object-cover border-2 border-white">
-                            <div>
-                                <h3 class="font-semibold"><?php echo htmlspecialchars($course['tutor_name']); ?></h3>
-                                <p class="text-blue-100"><?php echo htmlspecialchars($course['tutor_email']); ?></p>
-                            </div>
-                        </div>
-                        <div class="text-sm text-blue-100">
-                            <div class="flex items-center gap-2 mb-2">
-                                <i class="fas fa-video"></i>
-                                <span><?php echo mysqli_num_rows($classes_result); ?> Lessons</span>
-                            </div>
-                            <div class="flex items-center gap-2">
-                                <i class="fas fa-clock"></i>
-                                <span>Self-paced learning</span>
-                            </div>
-                        </div>
-                    </div>
-                </div>
+                <!-- <?php if (!$is_enrolled): ?>
+                    <button class="enrollButton bg-indigo-600 text-white px-6 py-2 rounded-full font-semibold hover:bg-indigo-700 transition-colors"
+                        data-course-id="<?php echo $course_id; ?>"
+                        data-user-id="<?php echo $_SESSION['user_id']; ?>"
+                        data-course-prize="<?php echo isset($course['course_prize']) ? $course['course_prize'] : '0'; ?>">
+                        Enroll Now
+                    </button>
+                <?php endif; ?> -->
+            </div>
+        </div>
+        <div class="w-full md:w-1/3">
+    <div class="bg-white shadow-lg rounded-2xl p-6">
+        <div class="flex items-center gap-4 mb-4">
+            <img src="<?php echo $image_path; ?>" alt="<?php echo $tutor_name; ?>"
+                class="w-16 h-16 rounded-full object-cover border-2 border-indigo-200">
+            <div>
+                <h3 class="font-semibold text-indigo-800">
+                    <!-- <?php echo $tutor_name; ?> -->
+                </h3>
+                <p class="text-indigo-600">
+                    <?php echo htmlspecialchars($tutor['full_name']); ?>
+                    <p class="text-grey-100"><?php echo htmlspecialchars($course['tutor_email']); ?></p>
+           </p>
+            </div>
+        </div>
+        <div class="text-sm text-indigo-600">
+            <div class="flex items-center gap-2 mb-2">
+                <i class="fas fa-video text-indigo-400"></i>
+                <span><?php echo mysqli_num_rows($classes_result); ?> Lessons</span>
+            </div>
+            <div class="flex items-center gap-2">
+                <i class="fas fa-clock text-indigo-400"></i>
+                <span>Self-paced learning</span>
             </div>
         </div>
     </div>
+</div>
+    </div>
+</div>
+</div>
 
     <!-- Course Content -->
-   <!-- Course Content -->
-<div class="max-w-6xl mx-auto px-4 mb-16">
+    <div class="max-w-6xl mx-auto px-4 mb-16">
     <h2 class="text-2xl font-bold text-gray-900 mb-8">Course Content</h2>
     <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         <?php
@@ -281,10 +336,10 @@ function isPreviousQuizCompletedAndTimeElapsed($conn, $class_id, $user_id)
                     }
                 }
         ?>
-                <div class="lesson-card bg-white rounded-xl overflow-hidden shadow-lg">
+                <div class="lesson-card bg-white rounded-xl overflow-hidden shadow-lg hover:shadow-xl transition-shadow duration-300">
                     <?php if ($is_unlocked): ?>
-                        <div class="video-container">
-                            <video controls controlsList="nodownload">
+                        <div class="video-container relative aspect-video">
+                            <video controls controlsList="nodownload" class="w-full h-full object-cover">
                                 <source src="<?php echo 'serve_video.php?video=' . urlencode($class['video_path']); ?>" type="video/mp4">
                                 Your browser does not support the video tag.
                             </video>
@@ -367,7 +422,7 @@ function isPreviousQuizCompletedAndTimeElapsed($conn, $class_id, $user_id)
                     <div class="flex gap-2">
                         <?php for ($i = 1; $i <= 5; $i++): ?>
                             <input type="radio" id="star<?php echo $i; ?>" name="rating" value="<?php echo $i; ?>" required>
-                            <label for="star<?php echo $i; ?>" class="text-3xl text-yellow-400 hover:text-yellow-500">★</label>
+                            <label for="star<?php echo $i; ?>" class="text-3xl text-yellow-400 hover:text-yellow-500 cursor-pointer">★</label>
                         <?php endfor; ?>
                     </div>
                 </div>

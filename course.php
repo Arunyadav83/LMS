@@ -218,6 +218,7 @@ if (!file_exists($image_path)) {
             overflow: hidden;
             transition: transform 0.3s ease;
             height: 100%;
+            /* width: 300px; */
         }
 
         .lesson-card:hover {
@@ -327,6 +328,10 @@ if (!file_exists($image_path)) {
             .lessons-grid {
                 grid-template-columns: repeat(2, 1fr);
             }
+
+            .lesson-card {
+                width: 100%;
+            }
         }
 
         /* Loading Spinner */
@@ -348,80 +353,150 @@ if (!file_exists($image_path)) {
                 transform: rotate(360deg);
             }
         }
+
+        .container {
+            overflow-x: hidden;
+            width: 100%;
+        }
+
+        @media (min-width: 1536px) {
+            .container {
+                max-width: 1300px !important;
+            }
+        }
+
+        .stars {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .stars input {
+            display: none;
+        }
+
+        .stars label {
+            font-size: 2.5rem;
+            color: white;
+            text-shadow: 0 0 2px black;
+            cursor: pointer;
+            transition: color 0.3s ease;
+        }
+
+        .stars input:checked~label,
+        .stars label:hover,
+        .stars label:hover~label {
+            color: gold;
+            text-shadow: none;
+        }
+
+        @media (max-width: 640px) {
+            .stars label {
+                font-size: 2rem;
+            }
+        }
+
+        .a {
+            max-width: 1000px;
+        }
     </style>
 </head>
 
 <body>
-    <!-- Course Header -->
-    <div class="course-header" style="margin-top: 49px;">
-        <div class="course-info-card">
-            <div class="course-grid">
-                <div>
-                    <h1 class="course-title"><?php echo htmlspecialchars($course['title']); ?></h1>
-                    <p class="course-description"><?php echo htmlspecialchars($course['description']); ?></p>
-                    <div class="tutor-profile">
-                        <img src="<?php echo $image_path; ?>" alt="<?php echo $tutor_name; ?>" class="tutor-image">
-                        <div>
-                            <h3 class="text-responsive-lg"><?php echo htmlspecialchars($tutor['full_name']); ?></h3>
-                            <p class="text-responsive-sm">
-                                <i class="fas fa-envelope"></i> <?php echo htmlspecialchars($course['tutor_email']); ?>
-                            </p>
 
-                        </div>
-                    </div>
-                    <div class="flex items-center gap-4">
-                        <div class="flex items-center">
-                            <span class="text-yellow-500 text-xl">
-                                <?php echo str_repeat('★', $avg_rating); ?>
-                            </span>
-                            <span class="ml-2 text-indigo-700">
-                                <?php echo $avg_rating; ?> (<?php echo $num_reviews; ?> reviews)
-                            </span>
-                        </div>
-                    </div>
-                </div>
-                <div>
-                    <div class="bg-white shadow-lg rounded-2xl p-6">
-                        <div class="text-sm text-indigo-600">
-                            <div class="flex items-center gap-2 mb-2">
-                                <i class="fas fa-video text-indigo-400"></i>
-                                <span><?php echo mysqli_num_rows($classes_result); ?> Lessons</span>
+    <div class="container">
+        <!-- Course Header -->
+        <div class="course-header" style="margin-top: 49px;">
+            <div class="course-info-card">
+                <div class="course-grid">
+                    <div>
+                        <h1 class="course-title"><?php echo htmlspecialchars($course['title']); ?></h1>
+                        <p class="course-description"><?php echo htmlspecialchars($course['description']); ?></p>
+                        <div class="tutor-profile">
+                            <img src="<?php echo $image_path; ?>" alt="<?php echo $tutor_name; ?>" class="tutor-image">
+                            <div>
+                                <h3 class="text-responsive-lg"><?php echo htmlspecialchars($tutor['full_name']); ?></h3>
+                                <p class="text-responsive-sm">
+                                    <i class="fas fa-envelope"></i> <?php echo htmlspecialchars($course['tutor_email']); ?>
+                                </p>
+
                             </div>
-                            <div class="flex items-center gap-2">
-                                <i class="fas fa-clock text-indigo-400"></i>
-                                <span>Self-paced learning</span>
+                        </div>
+                        <div class="flex items-center gap-4">
+                            <div class="flex items-center">
+                                <span class="text-yellow-500 text-xl">
+                                    <?php echo str_repeat('★', $avg_rating); ?>
+                                </span>
+                                <span class="ml-2 text-indigo-700">
+                                    <?php echo $avg_rating; ?> (<?php echo $num_reviews; ?> reviews)
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+                    <div>
+                        <div class="bg-white shadow-lg rounded-2xl p-6">
+                            <div class="text-sm text-indigo-600">
+                                <div class="flex items-center gap-2 mb-2">
+                                    <i class="fas fa-video text-indigo-400"></i>
+                                    <span><?php echo mysqli_num_rows($classes_result); ?> Lessons</span>
+                                </div>
+                                <div class="flex items-center gap-2">
+                                    <i class="fas fa-clock text-indigo-400"></i>
+                                    <span>Self-paced learning</span>
+                                </div>
                             </div>
                         </div>
                     </div>
                 </div>
             </div>
         </div>
-    </div>
-    <!-- Course Content -->
-    <div class="max-w-6xl mx-auto px-4 mb-16">
-        <h2 class="text-2xl font-bold text-gray-900 mb-8">Course Content</h2>
-        <div class="lessons-grid">
-            <?php
-            if (mysqli_num_rows($classes_result) > 0):
-                $lesson_number = 1;
-                while ($class = mysqli_fetch_assoc($classes_result)):
-                    // Check if this lesson should be unlocked
-                    $is_preview = ($lesson_number === 1);
-                    $is_unlocked = false;
-                    if ($is_preview || $is_enrolled) {
-                        // Check lesson unlock status
-                        $progress_query = "SELECT is_unlocked FROM class_progress WHERE user_id = ? AND class_id = ?";
-                        $progress_stmt = mysqli_prepare($conn, $progress_query);
-                        mysqli_stmt_bind_param($progress_stmt, "ii", $_SESSION['user_id'], $class['id']);
-                        mysqli_stmt_execute($progress_stmt);
-                        $progress_result = mysqli_fetch_assoc(mysqli_stmt_get_result($progress_stmt));
-                        $is_unlocked = $progress_result['is_unlocked'] ?? false;
-                        // First lesson is always unlocked
-                        if ($is_preview) {
-                            $is_unlocked = true;
-                        }
-                        // Second lesson is unlocked upon enrollment
-                        elseif ($lesson_number === 2 && $is_enrolled) {
+        <div class="max-w-6xl mx-auto px-4 mb-16">
+    <h2 class="text-2xl font-bold text-gray-900 mb-8">Course Content</h2>
+    <div class="lessons-grid">
+        <?php
+        if (mysqli_num_rows($classes_result) > 0):
+            $lesson_number = 1;
+            while ($class = mysqli_fetch_assoc($classes_result)):
+                // Check if this lesson should be unlocked
+                $is_preview = ($lesson_number === 1); // First lesson is always a preview
+                $is_unlocked = false;
+
+                if ($is_preview || $is_enrolled) {
+                    // Check lesson unlock status
+                    $progress_query = "SELECT is_unlocked FROM class_progress WHERE user_id = ? AND class_id = ?";
+                    $progress_stmt = mysqli_prepare($conn, $progress_query);
+                    mysqli_stmt_bind_param($progress_stmt, "ii", $_SESSION['user_id'], $class['id']);
+                    mysqli_stmt_execute($progress_stmt);
+                    $progress_result = mysqli_fetch_assoc(mysqli_stmt_get_result($progress_stmt));
+                    $is_unlocked = $progress_result['is_unlocked'] ?? false;
+                    
+                    // If it's the preview lesson, automatically unlock it
+                    if ($is_preview) {
+                        $is_unlocked = true;
+                    }
+                    
+                    // Unlock second lesson upon enrollment
+                    elseif ($lesson_number === 2 && $is_enrolled) {
+                        $unlock_query = "INSERT INTO class_progress (user_id, class_id, is_unlocked) 
+                           VALUES (?, ?, 1) ON DUPLICATE KEY UPDATE is_unlocked = 1";
+                        $unlock_stmt = mysqli_prepare($conn, $unlock_query);
+                        mysqli_stmt_bind_param($unlock_stmt, "ii", $_SESSION['user_id'], $class['id']);
+                        mysqli_stmt_execute($unlock_stmt);
+                        $is_unlocked = true;
+                    }
+                    // For lessons beyond the second, require completion of the previous quiz
+                    elseif ($lesson_number > 2) {
+                        $prev_class_id = $class['id'] - 1;
+                        $quiz_query = "SELECT percentage FROM quiz_results 
+                            WHERE user_id = ? AND class_id = ? 
+                            ORDER BY submitted_at DESC LIMIT 1";
+                        $quiz_stmt = mysqli_prepare($conn, $quiz_query);
+                        mysqli_stmt_bind_param($quiz_stmt, "ii", $_SESSION['user_id'], $prev_class_id);
+                        mysqli_stmt_execute($quiz_stmt);
+                        $quiz_result = mysqli_fetch_assoc(mysqli_stmt_get_result($quiz_stmt));
+                        
+                        if ($quiz_result && $quiz_result['percentage'] >= 70) {
                             $unlock_query = "INSERT INTO class_progress (user_id, class_id, is_unlocked) 
                                VALUES (?, ?, 1) ON DUPLICATE KEY UPDATE is_unlocked = 1";
                             $unlock_stmt = mysqli_prepare($conn, $unlock_query);
@@ -429,127 +504,119 @@ if (!file_exists($image_path)) {
                             mysqli_stmt_execute($unlock_stmt);
                             $is_unlocked = true;
                         }
-                        // Other lessons require previous quiz completion
-                        elseif ($lesson_number > 2) {
-                            $prev_class_id = $class['id'] - 1;
-                            $quiz_query = "SELECT percentage FROM quiz_results 
-                             WHERE user_id = ? AND class_id = ? 
-                             ORDER BY submitted_at DESC LIMIT 1";
-                            $quiz_stmt = mysqli_prepare($conn, $quiz_query);
-                            mysqli_stmt_bind_param($quiz_stmt, "ii", $_SESSION['user_id'], $prev_class_id);
-                            mysqli_stmt_execute($quiz_stmt);
-                            $quiz_result = mysqli_fetch_assoc(mysqli_stmt_get_result($quiz_stmt));
-                            if ($quiz_result && $quiz_result['percentage'] >= 70) {
-                                $unlock_query = "INSERT INTO class_progress (user_id, class_id, is_unlocked) 
-                                   VALUES (?, ?, 1) ON DUPLICATE KEY UPDATE is_unlocked = 1";
-                                $unlock_stmt = mysqli_prepare($conn, $unlock_query);
-                                mysqli_stmt_bind_param($unlock_stmt, "ii", $_SESSION['user_id'], $class['id']);
-                                mysqli_stmt_execute($unlock_stmt);
-                                $is_unlocked = true;
-                            }
-                        }
                     }
-            ?>
-                    <div class="lesson-card w-56 h-64 sm:w-64 sm:h-72 md:w-72 md:h-80">
+                }
+        ?>
+            <div class="lesson-card w-56 h-64 sm:w-64 sm:h-72 md:w-72 md:h-80">
+                <?php if ($is_unlocked): ?>
+                    <div class="video-container">
+                        <video controls controlsList="nodownload">
+                            <source src="<?php echo 'serve_video.php?video=' . urlencode($class['video_path']); ?>" type="video/mp4">
+                            Your browser does not support the video tag.
+                        </video>
+                    </div>
+                <?php else: ?>
+                    <div class="video-container">
+                        <div class="lock-overlay">
+                            <i class="fas fa-lock text-3xl text-white"></i>
+                        </div>
+                    </div>
+                <?php endif; ?>
+
+                <div class="p-4 sm:p-5">
+                    <div class="flex items-center justify-between mb-3">
+                        <span class="text-xs sm:text-sm font-medium text-blue-600">Lesson <?php echo $lesson_number; ?></span>
                         <?php if ($is_unlocked): ?>
-                            <div class="video-container">
-                                <video controls controlsList="nodownload">
-                                    <source src="<?php echo 'serve_video.php?video=' . urlencode($class['video_path']); ?>" type="video/mp4">
-                                    Your browser does not support the video tag.
-                                </video>
-                            </div>
+                            <span class="text-xs sm:text-sm text-green-600"><i class="fas fa-unlock"></i> Unlocked</span>
                         <?php else: ?>
-                            <div class="video-container">
-                                <div class="lock-overlay">
-                                    <i class="fas fa-lock text-3xl text-white"></i>
-                                </div>
-                            </div>
+                            <span class="text-xs sm:text-sm text-gray-500"><i class="fas fa-lock"></i> Locked</span>
                         <?php endif; ?>
-                        <div class="p-4 sm:p-5">
-                            <div class="flex items-center justify-between mb-3">
-                                <span class="text-xs sm:text-sm font-medium text-blue-600">Lesson <?php echo $lesson_number; ?></span>
-                                <?php if ($is_unlocked): ?>
-                                    <span class="text-xs sm:text-sm text-green-600"><i class="fas fa-unlock"></i> Unlocked</span>
-                                <?php else: ?>
-                                    <span class="text-xs sm:text-sm text-gray-500"><i class="fas fa-lock"></i> Locked</span>
-                                <?php endif; ?>
-                            </div>
-                            <h3 class="text-lg sm:text-xl font-semibold text-gray-900 mb-2">
-                                <?php echo htmlspecialchars($class['class_name']); ?>
-                            </h3>
-                            <p class="text-gray-600 text-xs sm:text-sm mb-3">
-                                <?php echo htmlspecialchars($class['description']); ?>
-                            </p>
-                            <?php if ($is_unlocked): ?>
-                                <?php if (!$is_preview): ?>
-                                    <a href="take_quiz.php?class_id=<?php echo $class['id']; ?>"
-                                        class="block w-full bg-blue-600 text-white text-center py-1.5 sm:py-2 rounded-lg hover:bg-blue-700 transition duration-300 text-xs sm:text-sm">
-                                        Take Quiz
-                                    </a>
-                                <?php endif; ?>
+                    </div>
+
+                    <h3 class="text-lg sm:text-xl font-semibold text-gray-900 mb-2">
+                        <?php echo htmlspecialchars($class['class_name']); ?>
+                    </h3>
+                    <p class="text-gray-600 text-xs sm:text-sm mb-3">
+                        <?php echo htmlspecialchars($class['description']); ?>
+                    </p>
+
+                    <?php if ($is_unlocked): ?>
+                        <?php if (!$is_preview): ?>
+                            <a href="take_quiz.php?class_id=<?php echo $class['id']; ?>"
+                                class="block w-full bg-blue-600 text-white text-center py-1.5 sm:py-2 rounded-lg hover:bg-blue-700 transition duration-300 text-xs sm:text-sm">
+                                Take Quiz
+                            </a>
+                        <?php endif; ?>
+                    <?php else: ?>
+                        <div class="bg-gray-50 rounded-lg p-3">
+                            <?php if (!$is_enrolled): ?>
+                                <p class="text-xs sm:text-sm text-gray-600 mb-2">
+                                    <i class="fas fa-info-circle mr-1"></i>
+                                    Enroll to unlock this lesson
+                                </p>
+                                <button class="w-full bg-blue-600 text-white py-1.5 sm:py-2 rounded-lg hover:bg-blue-700 transition-colors enrollButton text-xs sm:text-sm"
+                                    data-course-id="<?php echo $course_id; ?>"
+                                    data-user-id="<?php echo $_SESSION['user_id']; ?>"
+                                    data-course-prize="<?php echo isset($course['course_prize']) ? $course['course_prize'] : '0'; ?>">
+                                    Enroll Now
+                                </button>
                             <?php else: ?>
-                                <div class="bg-gray-50 rounded-lg p-3">
-                                    <?php if (!$is_enrolled): ?>
-                                        <p class="text-xs sm:text-sm text-gray-600 mb-2">
-                                            <i class="fas fa-info-circle mr-1"></i>
-                                            Enroll to unlock this lesson
-                                        </p>
-                                        <button class="w-full bg-blue-600 text-white py-1.5 sm:py-2 rounded-lg hover:bg-blue-700 transition-colors enrollButton text-xs sm:text-sm"
-                                            data-course-id="<?php echo $course_id; ?>"
-                                            data-user-id="<?php echo $_SESSION['user_id']; ?>"
-                                            data-course-prize="<?php echo isset($course['course_prize']) ? $course['course_prize'] : '0'; ?>">
-                                            Enroll Now
-                                        </button>
-                                    <?php else: ?>
-                                        <p class="text-xs sm:text-sm text-gray-600">
-                                            <i class="fas fa-trophy mr-1"></i>
-                                            Complete previous lesson's quiz with 70% score to unlock
-                                        </p>
-                                    <?php endif; ?>
-                                </div>
+                                <p class="text-xs sm:text-sm text-gray-600">
+                                    <i class="fas fa-trophy mr-1"></i>
+                                    Complete previous lesson's quiz with 70% score to unlock
+                                </p>
                             <?php endif; ?>
                         </div>
-                    </div>
-                <?php
-                    $lesson_number++;
-                endwhile;
-            else:
-                ?>
-                <div class="col-span-full text-center py-12">
-                    <i class="fas fa-book-open text-4xl text-gray-400 mb-4"></i>
-                    <p class="text-gray-600">No lessons available for this course yet.</p>
+                    <?php endif; ?>
                 </div>
-            <?php endif; ?>
-        </div>
-        <!-- Tutor Rating Section -->
-        <?php if (!empty($_SESSION['user_id'])): ?>
-            <div class="rating-section">
-                <h3 class="text-2xl font-bold text-gray-900 mb-6">Rate Your Experience</h3>
-                <form method="POST" action="submit_rating.php" class="max-w-2xl">
-                    <input type="hidden" name="tutor_id" value="<?php echo $tutor_id; ?>">
-                    <input type="hidden" name="user_id" value="<?php echo $_SESSION['user_id']; ?>">
-                    <div class="rating-stars flex items-center gap-4 mb-6">
-                        <span class="text-gray-700">Rating:</span>
-                        <div class="flex gap-2">
-                            <?php for ($i = 1; $i <= 5; $i++): ?>
-                                <input type="radio" id="star<?php echo $i; ?>" name="rating" value="<?php echo $i; ?>" required>
-                                <label for="star<?php echo $i; ?>" class="text-3xl text-yellow-400 hover:text-yellow-500 cursor-pointer">★</label>
-                            <?php endfor; ?>
-                        </div>
-                    </div>
-                    <div class="mb-6">
-                        <label for="review" class="block text-gray-700 mb-2">Your Review</label>
-                        <textarea id="review" name="review" rows="4"
-                            class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                            placeholder="Share your experience with this course..."></textarea>
-                    </div>
-                    <button type="submit"
-                        class="bg-blue-600 text-white px-6 py-2 rounded-lg hover:bg-blue-700 transition-colors">
-                        Submit Review
-                    </button>
-                </form>
+            </div>
+        <?php
+            $lesson_number++;
+            endwhile;
+        else:
+        ?>
+            <div class="col-span-full text-center py-12">
+                <i class="fas fa-book-open text-4xl text-gray-400 mb-4"></i>
+                <p class="text-gray-600">No lessons available for this course yet.</p>
             </div>
         <?php endif; ?>
+    </div>
+    <!-- Tutor Rating Section -->
+    <?php if (!empty($_SESSION['user_id'])): ?>
+        <div class="bg-white shadow-lg rounded-lg p-6 w-full max-w-md" class="a">
+            <h3 class="text-xl font-bold text-gray-900 mb-4 text-center">Rate Your Experience</h3>
+            <form method="POST" action="submit_rating.php">
+                <input type="hidden" name="tutor_id" value="<?php echo $tutor_id; ?>">
+                <input type="hidden" name="user_id" value="<?php echo $_SESSION['user_id']; ?>">
+
+                <!-- Star Rating (Right to Left Fill) -->
+                <div class="stars mb-6 flex flex-row-reverse gap-2 justify-center">
+                    <?php for ($i = 5; $i >= 1; $i--): ?>
+                        <input class="hidden star" id="star-<?php echo $i; ?>" type="radio" name="rating" value="<?php echo $i; ?>" required>
+                        <label class="text-3xl cursor-pointer text-gray-400 hover:text-yellow-500 transition-all" for="star-<?php echo $i; ?>">★</label>
+                    <?php endfor; ?>
+                </div>
+
+                <!-- Review Text Area -->
+                <div class="mb-4">
+                    <label for="review" class="block text-gray-700 mb-2">Your Review</label>
+                    <textarea id="review" name="review" rows="3"
+                        class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                        placeholder="Share your experience..."></textarea>
+                </div>
+
+                <!-- Submit Button -->
+                <button type="submit"
+                    class="w-full bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-all">
+                    Submit Review
+                </button>
+            </form>
+        </div>
+    <?php endif; ?>
+</div>
+
+
+
     </div>
     <!-- Keep the existing JavaScript code unchanged -->
     <script>

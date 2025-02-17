@@ -684,57 +684,33 @@ $course_titles = mysqli_fetch_all($result, MYSQLI_ASSOC);
             });
         });
 
-        // Function to handle edit action
-        function editCourse(courseId) {
-            // Open the edit modal for the specific course
-            const editModal = new bootstrap.Modal(document.getElementById(`editCourse${courseId}`));
-            editModal.show();
-        }
+        function confirmDelete(id) {
+    Swal.fire({
+        title: "Are you sure?",
+        text: "You won't be able to revert this!",
+        icon: "warning",
+        showCancelButton: true,
+        confirmButtonColor: "#3085d6",
+        cancelButtonColor: "#d33",
+        confirmButtonText: "Yes, delete it!"
+    }).then((result) => {
+        if (result.isConfirmed) {
+            // Submit the form using JavaScript
+            const form = document.createElement("form");
+            form.method = "POST";
+            form.action = ""; // Current page
 
-        // Function to handle delete action
-        function deleteCourse(courseId) {
-            Swal.fire({
-                title: 'Are you sure?',
-                text: "You won't be able to revert this!",
-                icon: 'warning',
-                showCancelButton: true,
-                confirmButtonColor: '#3085d6',
-                cancelButtonColor: '#d33',
-                confirmButtonText: 'Yes, delete it!'
-            }).then((result) => {
-                if (result.isConfirmed) {
-                    // Submit the delete form
-                    const form = document.createElement('form');
-                    form.method = 'POST';
-                    form.action = '';
-                    const input = document.createElement('input');
-                    input.type = 'hidden';
-                    input.name = 'id';
-                    input.value = courseId;
-                    form.appendChild(input);
-                    document.body.appendChild(form);
-                    form.submit();
-                }
-            });
-        }
+            const input = document.createElement("input");
+            input.type = "hidden";
+            input.name = "delete_course";
+            input.value = id;
 
-        function confirmDelete(event) {
-            event.preventDefault();
-            Swal.fire({
-                title: 'Are you sure?',
-                text: "You won't be able to revert this!",
-                icon: 'warning',
-                showCancelButton: true,
-                confirmButtonColor: '#3085d6',
-                cancelButtonColor: '#d33',
-                confirmButtonText: 'Yes, delete it!'
-            }).then((result) => {
-                if (result.isConfirmed) {
-                    event.target.closest('form').submit();
-                }
-            });
-            return false;
+            form.appendChild(input);
+            document.body.appendChild(form);
+            form.submit();
         }
+    });
+}
 
         // Ensure SweetAlert is properly initialized
         document.addEventListener('DOMContentLoaded', function() {

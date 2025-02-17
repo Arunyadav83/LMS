@@ -54,9 +54,9 @@ $students = mysqli_fetch_all($result, MYSQLI_ASSOC);
 
         <div class="flex flex-col lg:flex-row">
             <!-- Sidebar -->
-            <aside class="bg-gray-800 text-white w-full lg:w-1/5 h-screen p-4">
+       
                 <?php include 'sidebar.php'; ?>
-            </aside>
+           
 
             <!-- Main Content -->
             <main class="flex-1 p-6">

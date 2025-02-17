@@ -1,7 +1,8 @@
 <?php
 include 'header.php';
 // Start session and include necessary files
-session_start();
+// session_start();
+// ob_start();
 require_once 'config.php'; // Database connection file
 
 // Ensure user is logged in
@@ -45,12 +46,7 @@ while ($row = $result->fetch_assoc()) {
 // Close the statement
 $stmt->close();
 
-// // Optional: Display the courses for debugging
-// echo "<pre>";
-// print_r($courses);
-// echo "</pre>";
 ?>
-
 
 <!DOCTYPE html>
 <html lang="en">
@@ -59,73 +55,54 @@ $stmt->close();
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>My Enrolled Courses</title>
-    <!-- Bootstrap CSS -->
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            background-color: #f8f9fa;
-        }
-        .course-card {
-            margin-bottom: 20px;
-            border-radius: 10px;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-            overflow: hidden;
-        }
-        .course-image {
-            height: 200px;
-            object-fit: cover;
-        }
-        .progress-bar {
-            background-color: #007bff;
-        }
-        .card-body {
-            padding: 20px;
-        }
-    </style>
+    <!-- Tailwind CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
 </head>
 
-<body>
-<?php
-include 'header.php';?>
-    <div class="container mt-5">
-        <h2 class="text-center mb-4" style="margin-top: 132px;">My Enrolled Courses</h2>
-        <div class="row">
-            <?php if (!empty($courses)) : ?>
-                <?php foreach ($courses as $course) : ?>
-                    <div class="col-md-4">
-                        <div class="card course-card">
-                        <img
-                            src="assets/images/<?php echo htmlspecialchars($course['title'], ENT_QUOTES, 'UTF-8'); ?>.jpg"
-                            class="card-img-top img-fluid"
-                            style="max-height: 150px; object-fit: cover;"
-                            alt="<?php echo htmlspecialchars($course['title']); ?>">
-                            <div class="card-body">
-                                <h5 class="card-title"><?php echo htmlspecialchars($course['title']); ?></h5>
-                                <p class="card-text">
-                                    <strong>Duration:</strong> <?php echo htmlspecialchars($course['duration']); ?><br>
-                                    <!-- <strong>Videos:</strong> <?php echo htmlspecialchars($course['videos_count']); ?><br> -->
-                                    <strong>Tutor:</strong> <?php echo htmlspecialchars($course['tutor_name']); ?><br>
-                                    <strong>Enrolled At:</strong> <?php echo htmlspecialchars($course['enrolled_at']); ?><br>
-                                </p>
-                                <!-- <div class="progress mb-3">
-                                    <div class="progress-bar" role="progressbar" style="width: 50%;" aria-valuenow="50" aria-valuemin="0" aria-valuemax="100">
-                                        50% Completed
-                                    </div>
-                                </div> -->
-                                <a href="courses.php?course_id=<?php echo $course['course_id']; ?>" class="btn btn-primary w-100">View Details</a>
-                            </div>
-                        </div>
-                    </div>
-                <?php endforeach; ?>
-            <?php else : ?>
-                <p class="text-center">You haven't enrolled in any courses yet.</p>
-            <?php endif; ?>
-        </div>
+<body class="bg-gray-50 font-sans">
+<?php include 'header.php'; ?>
+
+<!-- Banner Section -->
+<section class="bg-gradient-to-r from-blue-500 to-teal-500 py-16">
+    <div class="container mx-auto text-center text-white">
+        <h1 class="text-4xl font-bold mb-4">Welcome to Ultrakey Learning</h1>
+        <p class="text-lg mb-6">Your journey towards mastering new skills begins here. Stay ahead with our interactive and engaging courses.</p>
+        <a href="courses.php" class="inline-block bg-white text-blue-600 py-2 px-6 rounded-lg text-xl font-semibold hover:bg-gray-100 transition">Browse All Courses</a>
     </div>
-    <!-- Bootstrap JS -->
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+</section>
+
+<!-- Enrolled Courses Section -->
+<div class="container mx-auto px-4 py-8">
+    <h2 class="text-center text-3xl font-semibold text-gray-800 mb-6 mt-12">My Enrolled Courses</h2>
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+        <?php if (!empty($courses)) : ?>
+            <?php foreach ($courses as $course) : ?>
+                <div class="bg-white rounded-lg shadow-lg overflow-hidden">
+                    <img
+                        src="assets/images/<?php echo htmlspecialchars($course['title'], ENT_QUOTES, 'UTF-8'); ?>.jpg"
+                        alt="<?php echo htmlspecialchars($course['title']); ?>"
+                        class="w-full h-48 object-cover"
+                    />
+                    <div class="p-6">
+                        <h5 class="text-lg font-semibold text-gray-800 mb-2"><?php echo htmlspecialchars($course['title']); ?></h5>
+                        <p class="text-gray-600">
+                            <strong>Duration:</strong> <?php echo htmlspecialchars($course['duration']); ?><br>
+                            <strong>Tutor:</strong> <?php echo htmlspecialchars($course['tutor_name']); ?><br>
+                            <strong>Enrolled At:</strong> <?php echo htmlspecialchars($course['enrolled_at']); ?><br>
+                        </p>
+                        <a href="courses.php?course_id=<?php echo $course['course_id']; ?>"
+                           class="mt-4 block w-full py-2 px-4 text-center text-white bg-blue-600 rounded-lg hover:bg-blue-700 transition-colors">View
+                           Details</a>
+                    </div>
+                </div>
+            <?php endforeach; ?>
+        <?php else : ?>
+            <p class="text-center text-gray-600 col-span-full">You haven't enrolled in any courses yet.</p>
+        <?php endif; ?>
+    </div>
+</div>
+
+<?php include 'footer.php'; ?>
 </body>
-<?php
-include 'footer.php'?>
+
 </html>

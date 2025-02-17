@@ -73,7 +73,7 @@ $result = mysqli_query($conn, $query);
         body {
             background-color: var(--background-color);
             font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
-            overflow: hidden;
+            /* overflow: hidden; */
         }
 
         .login-container {
@@ -334,6 +334,9 @@ $result = mysqli_query($conn, $query);
 </body>
 </html>
 
+
+<?php
+include 'footer.php';?>
 
 
 <!-- Bootstrap 5 JavaScript -->

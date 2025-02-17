@@ -283,13 +283,8 @@ foreach ($enrollments as $enrollment) {
                     </div>
                     <!-- List View -->
                     <div id="listView" class="view">
-                        <div class="card shadow-sm mb-4" style=" margin-top: 25px;">
-                            <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
-                                <!-- <h2 class="mb-0">Enrollments List</h2> -->
-                                <!-- <button class="btn btn-light btn-sm">
-                                    <i class="fas fa-plus"></i> Add Enrollment
-                                </button> -->
-                            </div>
+                        <div class="card shadow-sm mb-4" style="margin-top: 25px;">
+                            <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center"></div>
                             <div class="card-body">
                                 <div class="table_list">
                                     <table class="table table-hover table-striped align-middle">
@@ -321,68 +316,57 @@ foreach ($enrollments as $enrollment) {
                                                                 <span class="kebab-dot"></span>
                                                             </button>
 
-                                                            <!-- Debugging: Show Enrollment ID -->
-                                                            <?php echo "<!-- Enrollment ID: " . htmlspecialchars($enrollment['id']) . " -->"; ?>
-
-                                                            <!-- Popup Menu -->
                                                             <div class="popup-menu">
-                                                                <a href="#" data-bs-toggle="modal"
-                                                                    data-bs-target="#editEnrollmentModal<?php echo htmlspecialchars($enrollment['id']); ?>">
+                                                                <a href="#" data-bs-toggle="modal" data-bs-target="#editEnrollmentModal<?php echo $enrollment['id']; ?>">
                                                                     <i class="fas fa-edit text-primary"></i> Edit
                                                                 </a>
                                                                 <form method="POST" class="d-inline">
-                                                                    <input type="hidden" name="id" value="<?php echo htmlspecialchars($enrollment['id']); ?>">
+                                                                    <input type="hidden" name="id" value="<?php echo $enrollment['id']; ?>">
                                                                     <button type="submit" name="delete_enrollment" class="dropdown-item text-danger"
                                                                         onclick="return confirm('Are you sure you want to delete this enrollment?')">
                                                                         <i class="fas fa-trash"></i> Delete
                                                                     </button>
                                                                 </form>
                                                             </div>
-
                                                         </div>
                                                     </td>
                                                 </tr>
 
                                                 <!-- Edit Enrollment Modal -->
-
-                                                <div class="modal fade" id="editEnrollmentModal<?php echo htmlspecialchars($enrollment['id']); ?>"
-                                                    tabindex="-1" aria-labelledby="editEnrollmentModalLabel<?php echo htmlspecialchars($enrollment['id']); ?>"
+                                                <div class="modal fade" id="editEnrollmentModal<?php echo $enrollment['id']; ?>"
+                                                    tabindex="" aria-labelledby="editEnrollmentModalLabel<?php echo $enrollment['id']; ?>"
                                                     aria-hidden="true">
                                                     <div class="modal-dialog modal-dialog-centered modal-lg">
                                                         <div class="modal-content">
                                                             <div class="modal-header">
-                                                                <h5 class="modal-title" id="editEnrollmentModalLabel<?php echo htmlspecialchars($enrollment['id']); ?>">
+                                                                <h5 class="modal-title" id="editEnrollmentModalLabel<?php echo $enrollment['id']; ?>">
                                                                     Edit Enrollment
                                                                 </h5>
                                                                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                                                             </div>
                                                             <div class="modal-body">
                                                                 <form action="" method="post">
-                                                                    <input type="hidden" name="id" value="<?php echo htmlspecialchars($enrollment['id']); ?>">
+                                                                    <input type="hidden" name="id" value="<?php echo $enrollment['id']; ?>">
                                                                     <div class="row">
                                                                         <div class="col-md-6 mb-3">
-                                                                            <label for="edit_username_<?php echo htmlspecialchars($enrollment['id']); ?>" class="form-label">Username</label>
+                                                                            <label class="form-label">Username</label>
                                                                             <input type="text" class="form-control"
-                                                                                id="edit_username_<?php echo htmlspecialchars($enrollment['id']); ?>"
                                                                                 name="username" value="<?php echo htmlspecialchars($enrollment['username']); ?>" required>
                                                                         </div>
                                                                         <div class="col-md-6 mb-3">
-                                                                            <label for="edit_email_<?php echo htmlspecialchars($enrollment['id']); ?>" class="form-label">Email</label>
+                                                                            <label class="form-label">Email</label>
                                                                             <input type="email" class="form-control"
-                                                                                id="edit_email_<?php echo htmlspecialchars($enrollment['id']); ?>"
                                                                                 name="email" value="<?php echo htmlspecialchars($enrollment['email']); ?>" required>
                                                                         </div>
                                                                     </div>
                                                                     <div class="mb-3">
-                                                                        <label for="edit_course_name_<?php echo htmlspecialchars($enrollment['id']); ?>" class="form-label">Course Name</label>
+                                                                        <label class="form-label">Course Name</label>
                                                                         <input type="text" class="form-control"
-                                                                            id="edit_course_name_<?php echo htmlspecialchars($enrollment['id']); ?>"
                                                                             name="course_name" value="<?php echo htmlspecialchars($enrollment['course_name']); ?>" required>
                                                                     </div>
                                                                     <div class="mb-3">
-                                                                        <label for="edit_enrolled_at_<?php echo htmlspecialchars($enrollment['id']); ?>" class="form-label">Enrolled At</label>
+                                                                        <label class="form-label">Enrolled At</label>
                                                                         <input type="date" class="form-control"
-                                                                            id="edit_enrolled_at_<?php echo htmlspecialchars($enrollment['id']); ?>"
                                                                             name="enrolled_at" value="<?php echo htmlspecialchars($enrollment['enrolled_at']); ?>" required>
                                                                     </div>
                                                                     <div class="modal-footer">
@@ -394,10 +378,6 @@ foreach ($enrollments as $enrollment) {
                                                         </div>
                                                     </div>
                                                 </div>
-
-                                                <!-- Ensure Bootstrap JS is Loaded -->
-                                                <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-
                                             <?php endforeach; ?>
                                         </tbody>
                                     </table>
@@ -405,6 +385,10 @@ foreach ($enrollments as $enrollment) {
                             </div>
                         </div>
                     </div>
+
+                    <!-- Ensure Bootstrap JS is Loaded -->
+                    <!-- <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script> -->
+
 
                     <!-- Grid View -->
                     <div id="gridView" class="view" style="display: none;">
@@ -462,50 +446,12 @@ foreach ($enrollments as $enrollment) {
                         </div>
                     </div>
 
-                    <!-- Edit Modal -->
-                    <div class="modal fade" id="editModal" tabindex="-1" aria-labelledby="editModalLabel" aria-hidden="true">
-                        <div class="modal-dialog modal-lg">
-                            <div class="modal-content">
-                                <div class="modal-header">
-                                    <h5 class="modal-title" id="editModalLabel">Edit Enrollment</h5>
-                                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                                </div>
-                                <div class="modal-body">
-                                    <form>
-                                        <div class="row">
-                                            <div class="col-md-6 mb-3">
-                                                <label for="username" class="form-label">Username</label>
-                                                <input type="text" class="form-control" id="username" placeholder="Enter username" required>
-                                            </div>
-                                            <div class="col-md-6 mb-3">
-                                                <label for="email" class="form-label">Email</label>
-                                                <input type="email" class="form-control" id="email" placeholder="Enter email" required>
-                                            </div>
-                                        </div>
-                                        <div class="mb-3">
-                                            <label for="course_name" class="form-label">Course Name</label>
-                                            <input type="text" class="form-control" id="course_name" placeholder="Enter course name" required>
-                                        </div>
-                                        <div class="mb-3">
-                                            <label for="enrolled_at" class="form-label">Enrolled At</label>
-                                            <input type="date" class="form-control" id="enrolled_at" required>
-                                        </div>
-                                        <div class="modal-footer">
-                                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                                            <button type="submit" class="btn btn-primary">Save changes</button>
-                                        </div>
-                                    </form>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
                 </div>
             </main>
         </div>
     </div>
 
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+    <!-- <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script> -->
     <script>
         function showListView() {
             document.getElementById('listView').style.display = 'block';

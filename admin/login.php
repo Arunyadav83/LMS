@@ -50,114 +50,262 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     <title>Admin Login - LMS</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-    <link rel="icon" type="image/x-icon" href="../assets/images/apple-touch-icon.png">
 </head>
 <style>
-    /* Global Styles */
-    /* Global Styles */
     body {
-        background-color: #f4f7fa;
-        font-family: Arial, sans-serif;
+        background: linear-gradient(135deg, #45B5AA, #367c76);
+        font-family: 'Segoe UI', sans-serif;
+        margin: 0;
+        min-height: 100vh;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 20px;
     }
 
     /* Container */
     .container-fluid {
-        max-width: 100%;
-        height: 100vh;
-        display: flex;
-        justify-content: center;
-        align-items: center;
+        width: 100%;
+        max-width: 1200px;
+        margin: 0 auto;
     }
 
-    /* Flex Layout for Image and Form */
+    /* Row Layout */
     .row {
+        background: white;
+        border-radius: 20px;
+        box-shadow: 0 15px 30px rgba(0, 0, 0, 0.1);
+        overflow: hidden;
         display: flex;
+        align-items: center;
+        min-height: 400px;
         justify-content: center;
-        align-items: stretch;
-        /* max-width: 600px; */
-        height: 80vh;
-        background-color:rgb(210, 220, 251);
-        /* Ensure equal height between image and form */
-    }
-
-    /* Card Style */
-    .card {
-        background-color: #ffffff;
-        border-radius: 10px;
-        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-        padding: 30px;
-        height: 100%;
+        max-width: 1000px;
+        margin: 0 auto;
     }
 
     /* Image Section */
+    .col-md-6.col-lg-5 {
+        padding: 0;
+    }
+
     #loginImage {
-        max-width: 100%;
+        width: 100%;
         height: 100%;
-        /* Ensure the image takes full height */
         object-fit: cover;
-        /* Maintain aspect ratio and fill container */
-        border-radius: 10px;
+        transition: all 0.3s ease;
     }
 
-    /* Heading Style */
+    /* Form Section */
+    .col-md-6.col-lg-4 {
+        padding: 0px;
+    }
+
+    .card {
+        border: none;
+        box-shadow: none;
+        padding: 0;
+        background: transparent;
+    }
+
+    /* Form Elements */
     h2 {
-        font-size: 2rem;
-        font-weight: bold;
         color: #333;
+        font-size: 2.2rem;
+        font-weight: 600;
+        margin-bottom: 30px;
+        text-align: center;
     }
 
-    /* Form Inputs */
     .form-label {
-        font-weight: 500;
         color: #555;
+        font-weight: 500;
+        font-size: 0.95rem;
+        margin-bottom: 8px;
     }
 
     .form-control {
-        border-radius: 8px;
-        padding: 10px;
-        margin-bottom: 15px;
+        padding: 14px 16px;
+        border: 1.5px solid #ddd;
+        border-radius: 10px;
+        font-size: 1rem;
+        transition: all 0.3s ease;
+        background: #f8f9fa;
     }
 
-    /* Button Style */
+    .form-control:focus {
+        border-color: #45B5AA;
+        box-shadow: 0 0 0 4px rgba(69, 181, 170, 0.1);
+        outline: none;
+    }
+
     .btn-primary {
-        background-color: #4e73df;
-        border: none;
-        padding: 12px;
-        border-radius: 8px;
+        background: #45B5AA;
         color: white;
-        font-size: 16px;
+        padding: 14px;
+        border: none;
+        border-radius: 10px;
+        font-size: 1.1rem;
+        font-weight: 600;
+        transition: all 0.3s ease;
+        margin-top: 10px;
     }
 
     .btn-primary:hover {
-        background-color: #375aeb;
-    }
-
-    /* Responsive Styles */
-    @media (max-width: 768px) {
-
-        .col-md-6,
-        .col-lg-4 {
-            margin-bottom: 30px;
-        }
-
-        .card {
-            padding: 20px;
-        }
-
-        #loginImage {
-           
-            width: 100%;
-            max-width: 300px;
-            margin: 30px auto 20px auto;
-            /* Hide image on small screens */
-        }
+        background: #367c76;
+        transform: translateY(-2px);
+        box-shadow: 0 5px 15px rgba(69, 181, 170, 0.3);
     }
 
     /* Alert Styling */
     .alert {
-        font-size: 14px;
-        font-weight: 600;
+        padding: 15px;
+        border-radius: 10px;
+        margin-bottom: 25px;
+        font-size: 0.95rem;
     }
+
+    .alert-danger {
+        background: #fff2f2;
+        color: #e74c3c;
+        border: 1px solid #ffd1d1;
+    }
+
+    /* Responsive Design */
+    @media (max-width: 1200px) {
+        .container-fluid {
+            padding: 20px;
+        }
+        
+        .row {
+            min-height: 500px;
+        }
+    }
+
+    @media (max-width: 992px) {
+        .col-md-6.col-lg-4 {
+            padding: 30px;
+        }
+
+        h2 {
+            font-size: 2rem;
+        }
+    }
+
+    @media (max-width: 768px) {
+        body {
+            padding: 15px;
+        }
+
+        .row {
+            flex-direction: column;
+            min-height: auto;
+        }
+
+        .col-md-6.col-lg-5 {
+            display: none; /* Hide image on mobile */
+        }
+
+        .col-md-6.col-lg-4 {
+            width: 100%;
+            padding: 25px;
+        }
+
+        h2 {
+            font-size: 1.8rem;
+            margin-bottom: 25px;
+        }
+
+        .form-control {
+            padding: 12px 14px;
+        }
+
+        .btn-primary {
+            padding: 12px;
+            font-size: 1rem;
+        }
+    }
+
+    @media (max-width: 480px) {
+        body {
+            padding: 10px;
+        }
+
+        .col-md-6.col-lg-4 {
+            padding: 20px;
+        }
+
+        h2 {
+            font-size: 1.5rem;
+            margin-bottom: 20px;
+        }
+
+        .form-control {
+            padding: 10px 12px;
+            font-size: 0.95rem;
+        }
+
+        .btn-primary {
+            padding: 10px;
+            font-size: 0.95rem;
+        }
+
+        .alert {
+            padding: 12px;
+            font-size: 0.9rem;
+            margin-bottom: 20px;
+        }
+    }
+
+    /* Handle Mobile Input */
+    @media (max-width: 768px) {
+        input[type="email"],
+        input[type="password"] {
+            font-size: 16px; /* Prevents zoom on iOS */
+        }
+
+        .form-control {
+            min-height: 44px; /* Better touch targets */
+        }
+    }
+
+    /* Hide image on tablet and mobile */
+    @media (max-width: 1024px) {
+        .col-md-6.col-lg-5 {
+            display: none !important; /* Force hide with !important */
+        }
+
+        /* Adjust form section when image is hidden */
+        .col-md-6.col-lg-4 {
+            width: 100%;
+            max-width: 500px;
+            margin: 0 auto;
+            padding: 30px;
+        }
+
+        .row {
+            justify-content: center;
+            min-height: auto;
+        }
+    }
+
+    /* Additional mobile optimizations */
+    @media (max-width: 768px) {
+        .col-md-6.col-lg-4 {
+            padding: 25px;
+            max-width: 400px;
+        }
+    }
+
+    @media (max-width: 480px) {
+        .col-md-6.col-lg-4 {
+            padding: 20px;
+            max-width: 100%;
+        }
+    }
+    .p-5 {
+    padding: 2rem !important;
+}
 </style>
 
 <body>
@@ -198,7 +346,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         if (sessionStorage.getItem('loginSuccess') === 'true') {
             Swal.fire({
                 title: 'Welcome!',
-                text: 'Login successful. Redirecting...',
+                text: 'Login successful....',
                 icon: 'success',
                 showConfirmButton: false,
                 timer: 2000

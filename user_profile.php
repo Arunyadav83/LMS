@@ -20,7 +20,7 @@ $user_email = $_SESSION['email'] ?? '';
 $user_username = $_SESSION['username'] ?? '';
 
 if (!$user_email && !$user_username) {
-    echo "<p class='error'>Session variables for user email or username are not set.</p>";
+    echo "<p class='text-red-600'>Session variables for user email or username are not set.</p>";
 }
 
 // Initialize variables
@@ -57,7 +57,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         if (move_uploaded_file($file_tmp, $upload_path)) {
             $profile_image = $file_name; // Save file name to the database
         } else {
-            echo "<p class='error'>Failed to upload image.</p>";
+            echo "<p class='text-red-600'>Failed to upload image.</p>";
         }
     }
 
@@ -68,9 +68,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         );
         $stmt->bind_param("ssssss", $father_name, $phone_number, $emergency_contact, $profile_image, $user_email, $user_username);
         if ($stmt->execute()) {
-            echo "<p class='success'>Details updated successfully!</p>";
+            echo "<p class='text-green-600'>Details updated successfully!</p>";
         } else {
-            echo "<p class='error'>Failed to update details: " . $stmt->error . "</p>";
+            echo "<p class='text-red-600'>Failed to update details: " . $stmt->error . "</p>";
         }
         $stmt->close();
     }
@@ -84,241 +84,97 @@ if ($user_email || $user_username) {
     $stmt->bind_result($username, $email, $role, $created_at, $is_active, $father_name, $phone_number, $emergency_contact, $profile_image);
 
     if (!$stmt->fetch()) {
-        echo "<p class='error'>No user found with the given email or username.</p>";
+        echo "<p class='text-red-600'>No user found with the given email or username.</p>";
     }
     $stmt->close();
 }
-if ($profile_image): ?>
-    <div class="profile-image-container">
-        <img src="uploads/profile_images/<?php echo htmlspecialchars($profile_image); ?>" alt="Profile Image">
-    </div>
-<?php else: ?>
-    <p>No profile image uploaded.</p>
-<?php endif;
-
-$conn->close();
-
 ?>
-
 
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>User Profile</title>
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            margin: 0;
-            padding: 0;
-            background-color: #f9f9f9;
-        }
-
-        .container {
-            max-width: 800px;
-            margin: 50px auto;
-            padding: 20px;
-            background-color: #ffffff;
-            border-radius: 10px;
-            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
-        }
-
-
-        .profile-image-container {
-            text-align: center;
-            margin-top: 20px;
-        }
-
-        .profile-image-container img {
-            width: 100px;
-            height: 100px;
-            border-radius: 50%;
-            object-fit: cover;
-            margin: 10px auto;
-            /* Center the image */
-            display: block;
-        }
-
-        h1 {
-            text-align: center;
-            color: #333;
-        }
-
-        .profile-info p {
-            margin: 10px 0;
-            font-size: 16px;
-            color: #555;
-        }
-
-        .profile-info span {
-            font-weight: bold;
-            color: #333;
-        }
-
-        .profile-info img {
-            display: block;
-            margin: 0 auto 20px;
-            border-radius: 50%;
-            width: 100px;
-            height: 100px;
-            object-fit: cover;
-        }
-
-        .profile-info p {
-            margin: 10px 0;
-            font-size: 16px;
-            color: #555;
-        }
-
-        .profile-info span {
-            font-weight: bold;
-            color: #333;
-        }
-
-        .button-container {
-            text-align: center;
-            margin: 20px 0;
-        }
-
-        .button-container button {
-            background-color: #007BFF;
-            color: #ffffff;
-            border: none;
-            padding: 10px 20px;
-            border-radius: 5px;
-            cursor: pointer;
-            font-size: 16px;
-        }
-
-        .button-container button:hover {
-            background-color: #0056b3;
-        }
-
-        #additional-details {
-            display: none;
-            margin-top: 20px;
-        }
-
-        form {
-            display: flex;
-            flex-direction: column;
-            gap: 15px;
-        }
-
-        label {
-            font-weight: bold;
-            color: #333;
-        }
-
-        input[type="text"] {
-            width: 100%;
-            padding: 10px;
-            border: 1px solid #ddd;
-            border-radius: 5px;
-            font-size: 16px;
-        }
-
-        input[type="submit"] {
-            background-color: #28a745;
-            color: #ffffff;
-            border: none;
-            padding: 10px 20px;
-            border-radius: 5px;
-            cursor: pointer;
-            font-size: 16px;
-        }
-
-        input[type="submit"]:hover {
-            background-color: #218838;
-        }
-
-        .success {
-            color: green;
-            text-align: center;
-        }
-
-        .error {
-            color: red;
-            text-align: center;
-        }
-
-        @media (max-width: 768px) {
-            .container {
-                margin: 20px;
-                padding: 15px;
-            }
-
-            h1 {
-                font-size: 24px;
-            }
-
-            .profile-info p {
-                font-size: 14px;
-            }
-
-            input[type="submit"],
-            .button-container button {
-                font-size: 14px;
-                padding: 8px 16px;
-            }
-        }
-    </style>
-    <script>
-        function toggleAdditionalDetails() {
-            const additionalDetails = document.getElementById('additional-details');
-            additionalDetails.style.display = additionalDetails.style.display === 'none' ? 'block' : 'none';
-        }
-    </script>
+    <script src="https://cdn.tailwindcss.com"></script>
 </head>
+<body class="bg-gray-100">
+    <div class="flex">
+        <!-- Sidebar -->
+        <!-- <div class="w-1/4 bg-blue-800 text-white min-h-screen p-6">
+            <h2 class="text-2xl font-bold mb-8">User Dashboard</h2>
+            <ul>
+                <li><a href="#" class="block py-2 px-4 hover:bg-blue-700 rounded">Profile</a></li>
+                <li><a href="#" class="block py-2 px-4 hover:bg-blue-700 rounded">Settings</a></li>
+                <li><a href="#" class="block py-2 px-4 hover:bg-blue-700 rounded">Logout</a></li>
+            </ul>
+        </div> -->
 
-<body>
-    <div class="container">
-        <h1>User Profile</h1>
-        <div class="profile-info">
-            <p><span>Email:</span> <?php echo htmlspecialchars($email); ?></p>
-            <p><span>Username:</span> <?php echo htmlspecialchars($username); ?></p>
-            <p><span>Role:</span> <?php echo htmlspecialchars($role); ?></p>
-            <p><span>Created At:</span> <?php echo htmlspecialchars($created_at); ?></p>
-            <p><span>Is Active:</span> <?php echo htmlspecialchars($is_active ? 'Yes' : 'No'); ?></p>
-            <p><span>Father's Name:</span> <?php echo htmlspecialchars($father_name); ?></p>
-            <p><span>Phone Number:</span> <?php echo htmlspecialchars($phone_number); ?></p>
-            <p><span>Emergency Contact:</span> <?php echo htmlspecialchars($emergency_contact); ?></p>
+        <!-- Main Content -->
+        <div class="w-3/4 p-8">
+            <div class="bg-white rounded-lg shadow-lg p-6">
+                <h1 class="text-3xl font-semibold text-gray-800 mb-6">User Profile</h1>
+                
+                <div class="flex items-center mb-6">
+                    <div class="w-32 h-32 rounded-full overflow-hidden">
+                        <?php if ($profile_image): ?>
+                            <img src="uploads/profile_images/<?php echo htmlspecialchars($profile_image); ?>" alt="Profile Image" class="w-full h-full object-cover">
+                        <?php else: ?>
+                            <div class="w-full h-full bg-gray-300 flex items-center justify-center text-white text-xl">No Image</div>
+                        <?php endif; ?>
+                    </div>
+                    <div class="ml-6">
+                        <p class="text-xl text-gray-800"><strong>Email:</strong> <?php echo htmlspecialchars($email); ?></p>
+                        <p class="text-xl text-gray-800"><strong>Username:</strong> <?php echo htmlspecialchars($username); ?></p>
+                        <p class="text-xl text-gray-800"><strong>Role:</strong> <?php echo htmlspecialchars($role); ?></p>
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-2 gap-6">
+                    <div>
+                        <p class="text-lg text-gray-600"><strong>Created At:</strong> <?php echo htmlspecialchars($created_at); ?></p>
+                        <p class="text-lg text-gray-600"><strong>Status:</strong> <?php echo htmlspecialchars($is_active ? 'Active' : 'Inactive'); ?></p>
+                    </div>
+                    <div>
+                        <p class="text-lg text-gray-600"><strong>Father's Name:</strong> <?php echo htmlspecialchars($father_name); ?></p>
+                        <p class="text-lg text-gray-600"><strong>Phone Number:</strong> <?php echo htmlspecialchars($phone_number); ?></p>
+                        <p class="text-lg text-gray-600"><strong>Emergency Contact:</strong> <?php echo htmlspecialchars($emergency_contact); ?></p>
+                    </div>
+                </div>
+
+                <button onclick="document.getElementById('additional-details').classList.toggle('hidden')" class="w-full bg-blue-500 text-white py-2 rounded-md mt-6 hover:bg-blue-600">Edit Profile</button>
+
+                <div id="additional-details" class="hidden mt-6">
+                    <form method="POST" enctype="multipart/form-data">
+                        <div class="space-y-4">
+                            <div>
+                                <label for="father_name" class="block text-gray-700">Father's Name</label>
+                                <input type="text" id="father_name" name="father_name" value="<?php echo htmlspecialchars($father_name); ?>" class="w-full p-3 border border-gray-300 rounded-md" required>
+                            </div>
+                            <div>
+                                <label for="phone_number" class="block text-gray-700">Phone Number</label>
+                                <input type="text" id="phone_number" name="phone_number" value="<?php echo htmlspecialchars($phone_number); ?>" class="w-full p-3 border border-gray-300 rounded-md" required>
+                            </div>
+                            <div>
+                                <label for="emergency_contact" class="block text-gray-700">Emergency Contact</label>
+                                <input type="text" id="emergency_contact" name="emergency_contact" value="<?php echo htmlspecialchars($emergency_contact); ?>" class="w-full p-3 border border-gray-300 rounded-md" required>
+                            </div>
+                            <div>
+                                <label for="profile_image" class="block text-gray-700">Profile Image</label>
+                                <input type="file" id="profile_image" name="profile_image" class="w-full p-3 border border-gray-300 rounded-md">
+                            </div>
+                            <div>
+                                <input type="submit" value="Save Changes" class="w-full bg-green-500 text-white py-2 rounded-md hover:bg-green-600">
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
         </div>
-
-        <div class="button-container">
-            <button onclick="toggleAdditionalDetails()">Edit Additional Details</button>
-        </div>
-
-        <div id="additional-details">
-            <form method="POST" enctype="multipart/form-data">
-                <!-- <div class="profile-image-container">
-                    <?php if ($profile_image): ?>
-                        <img src="uploads/profile_images/<?php echo htmlspecialchars($profile_image); ?>" alt="Profile Image">
-                    <?php else: ?>
-                        <p>No profile image uploaded.</p>
-                    <?php endif; ?>
-                </div> -->
-
-                <label for="father_name">Father's Name:</label>
-                <input type="text" id="father_name" name="father_name" value="<?php echo htmlspecialchars($father_name); ?>" required>
-
-                <label for="phone_number">Phone Number:</label>
-                <input type="text" id="phone_number" name="phone_number" value="<?php echo htmlspecialchars($phone_number); ?>" required>
-
-                <label for="emergency_contact">Emergency Contact:</label>
-                <input type="text" id="emergency_contact" name="emergency_contact" value="<?php echo htmlspecialchars($emergency_contact); ?>" required>
-
-                <label for="profile_image">Profile Image:</label>
-                <input type="file" class="profile-info" name="profile_image" accept="image/*">
-                <small id="dimensionError" style="color: red;"></small>
-
-                <input type="submit" value="Save Details">
-            </form>
-        </div>
-
     </div>
 </body>
-
 </html>
+
+<?php
+$conn->close();
+?>

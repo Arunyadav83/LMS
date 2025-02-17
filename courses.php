@@ -60,16 +60,18 @@ $razorpayKey = 'rzp_test_Bvq9kiuaq8gkcs';
 
     <div class="container mx-auto px-4 py-8">
         <!-- Search Bar -->
-        <div class="max-w-xl mx-auto mb-8">
+      <!-- Enhanced Search Bar -->
+      <div class="max-w-xl mx-auto mb-8">
             <div class="relative">
                 <input
                     type="text"
                     id="searchInput"
-                    placeholder="Search courses..."
-                    class="w-full px-4 py-3 rounded-lg border border-gray-200 focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none shadow-sm text-base" style="
-    margin-top: 34px;
-">
-                <button class="absolute right-3 top-1/2 -translate-y-1/2">
+                    placeholder="Search courses by title or description..."
+                    class="w-full px-4 py-3 rounded-lg border border-gray-200 focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none shadow-sm text-base"
+                    style="margin-top: 34px;"
+                    oninput="performSearch()"
+                >
+                <button class="absolute right-3 top-1/2 -translate-y-1/2" onclick="performSearch()">
                     <i class="fas fa-search text-gray-400 text-lg"></i>
                 </button>
             </div>
@@ -385,9 +387,66 @@ $razorpayKey = 'rzp_test_Bvq9kiuaq8gkcs';
                 }
             });
         }
+
+        function performSearch() {
+                const searchInput = document.getElementById('searchInput');
+                const searchTerm = searchInput.value.toLowerCase().trim();
+                const courseCards = document.querySelectorAll('.card');
+                let hasResults = false;
+
+                courseCards.forEach(card => {
+                    const title = card.querySelector('h3').textContent.toLowerCase();
+                    const description = card.querySelector('p').textContent.toLowerCase();
+                    
+                    if (searchTerm === '' || title.includes(searchTerm) || description.includes(searchTerm)) {
+                        card.style.display = 'block';
+                        card.style.opacity = '1';
+                        hasResults = true;
+                    } else {
+                        card.style.opacity = '0';
+                        setTimeout(() => {
+                            card.style.display = 'none';
+                        }, 300); // Match this with the CSS transition time
+                    }
+                });
+
+                // Show no results message if needed
+                if (!hasResults && searchTerm !== '') {
+                    Swal.fire({
+                        title: 'No Results Found',
+                        text: 'Try different keywords or browse all courses',
+                        icon: 'info',
+                        confirmButtonText: 'OK',
+                        confirmButtonColor: '#3B82F6',
+                        showClass: {
+                            popup: 'animate__animated animate__fadeIn'
+                        }
+                    });
+                }
+
+                // Update URL with search parameter (optional)
+                const urlParams = new URLSearchParams(window.location.search);
+                if (searchTerm) {
+                    urlParams.set('search', searchTerm);
+                } else {
+                    urlParams.delete('search');
+                }
+                window.history.replaceState({}, '', `${window.location.pathname}?${urlParams}`);
+            }
+
+            // Execute search on page load if URL contains search parameter
+            document.addEventListener('DOMContentLoaded', () => {
+                const urlParams = new URLSearchParams(window.location.search);
+                const searchTerm = urlParams.get('search');
+                if (searchTerm) {
+                    const searchInput = document.getElementById('searchInput');
+                    searchInput.value = searchTerm;
+                    performSearch();
+                }
+            });
     </script>
 </body>
-
+ 
 </html>
 
 <?php include 'footer.php'; ?>

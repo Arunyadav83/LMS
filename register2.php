@@ -1,3 +1,4 @@
+
 <?php
 require_once 'config.php';
 require_once 'functions.php';
@@ -81,6 +82,20 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
 include 'header.php';
 ?>
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Learning Management System</title>
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Font Awesome CSS -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.1.1/css/all.min.css">
+    <link rel="stylesheet" href="styles.css">
+    <link rel="icon" type="image/x-icon" href="assets/images/apple-touch-icon.png">
+</head>
 <style>
     body {
         min-height: 100vh;
@@ -88,9 +103,9 @@ include 'header.php';
         padding: 0;
         /* display: flex; */
         align-items: center;
-        margin-left: 148px;
+        /* margin-left: 148px; */
         margin-top: 34px;
-        overflow: hidden;
+        /* overflow: hidden; */
         justify-content: center;
         font-family: 'Segoe UI', sans-serif;
         background: linear-gradient(135deg, #45B5AA, #367c76);
@@ -100,14 +115,15 @@ include 'header.php';
         display: flex;
         flex-direction: row;
         align-items: center;
+        align-self: center;
         background-color: #fff;
         border-radius: 15px;
         box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
         overflow: hidden;
-        max-width: 1200px;
+        max-width: 1000px;
         width: 90%;
-        margin-top: 100px;
-        /* overflow: hidden; */
+        margin-top: 89px;
+        
     }
 
     .form-section {
@@ -238,59 +254,71 @@ include 'header.php';
     .mt-3 a:hover {
         color: #367c76;
     }
-
-    @media (max-width: 768px) {
-        .form-container {
-            flex-direction: column;
-            width: 100%;
-            border-radius: 0;
-        }
-
-        .image-section {
-            order: -1;
-            padding: 20px;
-        }
-
-        .form-section {
-            padding: 20px;
-        }
-
-        .form-row {
-            flex-direction: column;
-            gap: 10px;
-        }
-
-        .form-heading h2 {
-            font-size: 1.8rem;
-        }
-
-        .btn-primary {
-            padding: 12px;
-            font-size: 1rem;
-        }
+/* Responsive Design */
+@media (max-width: 768px) {
+    .form-container {
+        flex-direction: column;
+        width: 100%;
+        border-radius: 0;
+        padding: 20px;
+    }
+   
+    .image-section {
+        order: -1; /* Moves image above the form */
+        padding: 10px;
     }
 
-    @media (max-width: 480px) {
-        .form-heading h2 {
-            font-size: 1.5rem;
-        }
-
-        .form-control {
-            padding: 10px;
-            font-size: 0.9rem;
-        }
-
-        .btn-primary {
-            padding: 10px;
-            font-size: 0.95rem;
-        }
-
-        .alert {
-            padding: 10px;
-            font-size: 0.9rem;
-        }
+    .form-section {
+        padding: 10px;
+        width: 100%;
     }
+
+    .form-row {
+        flex-direction: column;
+        gap: 10px;
+    }
+
+    .form-heading h2 {
+        font-size: 1.8rem;
+    }
+
+    .btn-primary {
+        padding: 12px;
+        font-size: 1rem;
+    }
+}
+
+@media (max-width: 480px) {
+    .form-heading h2 {
+        font-size: 1.5rem;
+    }
+
+    .form-control {
+        padding: 10px;
+        font-size: 0.9rem;
+    }
+
+    .btn-primary {
+        padding: 10px;
+        font-size: 0.95rem;
+    }
+
+    .alert {
+        padding: 10px;
+        font-size: 0.9rem;
+    }
+    .container{
+        overflow-x: hidden;
+        width: 100%;
+    }
+
+
+}
 </style>
+<body>
+    
+
+<div class="container">
 
 <div class="form-container">
     <div class="form-section">
@@ -343,11 +371,16 @@ include 'header.php';
     </div>
 </div>
 
+</div>
+<?php include 'footer.php'; ?>
+
 <!-- Bootstrap JS -->
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
 
 <!-- SweetAlert2 -->
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+
 
 <script>
     document.addEventListener("DOMContentLoaded", function() {
@@ -374,3 +407,7 @@ include 'header.php';
         <?php endif; ?>
     });
 </script>
+
+
+    
+</body>

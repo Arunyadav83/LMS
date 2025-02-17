@@ -211,7 +211,7 @@ $course_titles = mysqli_fetch_all($result, MYSQLI_ASSOC);
             margin-bottom: 20px;
         }
 
-        
+
 
         .add-course-form {
             background-color: #00CED1;
@@ -239,6 +239,7 @@ $course_titles = mysqli_fetch_all($result, MYSQLI_ASSOC);
             background-color: rgb(244, 244, 255);
         }
 
+
         .card:hover {
             transform: scale(1.03);
             box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
@@ -253,7 +254,7 @@ $course_titles = mysqli_fetch_all($result, MYSQLI_ASSOC);
 
         .card-body {
             padding: 1rem;
-            background-color: white;
+            /* background-color: white; */
         }
 
 
@@ -273,7 +274,7 @@ $course_titles = mysqli_fetch_all($result, MYSQLI_ASSOC);
         .card-body {
             padding: 1.2rem;
             box-shadow: 0px 2px lightblue 0.8px;
-            background-color: rgb(255, 255, 255);
+            /* background-color: rgb(255, 255, 255); */
             ;
 
         }
@@ -374,6 +375,7 @@ $course_titles = mysqli_fetch_all($result, MYSQLI_ASSOC);
                 width: 100%;
 
             }
+           
         }
 
         /* Kebab Menu Styles */
@@ -387,6 +389,9 @@ $course_titles = mysqli_fetch_all($result, MYSQLI_ASSOC);
             border: none;
             cursor: pointer;
             padding: 5px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
         }
 
         .kebab-dot {
@@ -404,8 +409,9 @@ $course_titles = mysqli_fetch_all($result, MYSQLI_ASSOC);
             right: 0;
             background-color: white;
             border: 1px solid #ccc;
-            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
-            z-index: 1001;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+            z-index: 10;
+            padding: 5px;
             /* Ensure it's above other elements */
         }
 
@@ -414,12 +420,6 @@ $course_titles = mysqli_fetch_all($result, MYSQLI_ASSOC);
             /* Show when active */
         }
 
-        .popup-menu a {
-            display: block;
-            padding: 8px 16px;
-            text-decoration: none;
-            color: #333;
-        }
 
         /* .table_list {
             position: relative;
@@ -427,6 +427,9 @@ $course_titles = mysqli_fetch_all($result, MYSQLI_ASSOC);
             overflow: visible;
             
         } */
+         .image{
+           width: 350px; height: 242px; object-fit: cover;
+         }
 
         .popup-menu a:hover {
             background-color: #f5f5f5;
@@ -442,6 +445,7 @@ $course_titles = mysqli_fetch_all($result, MYSQLI_ASSOC);
         .popup-menu a:hover {
             background-color: #f5f5f5;
         }
+
     </style>
 </head>
 
@@ -526,7 +530,7 @@ $course_titles = mysqli_fetch_all($result, MYSQLI_ASSOC);
                                     <tr>
                                         <th>ID</th>
                                         <th>Title</th>
-                                        <th>Description</th> 
+                                        <th>Description</th>
                                         <th>Tutor</th>
                                         <th>Actions</th>
                                     </tr>
@@ -576,6 +580,7 @@ $course_titles = mysqli_fetch_all($result, MYSQLI_ASSOC);
                                                 <div class="kebab-dot"></div>
                                             </button>
                                             <div class="popup-menu">
+                                                <!-- Edit Button -->
                                                 <a href="#" onclick="editCourse(<?php echo $course['id']; ?>)">Edit</a>
                                                 <a href="#" onclick="deleteCourse(<?php echo $course['id']; ?>)">Delete</a>
                                             </div>
@@ -586,7 +591,7 @@ $course_titles = mysqli_fetch_all($result, MYSQLI_ASSOC);
                                             src="../assets/images/<?php echo htmlspecialchars($course['title']); ?>.jpg"
                                             alt="<?php echo htmlspecialchars($course['title']); ?>"
                                             class="rounded"
-                                            style="width: 100px; height: 100px; object-fit: contain; margin-bottom: 10px;" />
+                                            class="image" />
 
                                         <!-- Title with Buttons on Same Line -->
                                         <div class="d-flex justify-content-between align-items-center mb-3" style="margin-top: 34px;">
@@ -685,32 +690,32 @@ $course_titles = mysqli_fetch_all($result, MYSQLI_ASSOC);
         });
 
         function confirmDelete(id) {
-    Swal.fire({
-        title: "Are you sure?",
-        text: "You won't be able to revert this!",
-        icon: "warning",
-        showCancelButton: true,
-        confirmButtonColor: "#3085d6",
-        cancelButtonColor: "#d33",
-        confirmButtonText: "Yes, delete it!"
-    }).then((result) => {
-        if (result.isConfirmed) {
-            // Submit the form using JavaScript
-            const form = document.createElement("form");
-            form.method = "POST";
-            form.action = ""; // Current page
+            Swal.fire({
+                title: "Are you sure?",
+                text: "You won't be able to revert this!",
+                icon: "warning",
+                showCancelButton: true,
+                confirmButtonColor: "#3085d6",
+                cancelButtonColor: "#d33",
+                confirmButtonText: "Yes, delete it!"
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    // Submit the form using JavaScript
+                    const form = document.createElement("form");
+                    form.method = "POST";
+                    form.action = ""; // Current page
 
-            const input = document.createElement("input");
-            input.type = "hidden";
-            input.name = "delete_course";
-            input.value = id;
+                    const input = document.createElement("input");
+                    input.type = "hidden";
+                    input.name = "delete_course";
+                    input.value = id;
 
-            form.appendChild(input);
-            document.body.appendChild(form);
-            form.submit();
+                    form.appendChild(input);
+                    document.body.appendChild(form);
+                    form.submit();
+                }
+            });
         }
-    });
-}
 
         // Ensure SweetAlert is properly initialized
         document.addEventListener('DOMContentLoaded', function() {
@@ -737,6 +742,18 @@ $course_titles = mysqli_fetch_all($result, MYSQLI_ASSOC);
                 }
             });
         });
+        function editCourse(courseId) {
+    // Find the modal by ID and show it
+    var modalId = '#editCourse' + courseId;
+    var modal = document.querySelector(modalId);
+    if (modal) {
+        var bootstrapModal = new bootstrap.Modal(modal);
+        bootstrapModal.show();
+    } else {
+        console.error("Modal not found for course ID:", courseId);
+    }
+}
+
     </script>
 </body>
 

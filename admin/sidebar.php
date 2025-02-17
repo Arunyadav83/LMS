@@ -13,28 +13,36 @@
             font-family: var(--bs-body-font-family);
             font-size: var(--bs-body-font-size);
         }
+/* Updated Header Styles */
+.header {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 70px;
+    background: #1a69a5;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0 20px;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+    z-index: 9999; /* Increased z-index to stay on top */
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    font-family: var(--bs-body-font-family);
+    font-size: var(--bs-body-font-size);
+}
 
-        /* Header Styles */
-        .header {
-            position: fixed;
-            top: 0;
-            left: 0;
-            right: 0;
-            height: 70px;
-           
-            background:#1a69a5;
-  
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 0 20px;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
-            z-index: 1000;
-            backdrop-filter: blur(8px);
-            -webkit-backdrop-filter: blur(8px);
-            font-family: var(--bs-body-font-family);
-            font-size: var(--bs-body-font-size);
-        }
+/* Ensure other elements are below the header */
+body {
+    padding-top: 0px; /* Add padding to prevent content overlap */
+}
+
+.some-buttons {
+    z-index: 100; /* Lower than header */
+    position: relative; /* Prevents floating over header */
+}
+
 
         .logo {
             width: 120px;
@@ -303,7 +311,7 @@
             display: none;
             background: none;
             border: none;
-            color: #2674b7;
+            color:rgb(253, 253, 253);
             font-size: 24px;
             cursor: pointer;
             padding: 8px 12px;

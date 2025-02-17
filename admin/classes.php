@@ -138,7 +138,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['add_class'])) {
     $course_id = (int)$_POST['course_id'];
     $class_name = mysqli_real_escape_string($conn, $_POST['class_name']);
     $description = mysqli_real_escape_string($conn, $_POST['description']);
-    
+
     // Handle video upload
     $video_path = '';
     if (isset($_FILES['class_video']) && $_FILES['class_video']['error'] == 0) {
@@ -158,7 +158,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['add_class'])) {
         $target_dir = "../assets/images/";
         $file_name = str_replace(' ', '', $class_name) . '.jpg';
         $target_file = $target_dir . $file_name;
-        
+
         if (move_uploaded_file($_FILES['class_thumbnail']['tmp_name'], $target_file)) {
             $thumbnail_path = $file_name;  // Save filename to insert into the database
         } else {
@@ -199,7 +199,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['add_class'])) {
 
                 if (mysqli_stmt_execute($stmt)) {
                     $question_id = mysqli_insert_id($conn);  // Get the inserted question ID
-                    
+
                     // Insert answers if provided
                     if (isset($_POST['answers'][$index]) && isset($_POST['feedback'][$index])) {
                         foreach ($_POST['answers'][$index] as $answer_index => $answer) {
@@ -307,12 +307,12 @@ $classes = mysqli_fetch_all($result, MYSQLI_ASSOC);
     }
 
     @media (max-width: 768px) {
-            .table_list {
-                overflow-x: auto;
-                width: 100%;
+        .table_list {
+            overflow-x: auto;
+            width: 100%;
 
-            }
         }
+    }
 
     .btn-primary {
         margin-right: 36%;
@@ -410,6 +410,54 @@ $classes = mysqli_fetch_all($result, MYSQLI_ASSOC);
         background-color: #0433c3;
         border-radius: 30px;
     }
+    .kebab-menu {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    display: inline-block;
+}
+
+.kebab-button {
+    background: none;
+    border: none;
+    cursor: pointer;
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
+}
+
+.kebab-dot {
+    width: 5px;
+    height: 5px;
+    background-color: black;
+    border-radius: 50%;
+}
+
+.popup-menu {
+    display: none;
+    position: absolute;
+    top: 25px;
+    right: 0;
+    background: white;
+    border-radius: 5px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+    z-index: 10;
+    padding: 5px 0;
+    min-width: 120px;
+}
+
+.popup-menu a {
+    display: block;
+    padding: 8px 10px;
+    text-decoration: none;
+    color: black;
+    font-size: 14px;
+}
+
+.popup-menu a:hover {
+    background: #f5f5f5;
+}
+
 </style>
 <script>
     document.getElementById('addQuestion').addEventListener('click', function() {
@@ -556,53 +604,62 @@ $classes = mysqli_fetch_all($result, MYSQLI_ASSOC);
                     <p>You haven't created any classes yet.</p>
                 </div>
             <?php else: ?>
-
                 <div class="table_list">
-                <table class="table table-striped table-hover custom-table">
-                    <thead>
-                        <tr>
-                            <th>Course</th>
-                            <th>Class Name</th>
-                            <th>Description</th>
-                            <th>Video</th>
-                            <th>Online Class</th>
-                            <th>Actions</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <?php foreach ($classes as $class): ?>
+                    <table class="table table-striped table-hover custom-table">
+                        <thead>
                             <tr>
-                                <td><?php echo htmlspecialchars($class['course_title']); ?></td>
-                                <td><?php echo htmlspecialchars($class['class_name']); ?></td>
-                                <td>
-                                    <span class="text-truncate d-inline-block" style="max-width: 150px;" title="<?php echo htmlspecialchars($class['description']); ?>">
-                                        <?php echo htmlspecialchars($class['description']); ?>
-                                    </span>
-                                </td>
-                                <td>
-                                    <?php if (!empty($class['video_path'])): ?>
-                                        <a href="<?php echo $class['video_path']; ?>" target="_blank" class="btn btn-sm btn-success btn-custom">View Video</a>
-                                    <?php else: ?>
-                                        <span class="badge bg-secondary">N/A</span>
-                                    <?php endif; ?>
-                                </td>
-                                <td>
-                                    <?php if ($class['is_online']): ?>
-                                        <span class="badge bg-primary">Yes</span><br>
-                                        <small><?php echo htmlspecialchars($class['schedule_time']); ?></small>
-                                    <?php else: ?>
-                                        <span class="badge bg-danger">No</span>
-                                    <?php endif; ?>
-                                </td>
-                                <td class="d-flex justify-content-center">
-                                    <a href="edit_class.php?id=<?php echo $class['id']; ?>" class="btn btn-sm btn-primary btn-custom me-2">Edit</a>
-                                    <a href="view_quiz.php?class_id=<?php echo $class['id']; ?>" class="btn btn-sm btn-info btn-custom me-2">View Quiz</a>
-                                    <button class="btn btn-sm btn-danger btn-custom" onclick="confirmDelete(<?php echo $class['id']; ?>)">Delete</button>
-                                </td>
+                                <th>Course</th>
+                                <th>Class Name</th>
+                                <th>Description</th>
+                                <th>Video</th>
+                                <th>Online Class</th>
+                                <th>Actions</th>
                             </tr>
-                        <?php endforeach; ?>
-                    </tbody>
-                </table>
+                        </thead>
+                        <tbody>
+                            <?php foreach ($classes as $class): ?>
+                                <tr>
+                                    <td><?php echo htmlspecialchars($class['course_title']); ?></td>
+                                    <td><?php echo htmlspecialchars($class['class_name']); ?></td>
+                                    <td>
+                                        <span class="text-truncate d-inline-block" style="max-width: 150px;" title="<?php echo htmlspecialchars($class['description']); ?>">
+                                            <?php echo htmlspecialchars($class['description']); ?>
+                                        </span>
+                                    </td>
+                                    <td>
+                                        <?php if (!empty($class['video_path'])): ?>
+                                            <a href="<?php echo $class['video_path']; ?>" target="_blank" class="btn btn-sm btn-success btn-custom">View Video</a>
+                                        <?php else: ?>
+                                            <span class="badge bg-secondary">N/A</span>
+                                        <?php endif; ?>
+                                    </td>
+                                    <td>
+                                        <?php if ($class['is_online']): ?>
+                                            <span class="badge bg-primary">Yes</span><br>
+                                            <small><?php echo htmlspecialchars($class['schedule_time']); ?></small>
+                                        <?php else: ?>
+                                            <span class="badge bg-danger">No</span>
+                                        <?php endif; ?>
+                                    </td>
+                                    <td class="position-relative">
+                                        <!-- Kebab Menu -->
+                                        <div class="kebab-menu">
+                                            <button class="kebab-button" onclick="toggleMenu(this)">
+                                                <div class="kebab-dot"></div>
+                                                <div class="kebab-dot"></div>
+                                                <div class="kebab-dot"></div>
+                                            </button>
+                                            <div class="popup-menu">
+                                                <a href="#" onclick="editCourse(<?php echo $class['id']; ?>)">Edit</a>
+                                                <a href="#" onclick="deleteCourse(<?php echo $class['id']; ?>)">Delete</a>
+                                                <a href="#" onclick="viewQuiz(<?php echo $class['id']; ?>)">View Quiz</a>
+                                            </div>
+                                        </div>
+                                    </td>
+                                </tr>
+                            <?php endforeach; ?>
+                        </tbody>
+                    </table>
                 </div>
             <?php endif; ?>
         </div>
@@ -632,6 +689,37 @@ $classes = mysqli_fetch_all($result, MYSQLI_ASSOC);
                     details.style.display = "none";
                 }
             });
+
+            function toggleMenu(button) {
+                let menu = button.nextElementSibling;
+                let allMenus = document.querySelectorAll(".popup-menu");
+
+                allMenus.forEach(m => {
+                    if (m !== menu) m.style.display = "none";
+                });
+
+                menu.style.display = menu.style.display === "block" ? "none" : "block";
+            }
+
+            document.addEventListener("click", function(event) {
+                if (!event.target.closest(".kebab-menu")) {
+                    document.querySelectorAll(".popup-menu").forEach(menu => menu.style.display = "none");
+                }
+            });
+
+            function editCourse(id) {
+                window.location.href = `edit_class.php?id=${id}`;
+            }
+
+            function deleteCourse(id) {
+                if (confirm("Are you sure you want to delete this class?")) {
+                    window.location.href = `delete_class.php?id=${id}`;
+                }
+            }
+
+            function viewQuiz(id) {
+                window.location.href = `view_quiz.php?class_id=${id}`;
+            }
         </script>
 
         <?php
@@ -671,57 +759,40 @@ $classes = mysqli_fetch_all($result, MYSQLI_ASSOC);
     <?php else: ?>
         <?php foreach ($classes as $class): ?>
             <div class="col">
-                <div class="card h-100">
-                    <div class="card-body">
-                        <h5 class="card-title"><?php echo htmlspecialchars($class['class_name']); ?></h5>
-                        <!-- Shortened description -->
-                        <p class="card-text">
-                            <?php echo htmlspecialchars(substr($class['description'], 0, 100)); ?>
-                            <?php if (strlen($class['description']) > 100): ?>
-                                <span>...</span>
-                                <button
-                                    class="btn btn-link text-primary p-0"
-                                    data-bs-toggle="modal"
-                                    data-bs-target="#descriptionModal<?php echo $class['id']; ?>">
-                                    Read More
-                                </button>
-                            <?php endif; ?>
-                        </p>
-                        <p><strong>Course:</strong> <?php echo htmlspecialchars($class['course_title']); ?></p>
-                        <p><strong>Online Class:</strong> <?php echo $class['is_online'] ? 'Yes - ' . htmlspecialchars($class['schedule_time']) : 'No'; ?></p>
-                        <?php if (!empty($class['video_path'])): ?>
-                            <button
-                                class="btn btn-info btn-sm mb-2"
-                                data-bs-toggle="modal"
-                                data-bs-target="#videoModal"
-                                onclick="playVideo('<?php echo htmlspecialchars($class['video_path']); ?>')">
-                                View Video
-                            </button>
-                        <?php endif; ?>
-
-                        <div class="d-flex justify-content-start">
-                            <a href="edit_class.php?id=<?php echo $class['id']; ?>" class="btn btn-sm btn-primary me-2">Edit</a>
-                            <a href="view_quiz.php?class_id=<?php echo $class['id']; ?>" class="btn btn-sm btn-info me-2">View Quiz</a>
-                            <a href="delete_class.php?id=<?php echo $class['id']; ?>" class="btn btn-sm btn-danger" onclick="return confirm('Are you sure you want to delete this class?');">Delete</a>
+                <div class="card h-100 position-relative">
+                    <!-- Kebab Menu (Three Dots) -->
+                    <div class="kebab-menu">
+                        <button class="kebab-button" onclick="toggleMenu(this)">
+                            <div class="kebab-dot"></div>
+                            <div class="kebab-dot"></div>
+                            <div class="kebab-dot"></div>
+                        </button>
+                        <div class="popup-menu">
+                            <a href="#" onclick="editCourse(<?php echo $class['id']; ?>)">Edit</a>
+                            <a href="#" onclick="deleteCourse(<?php echo $class['id']; ?>)">Delete</a>
+                            <a href="#" onclick="viewQuiz(<?php echo $class['id']; ?>)">View Quiz</a>
                         </div>
                     </div>
-                </div>
-            </div>
 
-            <!-- Modal for showing full description -->
-            <div class="modal fade" id="descriptionModal<?php echo $class['id']; ?>" tabindex="-1" aria-labelledby="descriptionModalLabel<?php echo $class['id']; ?>" aria-hidden="true">
-                <div class="modal-dialog">
-                    <div class="modal-content">
-                        <div class="modal-header">
-                            <h5 class="modal-title" id="descriptionModalLabel<?php echo $class['id']; ?>">Class Description</h5>
-                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                        </div>
-                        <div class="modal-body">
-                            <?php echo htmlspecialchars($class['description']); ?>
-                        </div>
-                        <div class="modal-footer">
-                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                        </div>
+                    <!-- Course Image as Full Background -->
+                    <img src="../assets/images/<?php echo htmlspecialchars($class['course_title']); ?>.jpg"
+                        class="card-img-top"
+                        alt="<?php echo htmlspecialchars($class['course_title']); ?>"
+                        style="height: 200px; object-fit: cover;">
+
+                    <div class="card-body">
+                        <h5 class="card-title"><?php echo htmlspecialchars($class['class_name']); ?></h5>
+                        <p><strong>Course:</strong> <?php echo htmlspecialchars($class['course_title']); ?></p>
+                        <p><strong>Online Class:</strong> <?php echo $class['is_online'] ? 'Yes - ' . htmlspecialchars($class['schedule_time']) : 'No'; ?></p>
+
+                        <?php 
+                        $fullDescription = htmlspecialchars($class['description']);
+                        $shortDescription = (strlen($fullDescription) > 100) ? substr($fullDescription, 0, 100) . '...' : $fullDescription;
+                        ?>
+                        <p><strong>Description:</strong> <?php echo $shortDescription; ?></p>
+                        <?php if (strlen($fullDescription) > 100): ?>
+                            <button class="btn btn-link" onclick="openModal('<?php echo addslashes($fullDescription); ?>')">Read More</button>
+                        <?php endif; ?>
                     </div>
                 </div>
             </div>
@@ -730,7 +801,32 @@ $classes = mysqli_fetch_all($result, MYSQLI_ASSOC);
 </div>
 
 
-        
+<div id="descriptionModal" class="modal fade" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Full Description</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <p id="modalDescription"></p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+function openModal(description) {
+    document.getElementById('modalDescription').innerText = description;
+    var myModal = new bootstrap.Modal(document.getElementById('descriptionModal'));
+    myModal.show();
+}
+</script>
+
+
+
+
+
 
 
         <!-- Video Modal -->

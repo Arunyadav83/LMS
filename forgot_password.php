@@ -75,113 +75,181 @@ function sendOtpEmail($email, $otp) {
 }
 ?>
 
-<style>
-     body {
-        margin: 0;
-        padding: 0;
-        font-family: Arial, sans-serif;
-        background: linear-gradient(120deg, #84fab0, #8fd3f4);
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        height: 100vh;
-    }
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Forgot Password</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: 'Inter', sans-serif;
+            background: linear-gradient(135deg, #fdfcfb 0%, #e2d1c3 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
 
-    .container {
-        background-color: white;
-        border-radius: 10px;
-        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
-        padding: 30px;
-        width: 100%;
-        max-width: 400px;
-        text-align: center;
-    }
+        .container {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-radius: 16px;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 
+                        0 2px 4px -1px rgba(0, 0, 0, 0.06);
+            padding: 2rem;
+            width: 90%;
+            max-width: 400px;
+            transition: transform 0.2s;
+        }
 
-    h2 {
-        color: #333;
-        margin-bottom: 20px;
-    }
+        .container:hover {
+            transform: translateY(-2px);
+        }
 
-    .form-group {
-        margin-bottom: 15px;
-        text-align: left;
-    }
+        h2 {
+            color: #1a1a1a;
+            font-size: 1.5rem;
+            font-weight: 600;
+            text-align: center;
+            margin-bottom: 1.5rem;
+        }
 
-    .form-group label {
-        display: block;
-        font-weight: bold;
-        margin-bottom: 5px;
-        color: #555;
-    }
+        .form-group {
+            margin-bottom: 1.25rem;
+        }
 
-    .form-group input {
-        width: 100%;
-        padding: 10px;
-        border: 1px solid #ccc;
-        border-radius: 5px;
-        font-size: 16px;
-    }
+        .form-group label {
+            display: block;
+            font-size: 0.875rem;
+            font-weight: 500;
+            color: #374151;
+            margin-bottom: 0.5rem;
+        }
 
-    .btn {
-        background-color: #4caf50;
-        color: white;
-        padding: 10px 20px;
-        border: none;
-        border-radius: 5px;
-        cursor: pointer;
-        font-size: 16px;
-        transition: background-color 0.3s;
-    }
+        .form-group input {
+            width: 100%;
+            padding: 0.75rem 1rem;
+            border: 1px solid #e5e7eb;
+            border-radius: 0.5rem;
+            font-size: 1rem;
+            transition: all 0.2s;
+            outline: none;
+            box-sizing: border-box;
+        }
 
-    .btn:hover {
-        background-color: #45a049;
-    }
+        .form-group input:focus {
+            border-color: #9b87f5;
+            box-shadow: 0 0 0 3px rgba(155, 135, 245, 0.1);
+        }
 
-    .error-message {
-        color: red;
-        margin-top: 10px;
-        font-size: 14px;
-    }
+        .btn {
+            width: 100%;
+            background-color: #9b87f5;
+            color: white;
+            padding: 0.75rem 1.5rem;
+            border: none;
+            border-radius: 0.5rem;
+            font-size: 1rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
 
-    .text-muted {
-        margin-top: 15px;
-        font-size: 14px;
-        color: #777;
-    }
+        .btn:hover {
+            background-color: #8b74f1;
+            transform: translateY(-1px);
+        }
 
-    .text-muted a {
-        color: #4caf50;
-        text-decoration: none;
-    }
+        .btn:active {
+            transform: translateY(0);
+        }
 
-    .text-muted a:hover {
-        text-decoration: underline;
-    }
-</style>
+        .error-message {
+            color: #dc2626;
+            font-size: 0.875rem;
+            margin-top: 0.5rem;
+            text-align: center;
+        }
 
-<div class="container">
-    <h2>Forgot Password</h2>
-    <form action="forgot_password.php" method="post">
-        <div class="form-group">
-            <label for="email">Email</label>
-            <input type="email" id="email" name="email" required>
-        </div>
-        <button type="submit" class="btn">Submit</button>
-    </form>
+        .success-message {
+            color: #059669;
+            font-size: 0.875rem;
+            margin-top: 0.5rem;
+            text-align: center;
+        }
 
-    <?php if ($error): ?>
-        <p class="error-message"> <?php echo $error; ?> </p>
-    <?php endif; ?>
+        .text-muted {
+            color: #6b7280;
+            font-size: 0.875rem;
+            text-align: center;
+            margin-top: 1rem;
+        }
 
-    <?php if (isset($_SESSION['otp_time']) && (time() - $_SESSION['otp_time'] > $otp_validity_time)): ?>
-        <!-- Resend OTP Button -->
+        .text-muted a {
+            color: #9b87f5;
+            text-decoration: none;
+            font-weight: 500;
+        }
+
+        .text-muted a:hover {
+            text-decoration: underline;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .container {
+            animation: fadeIn 0.3s ease-out;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h2>Forgot Password</h2>
         <form action="forgot_password.php" method="post">
-            <button type="submit" name="resend_otp" class="btn">Resend OTP</button>
+            <div class="form-group">
+                <label for="email">Email Address</label>
+                <input 
+                    type="email" 
+                    id="email" 
+                    name="email" 
+                    placeholder="Enter your email"
+                    required
+                >
+            </div>
+            <button type="submit" class="btn">Reset Password</button>
         </form>
-    <?php endif; ?>
 
-    <?php if ($success): ?>
-        <p class="text-muted"><?php echo $success; ?></p>
-    <?php endif; ?>
-</div>
+        <?php if ($error): ?>
+            <p class="error-message"><?php echo $error; ?></p>
+        <?php endif; ?>
 
+        <?php if (isset($_SESSION['otp_time']) && (time() - $_SESSION['otp_time'] > $otp_validity_time)): ?>
+            <form action="forgot_password.php" method="post">
+                <button type="submit" name="resend_otp" class="btn" style="margin-top: 1rem; background-color: #6b7280;">
+                    Resend OTP
+                </button>
+            </form>
+        <?php endif; ?>
+
+        <?php if ($success): ?>
+            <p class="success-message"><?php echo $success; ?></p>
+        <?php endif; ?>
+
+        <p class="text-muted">
+            Remember your password? <a href="login.php">Login here</a>
+        </p>
+    </div>
+</body>
+</html>

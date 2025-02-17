@@ -623,7 +623,7 @@ if ($stmt && mysqli_num_rows($stmt) > 0) {
             <!-- Main Content -->
             <main class="col main-content">
                 <div class="container-fluid">
-                    <h3 class=" fw-bold" style="color:#16308b; margin-bottom:45px; margin:34px">Admin Dashboard</h3>
+                    <h3 class=" fw-bold" style="color:#16308b; margin:84px">Admin Dashboard</h3>
 
                     <!-- Statistics Cards Row -->
                     <div class="row g-4 mb-4">
@@ -839,31 +839,7 @@ if ($stmt && mysqli_num_rows($stmt) > 0) {
                             </table>
                         </div>
                     </div>
-                    <!-- <div class="dashboard">
-                        <div class="title">
-                            <h2>Top Instructors</h2>
-                            <a href="#">View all</a>
-                        </div>
-                        <div class="instructor-list">
-                            <?php if (!empty($instructors)): ?>
-                                <?php foreach ($instructors as $instructor): ?>
-                                    <div class="instructor-card">
-                                        <div class="profile">
-                                            <img src="profile-placeholder.jpg" alt="Profile Picture">
-                                        </div>
-                                        <div class="details">
-                                            <h4>Tutor ID: <?php echo $instructor['tutor_id']; ?></h4>
-                                            <span><?php echo $instructor['total_enrollments']; ?> Enrollments</span>
-                                            <div class="rating">⭐ 4.5/5.0</div> <!-- Replace with actual rating if available -->
-                                        </div>
-                                        <button class="view-btn">View</button>
-                                    </div>
-                                <?php endforeach; ?>
-                            <?php else: ?>
-                                <p>No instructors found.</p>
-                            <?php endif; ?>
-                        </div>
-                    </div> -->
+                
 
 
 
